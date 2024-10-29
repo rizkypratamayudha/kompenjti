@@ -59,5 +59,3 @@ Route::group(['prefix'=>'validasi'], function(){
 });
 
 });
-
-TOPEK GAMTENG
