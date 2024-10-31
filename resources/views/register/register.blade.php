@@ -49,7 +49,7 @@
                         </div>
                     </div>
                     <div class="input-group mb-3">
-                        <input id="username" name="username" type="text" class="form-control" placeholder="Username" required>
+                        <input id="username" name="username" type="number" class="form-control" placeholder="NIM/NIP" required>
                         <div class="input-group-append">
                             <div class="input-group-text">
                                 <span class="fas fa-envelope"></span>
@@ -58,16 +58,16 @@
                     </div>
                     <div class="input-group mb-3">
                         <input id="password" name="password" type="password" class="form-control" placeholder="Password" required>
-                        <div class="input-group-append">
+                        <div class="input-group-append" >
                             <div class="input-group-text">
                                 <span class="fas fa-lock"></span>
                             </div>
                         </div>
                     </div>
                     <div id="additional-fields">
-                        <div class="input-group mb-3" id="email-field" style="display: none;">
+                        <div class="input-group mb-3" id="email-field" style="display: none;" >
                             <input id="email" name="email" type="email" class="form-control"
-                                placeholder="Email">
+                                placeholder="Email" required>
                             <div class="input-group-append">
                                 <div class="input-group-text">
                                     <span class="fas fa-envelope"></span>
@@ -75,9 +75,9 @@
                             </div>
                         </div>
 
-                        <div class="input-group mb-3" id="no-hp-field" style="display: none;">
-                            <input id="no_hp" name="no_hp" type="text" class="form-control"
-                                placeholder="No HP">
+                        <div class="input-group mb-3" id="no-hp-field" style="display: none;" >
+                            <input id="no_hp" name="no_hp" type="number" class="form-control"
+                                placeholder="No HP" required>
                             <div class="input-group-append">
                                 <div class="input-group-text">
                                     <span class="fas fa-phone"></span>
@@ -86,18 +86,22 @@
                         </div>
 
                         <div class="input-group mb-3" id="prodi-field" style="display: none;">
-                            <input id="prodi" name="prodi" type="text" class="form-control"
-                                placeholder="Prodi">
+                            <select class="form-control" id="prodi_id" name="prodi_id" required>
+                                <option value="">- Pilih Prodi -</option>
+                                @foreach ($prodi as $item)
+                                    <option value="{{ $item->prodi_id }}">{{ $item->prodi_nama }}</option>
+                                @endforeach
+                            </select>
                             <div class="input-group-append">
                                 <div class="input-group-text">
-                                    <span class="fas fa-university"></span>
+                                    <span class="fas fa-level-down-alt"></span>
                                 </div>
                             </div>
                         </div>
 
                         <div class="input-group mb-3" id="angkatan-field" style="display: none;">
-                            <input id="angkatan" name="angkatan" type="text" class="form-control"
-                                placeholder="Angkatan">
+                            <input id="angkatan" name="angkatan" type="number" min="2018" max="2024" class="form-control"
+                                placeholder="Angkatan" required>
                             <div class="input-group-append">
                                 <div class="input-group-text">
                                     <span class="fas fa-calendar-alt"></span>
@@ -140,8 +144,18 @@
 
                 if (selectedRole == '3') { // Mahasiswa
                     $('#email-field, #no-hp-field, #prodi-field, #angkatan-field').show();
-                } else if (selectedRole == '2' || selectedRole == '4') { // Dosen or Kaprodi
+                    // Set rules for Mahasiswa
+                    $("#email").rules("add", { required: true, email: true }); // Add email validation
+                    $("#no_hp").rules("add", { required: true });
+                    $("#prodi_id").rules("add", { required: true });
+                    $("#angkatan").rules("add", { required: true });
+                } else if (selectedRole == '2' || selectedRole == '4' || selectedRole == '1') { // Dosen or Kaprodi
                     $('#email-field, #no-hp-field').show();
+                    // Set rules for Dosen or Kaprodi
+                    $("#email").rules("add", { required: true, email: true }); // Add email validation
+                    $("#no_hp").rules("add", { required: true });
+                    $("#prodi_id").rules("remove", "required"); // Remove required for prodi_id
+                    $("#angkatan").rules("remove", "required"); // Remove required for angkatan
                 }
             });
 

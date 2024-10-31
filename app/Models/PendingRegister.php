@@ -11,7 +11,7 @@ class PendingRegister extends Model
     protected $table = 't_pending_register';
     protected $primaryKey = 'user_id';
 
-    protected $fillable = ['user_id','level_id','username','nama','password','created_at','updated_at'];
+    protected $fillable = ['user_id','level_id','username','nama','password','email','no_hp','angkatan','prodi_id','created_at','updated_at'];
 
     protected $hidden = ['password'];
 
