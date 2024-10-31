@@ -20,4 +20,11 @@ class PendingRegister extends Model
     public function level():BelongsTo{
         return $this->belongsTo(levelmodel::class,'level_id', 'level_id');
     }
+    public function user() {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+    public function prodi(): BelongsTo // Add the prodi relationship
+    {
+        return $this->belongsTo(ProdiModel::class, 'prodi_id', 'prodi_id'); // Adjust to match your ProdiModel class
+    }
 }

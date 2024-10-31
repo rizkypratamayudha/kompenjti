@@ -39,14 +39,14 @@
                         </div>
                     </div>
                 @else
-                    @foreach ($user as $user)
+                    @foreach ($user as $userItem) <!-- Changed variable name to avoid conflicts -->
                         <div class="col-md-4">
                             <div class="card mb-4">
-                                <h5 class="card-header">{{ $user->nama }}</h5>
+                                <h5 class="card-header">{{ $userItem->nama }}</h5>
                                 <div class="card-body">
-                                    <h5 class="card-title">{{ $user->level->level_nama ?? '-' }}</h5>
-                                    <p class="card-text">{{ $user->username }}</p>
-                                    <a href="{{ url('/user/' . $user->user_id . '/show_ajax') }}" class="btn btn-primary">Detail Pengguna</a>
+                                    <h5 class="card-title">{{ $userItem->level->level_nama ?? '-' }}</h5>
+                                    <p class="card-text">{{ $userItem->username }}</p>
+                                    <a href="{{ url('/validasi/' . $userItem->user_id . '/show_ajax') }}" class="btn btn-primary btn-detail">Detail Pengguna</a>
                                 </div>
                             </div>
                         </div>
@@ -55,6 +55,7 @@
             </div>
         </div>
     </div>
+
     <div id="myModal" class="modal fade animate shake" tabindex="-1" role="dialog" data-backdrop="static"
         data-keyboard="false" data-width="75%" aria-hidden="true"></div>
 @endsection
@@ -67,22 +68,16 @@
             });
         }
         $(document).ready(function() {
-            $('#level_id').on('change', function() {
-                var level_id = $(this).val();
+    $('.btn-detail').on('click', function(e) {
+        e.preventDefault();
+        var url = $(this).attr('href');
 
-                // Mengirim permintaan AJAX untuk mendapatkan data pengguna
-                $.ajax({
-                    url: "{{ url('validasi/') }}",
-                    type: "GET",
-                    data: {
-                        level_id: level_id
-                    },
-                    success: function(data) {
-                        // Mengganti konten card dengan data baru
-                        $('.card-body').html(data);
-                    }
-                });
-            });
+        // Load the content into the modal
+        $('#myModal').load(url, function() {
+            $('#myModal').modal('show');
         });
+    });
+});
+
     </script>
 @endpush

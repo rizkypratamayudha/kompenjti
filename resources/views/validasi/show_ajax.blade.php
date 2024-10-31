@@ -57,8 +57,8 @@
                             <td class="col-9" >{{$user->no_hp}}</td>
                         </tr>
                         <tr>
-                            <th class="text-right col-3">Prodi :</th>
-                            <td class="col-9" >{{$user->prodi}}</td>
+                            <th class="text-right col-3">Prodi ID :</th>
+                            <td class="col-9">{{ $user->prodi_id }}</td>
                         </tr>
                         <tr>
                             <th class="text-right col-3">Angkatan :</th>
