@@ -10,7 +10,7 @@
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="adminlte//plugins/fontawesome-free/css/all.min.css">
+    <link rel="stylesheet" href="adminlte/plugins/fontawesome-free/css/all.min.css">
     <!-- icheck bootstrap -->
     <link rel="stylesheet" href="adminlte/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
     <!-- Theme style -->
@@ -121,6 +121,10 @@
 
     <!-- jQuery -->
     <script src="adminlte/plugins/jquery/jquery.min.js"></script>
+    <!-- jQuery Validation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
     <!-- Bootstrap 4 -->
     <script src="adminlte/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
     <!-- AdminLTE App -->
@@ -140,9 +144,8 @@
                     $('#email-field, #no-hp-field').show();
                 }
             });
-        });
 
-        $(document).ready(function() {
+            // Validate the form
             $("#form-register").validate({
                 rules: {
                     username: {
@@ -170,8 +173,7 @@
                         type: form.method,
                         data: $(form).serialize(),
                         success: function(response) {
-                            console.log(response)
-                            if (response.status) { // jika sukses
+                            if (response.status) { // if success
                                 Swal.fire({
                                     icon: 'success',
                                     title: 'Mohon Tunggu Verifikasi\nDari Admin',
@@ -179,7 +181,7 @@
                                 }).then(function() {
                                     window.location = response.redirect;
                                 });
-                            } else { // jika error
+                            } else { // if error
                                 $('.error-text').text('');
                                 $.each(response.msgField, function(prefix, val) {
                                     $('#error-' + prefix).text(val[0]);
@@ -199,10 +201,10 @@
                     error.addClass('invalid-feedback');
                     element.closest('.input-group').append(error);
                 },
-                highlight: function(element, errorClass, validClass) {
+                highlight: function(element) {
                     $(element).addClass('is-invalid');
                 },
-                unhighlight: function(element, errorClass, validClass) {
+                unhighlight: function(element) {
                     $(element).removeClass('is-invalid');
                 }
             });
