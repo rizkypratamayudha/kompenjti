@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\PendingRegister;
 use Illuminate\Http\Request;
 
 class ValidasiController extends Controller
@@ -12,7 +13,12 @@ class ValidasiController extends Controller
             'list'=>['Home','Validasi Registrasi']
         ];
 
+        $page = (object)[
+            'title' => 'Page Validasi Registrasi Pengguna'
+        ];
+
         $activeMenu = 'validasi';
-        return view('validasi.index',['breadcrumb'=>$breadcrumb,'activeMenu'=>$activeMenu]);
+        $user = PendingRegister::with('level')->get();
+        return view('validasi.index',['breadcrumb'=>$breadcrumb,'activeMenu'=>$activeMenu,'page'=>$page,'user'=>$user]);
     }
 }

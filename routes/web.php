@@ -56,6 +56,7 @@ Route::group(['prefix'=>'user'], function(){
 
 Route::group(['prefix'=>'validasi'], function(){
     Route::get('/',[ValidasiController::class,'index']);
+    Route::get('/list',[ValidasiController::class,'list']);
 });
 
 });

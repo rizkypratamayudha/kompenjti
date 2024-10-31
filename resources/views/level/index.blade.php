@@ -62,7 +62,7 @@
                     orderable: false,
                     searchable: false
                 }, {
-                    data: "level_kode",
+                    data: "kode_level",
                     className: "",
                     orderable: true,
                     searchable: true
