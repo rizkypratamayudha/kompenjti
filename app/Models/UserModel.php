@@ -11,30 +11,45 @@ class UserModel extends Authenticatable
 {
     use HasFactory;
     protected $table = 'm_user';
-    protected $primaryKey ='user_id';
-    protected $fillable = ['user_id','level_id','username','nama','password',];
+    protected $primaryKey = 'user_id';
+    protected $fillable = [
+        'user_id',
+        'level_id',
+        'prodi_id',
+        'username',
+        'nama',
+        'password',
+        'email',
+        'no_hp',
+        'angkatan',
+    ];
 
     protected $hidden = ['password'];
 
-    protected $casts = ['password'=>'hashed'];
+    protected $casts = ['password' => 'hashed'];
 
-    public function level():BelongsTo{
-        return $this->belongsTo(LevelModel::class,'level_id');
+    public function level(): BelongsTo
+    {
+        return $this->belongsTo(LevelModel::class, 'level_id');
     }
 
-    public function getRoleName(){
+    public function getRoleName()
+    {
         return $this->level->level_nama;
     }
 
-    public function getUsername(){
+    public function getUsername()
+    {
         return $this->username;
     }
 
-    public function hasRole($role){
+    public function hasRole($role)
+    {
         return $this->level->level_kode == $role;
     }
 
-    public function getRole(){
+    public function getRole()
+    {
         return $this->level->level_kode;
     }
 }

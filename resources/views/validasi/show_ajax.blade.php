@@ -66,9 +66,64 @@
                         </tr>
                     </table>
                 </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" onclick="declineUser('{{ $user->user_id }}')">Decline</button>
+                    <button type="button" class="btn btn-success" onclick="approveUser('{{ $user->user_id }}')">Approve</button>
+                </div>
             </div>
         </div>
     <script>
+        function approveUser(userId) {
+        $.ajax({
+            url: 'validasi/approve/' + userId,
+            type: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}'
+            },
+            success: function(response) {
+                $('#myModal').modal('hide');
+                Swal.fire({
+                    icon: 'success',
+                    title: 'User Approved',
+                    text: response.message
+                });
+                dataUser.ajax.reload();
+            },
+            error: function(response) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Approval Failed',
+                    text: response.responseJSON.error
+                });
+            }
+        });
+    }
+
+    function declineUser(userId) {
+        $.ajax({
+            url: 'validasi/decline/' + userId,
+            type: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}'
+            },
+            success: function(response) {
+                $('#myModal').modal('hide');
+                Swal.fire({
+                    icon: 'success',
+                    title: 'User Declined',
+                    text: response.message
+                });
+                dataUser.ajax.reload();
+            },
+            error: function(response) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Decline Failed',
+                    text: response.responseJSON.error
+                });
+            }
+        });
+    }
         $(document).ready(function() {
             $("#form-delete").validate({
                 rules: {},
