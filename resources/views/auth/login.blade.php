@@ -37,17 +37,17 @@
                                 <span class="fas fa-envelope"></span>
                             </div>
                         </div>
-                        <small id="error-username" class="error-text text-danger" id="error-text"></small>
+                        <small id="error-username" class="error-text text-danger"></small>
                     </div>
                     <div class="input-group mb-3">
                         <input type="password" id="password" name="password" class="form-control"
                             placeholder="Password">
                         <div class="input-group-append">
-                            <div class="input-group-text">
-                                <span class="fas fa-lock"></span>
+                            <div class="input-group-text" onclick="togglePassword()">
+                                <span id="toggle-icon" class="fas fa-eye"></span>
                             </div>
                         </div>
-                        <small id="error-password" class="error-text text-danger" id="error-text"></small>
+                        <small id="error-password" class="error-text text-danger"></small>
                     </div>
                     <div class="row">
                         <div class="col-8">
@@ -64,7 +64,7 @@
                     </div>
                 </form>
                 <div class="">
-                    <a href="{{url('register/')}}" >Registrasi</a>
+                    <a href="{{url('register/')}}">Registrasi</a>
                 </div>
             </div>
             <!-- /.card-body -->
@@ -149,6 +149,21 @@
                 }
             });
         });
+
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const toggleIcon = document.getElementById('toggle-icon');
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            }
+        }
     </script>
 </body>
 
