@@ -1,6 +1,9 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Models\detail_dosenModel;
+use App\Models\detail_kaprodiModel;
+use App\Models\detail_mahasiswaModel;
 use App\Models\LevelModel;
 use App\Models\PendingRegister;
 use App\Models\UserModel;
@@ -43,7 +46,7 @@ class ValidasiController extends Controller
 
     public function show_ajax(string $id)
 {
-    // Find the user in the PendingRegister model along with the 'level' relationship
+    
     $user = PendingRegister::with(['level','prodi'])->find($id);
 
     // Check if the user is not found
@@ -56,31 +59,57 @@ class ValidasiController extends Controller
 }
 
 public function approve(string $id)
-    {
-        $pendingUser = PendingRegister::find($id);
+{
+    $pendingUser = PendingRegister::find($id);
 
-        if (!$pendingUser) {
-            return response()->json(['error' => 'User not found'], 404);
-        }
+    if (!$pendingUser) {
+        return response()->json(['error' => 'User not found'], 404);
+    }
 
-        // Move data to m_user
-        UserModel::create([
-            'user_id' => $pendingUser->user_id,
-            'level_id' => $pendingUser->level_id,
+    // Move essential data to m_user
+    $user = UserModel::create([
+        'user_id' => $pendingUser->user_id,
+        'level_id' => $pendingUser->level_id,
+        'nama' => $pendingUser->nama,
+        'username' => $pendingUser->username,
+        'password' => $pendingUser->password,  // Pastikan password di-hash
+    ]);
+
+    // Move additional data based on level_id
+    if ($pendingUser->level_id == 2) {
+        detail_dosenModel::create([
+            'user_id' => $user->user_id,
             'prodi_id' => $pendingUser->prodi_id,
-            'username' => $pendingUser->username,
-            'nama' => $pendingUser->nama,
-            'password' => Hash::make($pendingUser->password),  // Ensure the password is hashed
+            'email' => $pendingUser->email,
+            'no_hp' => $pendingUser->no_hp,
+            
+        ]);
+    } elseif ($pendingUser->level_id == 3) {
+        detail_mahasiswaModel::create([
+            'user_id' => $user->user_id,
+            'prodi_id' => $pendingUser->prodi_id,
             'email' => $pendingUser->email,
             'no_hp' => $pendingUser->no_hp,
             'angkatan' => $pendingUser->angkatan,
+            
         ]);
-
-        // Delete the user from t_pending_register
-        $pendingUser->delete();
-
-        return response()->json(['status' => true, 'message' => 'User approved and moved to m_user.']);
+    } elseif ($pendingUser->level_id == 4) {
+        detail_kaprodiModel::create([
+            'user_id' => $user->user_id,
+            'prodi_id' => $pendingUser->prodi_id,
+            'email' => $pendingUser->email,
+            'no_hp' => $pendingUser->no_hp,
+            
+        ]);
     }
+
+    // Delete the user from t_pending_register
+    $pendingUser->delete();
+
+    return response()->json(['status' => true, 'message' => 'User approved and moved to respective detail table.']);
+}
+
+
 
     public function decline(string $id)
     {

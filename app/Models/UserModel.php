@@ -15,13 +15,9 @@ class UserModel extends Authenticatable
     protected $fillable = [
         'user_id',
         'level_id',
-        'prodi_id',
         'username',
         'nama',
         'password',
-        'email',
-        'no_hp',
-        'angkatan',
     ];
 
     protected $hidden = ['password'];
@@ -32,6 +28,7 @@ class UserModel extends Authenticatable
     {
         return $this->belongsTo(LevelModel::class, 'level_id');
     }
+
 
     public function getRoleName()
     {

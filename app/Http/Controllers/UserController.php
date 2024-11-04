@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\detail_dosenModel;
+use App\Models\detail_kaprodiModel;
+use App\Models\detail_mahasiswaModel;
 use App\Models\LevelModel;
 use App\Models\UserModel;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\Facades\DataTables;
@@ -167,31 +171,46 @@ public function confirm_ajax(string $id)
     }
 
     public function delete_ajax(Request $request, $id)
-    {
-        if ($request->ajax() || $request->wantsJson()) {
-            $user = UserModel::find($id);
+{
+    if ($request->ajax() || $request->wantsJson()) {
+        $user = UserModel::find($id);
 
-            if ($user) {
-                try {
-                    $user->delete();
-                    return response()->json([
-                        'status' => true,
-                        'message' => 'Data berhasil dihapus'
-                    ]);
-                } catch (\Illuminate\Database\QueryException $e) {
-                    return response()->json([
-                        'status' => false,
-                        'message' => 'Data gagal dihapus karena masih terdapat tabel lain yang terkait dengan data ini'
-                    ]);
+        if ($user) {
+            DB::beginTransaction(); // Mulai transaksi untuk memastikan integritas data
+            try {
+                // Hapus data terkait berdasarkan level_id
+                if ($user->level_id == 2) {
+                    detail_dosenModel::where('user_id', $id)->delete();
+                } elseif ($user->level_id == 3) {
+                    detail_mahasiswaModel::where('user_id', $id)->delete();
+                } elseif ($user->level_id == 4) {
+                    detail_kaprodiModel::where('user_id', $id)->delete();
                 }
-            } else {
+
+                // Hapus data utama dari UserModel
+                $user->delete();
+
+                DB::commit(); // Commit transaksi jika semua operasi berhasil
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Data berhasil dihapus beserta data terkait'
+                ]);
+            } catch (\Exception $e) {
+                DB::rollBack(); // Batalkan transaksi jika terjadi kesalahan
                 return response()->json([
                     'status' => false,
-                    'message' => 'Data tidak ditemukan'
+                    'message' => 'Data gagal dihapus karena terjadi kesalahan: ' . $e->getMessage()
                 ]);
             }
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => 'Data tidak ditemukan'
+            ]);
         }
-
-        return redirect('/');
     }
+
+    return redirect('/');
+}
+
 }
