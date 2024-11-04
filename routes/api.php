@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\Api\APIRegisterController;
+use App\Http\Controllers\Api\RegisterController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -19,6 +19,6 @@ use Illuminate\Support\Facades\Route;
 //     return $request->user();
 // });
 
-Route::post('/registerWithDetails', [APIRegisterController::class, 'registerWithDetails']);
+Route::post('/registerWithDetails', [RegisterController::class, 'registerWithDetails']);
 
 

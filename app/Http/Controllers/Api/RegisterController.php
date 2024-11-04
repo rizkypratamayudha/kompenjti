@@ -1,16 +1,16 @@
 <?php
 
+namespace App\Http\Controllers\Api;
 
-namespace App\Http\Controllers;
-
+use App\Http\Controllers\Controller;
 use App\Models\detail_mahasiswaModel;
 use App\Models\UserModel;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\DB;
 
-class APIRegisterController extends Controller
+class RegisterController extends Controller
 {
     public function registerWithDetails(Request $request)
     {
