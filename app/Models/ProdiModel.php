@@ -12,5 +12,5 @@ class ProdiModel extends Model
     protected $table = 'prodi';
     protected $primaryKey = 'prodi_id';
 
-    
+    protected $fillable = 'prodi_nama';
 }

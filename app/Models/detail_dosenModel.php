@@ -13,7 +13,7 @@ class detail_dosenModel extends Model
     protected $table = 'detail_dosen';
     protected $primaryKey = 'detail_dosen_id';
 
-    protected $fillable = ['detail_dosen_id','user_id','email','no_hp','created_at','updated_at'];
+    protected $fillable = ['user_id','email','no_hp','created_at','updated_at'];
 
     public function user(): BelongsTo
     {
