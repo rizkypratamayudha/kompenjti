@@ -59,7 +59,7 @@
                         @if ($user->prodi_id && $user->angkatan)
                         <tr>
                             <th class="text-right col-3">Prodi ID :</th>
-                            <td class="col-9">{{ $user->prodi_id->prodi_nama }}</td>
+                            <td class="col-9">{{ $user->prodi->prodi_nama }}</td>
                         </tr>
                         <tr>
                             <th class="text-right col-3">Angkatan :</th>
