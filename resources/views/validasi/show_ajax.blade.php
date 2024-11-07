@@ -56,6 +56,7 @@
                             <th class="text-right col-3">No HP :</th>
                             <td class="col-9" >{{$user->no_hp}}</td>
                         </tr>
+                        @if ($user->prodi_id && $user->angkatan)
                         <tr>
                             <th class="text-right col-3">Prodi ID :</th>
                             <td class="col-9">{{ $user->prodi_id }}</td>
@@ -64,6 +65,7 @@
                             <th class="text-right col-3">Angkatan :</th>
                             <td class="col-9" >{{$user->angkatan}}</td>
                         </tr>
+                        @endif
                     </table>
                 </div>
                 <div class="modal-footer">
