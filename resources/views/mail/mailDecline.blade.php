@@ -1,0 +1,2 @@
+<h1>HALOOO, {{$data['nama']}}</h1>
+<h2>PERMINTAAN REGISTRASI ANDA DITOLAK</h2>
