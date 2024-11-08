@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Mail\kirimEmail;
 use App\Models\detail_dosenModel;
 use App\Models\detail_kaprodiModel;
 use App\Models\detail_mahasiswaModel;
@@ -9,6 +10,7 @@ use App\Models\PendingRegister;
 use App\Models\UserModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 
 class ValidasiController extends Controller
 {
@@ -46,7 +48,7 @@ class ValidasiController extends Controller
 
     public function show_ajax(string $id)
 {
-    
+
     $user = PendingRegister::with(['level','prodi'])->find($id);
 
     // Check if the user is not found
@@ -82,7 +84,7 @@ public function approve(string $id)
             'prodi_id' => $pendingUser->prodi_id,
             'email' => $pendingUser->email,
             'no_hp' => $pendingUser->no_hp,
-            
+
         ]);
     } elseif ($pendingUser->level_id == 3) {
         detail_mahasiswaModel::create([
@@ -91,7 +93,7 @@ public function approve(string $id)
             'email' => $pendingUser->email,
             'no_hp' => $pendingUser->no_hp,
             'angkatan' => $pendingUser->angkatan,
-            
+
         ]);
     } elseif ($pendingUser->level_id == 4) {
         detail_kaprodiModel::create([
@@ -99,11 +101,11 @@ public function approve(string $id)
             'prodi_id' => $pendingUser->prodi_id,
             'email' => $pendingUser->email,
             'no_hp' => $pendingUser->no_hp,
-            
+
         ]);
     }
 
-    // Delete the user from t_pending_register
+    Mail::to($pendingUser->email)->send(new kirimEmail(['nama'=>$pendingUser->nama]));
     $pendingUser->delete();
 
     return response()->json(['status' => true, 'message' => 'User approved and moved to respective detail table.']);
