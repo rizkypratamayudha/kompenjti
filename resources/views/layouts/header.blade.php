@@ -36,66 +36,83 @@
                 </form>
             </div>
         </li>
-        <li class="nav-item">
-            <a class="nav-link" data-toggle="modal" data-target="#profileModal" role="button">
-                {{-- @if(Auth::user()->avatar)
-                    <img style="width: 25px; height: 25px; object-fit: cover;"  class="img-fluid rounded-circle" src="{{ asset('images/' . Auth::user()->avatar) }}" alt="User Avatar">
-                @else --}}
-                    <i class="fas fa-user"></i>
-                {{-- @endif --}}
-            </a>
-        </li>
+         <!-- Profile Icon -->
+<li class="nav-item">
+    <a id="profile" class="nav-link" href="#" role="button">
+        <img src="{{ Auth::user()->avatar ? asset('app/' . Auth::user()->avatar) : asset('user.png') }}"
+            alt="User Avatar" class="img-circle" width="30" height="30" style="object-fit: cover;">
+    </a>
+</li>
+
+        <!-- Logout Form -->
+        <form id="logout-form" action="{{ url('logout') }}" method="get" style="display: none;">
+            @csrf
+        </form>
     </ul>
 </nav>
-
-<div class="modal fade" id="profileModal" tabindex="-1" role="dialog" aria-labelledby="profileModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
+<!-- Profile Modal -->
+<div class="modal fade" id="profileModal" tabindex="-1" role="dialog" aria-labelledby="profileModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document"> <!-- Modal dialog centered -->
         <div class="modal-content">
-            <div class="modal-header text-center">
-                <h5 class="modal-title w-100" id="profileModalLabel">Profile anda</h5>
+            <div class="modal-header">
+                <h5 class="modal-title" id="profileModalLabel">User Profile</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
             <div class="modal-body text-center">
-                <div class="profile-info">
-                    <div>
-                        <img src="{{ Auth::user()->avatar ? asset('images/' . Auth::user()->avatar) : asset('user.png') }}"
-                alt="User Avatar"
-                class="img-fluid rounded-circle"
-                style="width: 120px; height: 120px; object-fit: cover;">
-                    </div> <!--avatar profile yang bisa berupa gambar-->
-                    <div class="mb-2 mt-2">
-                        <h4 class="font-weight-bold">{{Auth::user()->username}}</h4>
-                    </div> <!--username yang login -->
-                    <div>
-                        <span style="font-size: 16px; padding: 8px 15px;">{{Auth::user()->level->level_nama}}</span>
-                    </div> <!--level_nama dari username yang login-->
-                </div>
+                <!-- Avatar -->
+                <img src="{{ Auth::user()->avatar ? asset('app/' . Auth::user()->avatar) : asset('user.png') }}"
+                    alt="User Avatar" class="img-circle mb-3" width="100" height="100"
+                    tyle="object-fit: cover;">
+                
+            
+                <!-- Profile Information with Icons -->
+                <p><strong><i class="fas fa-user"></i> Username:</strong> {{ auth()->user()->username }}</p>
+                <p><strong><i class="fas fa-id-card"></i> Nama:</strong> {{ auth()->user()->nama }}</p>
+                <p><strong><i class="fas fa-user-tag"></i> Level:</strong>
+                    {{ auth()->user()->level ? auth()->user()->level->level_nama : 'Tidak ada level' }}</p>
             </div>
-            <div class="modal-footer justify-content-center">
-                <a href="{{url('profile/edit/')}}" class="btn btn-info">Edit Profile</a>
-                <a id="logout-link" class="btn btn-danger" href="{{url('logout/')}}">Logout</a>
+            
+            <div class="modal-footer justify-content-center"> <!-- Centered footer -->
+                <!-- Logout Button with Icon -->
+                <button type="button" class="btn btn-danger" data-dismiss="modal" id="logout-link">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            
+                <!-- Edit Profile Button with Icon -->
+                <a href="{{ url('profile/edit') }}" class="btn btn-primary">
+                    <i class="fas fa-edit"></i> Edit Profile
+                </a>
             </div>
+            
         </div>
     </div>
 </div>
 
-<script>
-    document.getElementById('logout-link').addEventListener('click', function (e) {
-        e.preventDefault(); // Prevent the default link behavior
+<!-- SweetAlert -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-        // Trigger SweetAlert2 confirmation dialog
+<!-- Profile Modal Script -->
+<script>
+    document.getElementById('profile').addEventListener('click', function(e) {
+        e.preventDefault();
+        $('#profileModal').modal('show'); // Trigger the modal
+    });
+
+    document.getElementById('logout-link').addEventListener('click', function(e) {
+        e.preventDefault();
         Swal.fire({
-            title: 'Apakah yakin ingin keluar?',
-            text: "Session anda akan berakhir",
+            title: 'Apakah Anda yakin ingin keluar?',
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Log Out',
+            confirmButtonText: 'Ya, keluar!',
+            cancelButtonColor: '#d33',
             cancelButtonText: 'Batal'
         }).then((result) => {
             if (result.isConfirmed) {
-                // If user confirms, redirect to the logout URL
-                window.location.href = "{{ url('logout/') }}";
+                document.getElementById('logout-form').submit();
             }
         });
     });

@@ -28,6 +28,14 @@ Route::get('logout', [AuthController::class, 'logout'])->middleware('auth');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/', [welcomeController::class, 'index']);
+    
+    Route::group(['prefix'=>'profile'], function(){
+        Route::get('/edit', [UserController::class, 'profile']);
+        Route::post('/update_profile', [UserController::class, 'update_profile']);
+        Route::put('/update', [UserController::class, 'updateinfo']);
+        Route::put('/update_password', [UserController::class, 'update_password']);
+        Route::post('/delete_avatar', [UserController::class, 'deleteAvatar']);
+    });
 
     Route::group(['prefix' => 'level'], function () {
         Route::get('/', [LevelController::class, 'index']);

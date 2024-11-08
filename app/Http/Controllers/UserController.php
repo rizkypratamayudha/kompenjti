@@ -8,6 +8,7 @@ use App\Models\detail_mahasiswaModel;
 use App\Models\LevelModel;
 use App\Models\UserModel;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -211,6 +212,163 @@ public function confirm_ajax(string $id)
     }
 
     return redirect('/');
+}
+public function profile()
+{
+    $breadcrumb = (object)[
+        'title' => 'Profil Saya',
+        'list' => ['Home', 'Profil'],
+    ];
+
+    $page = (object)[
+        'title' => 'Edit Profil Pengguna'
+    ];
+    
+    $activeMenu = 'profile'; // Set menu yang aktif
+
+    // Ambil data pengguna yang sedang login
+    $user = Auth::user();
+
+    // Pastikan user tidak null
+    if (!$user) {
+        return redirect()->route('login')->with('error', 'Silakan login terlebih dahulu.');
+    }
+
+    // Ambil level_id dan level_nama dari tabel m_level
+    $level_id = $user->level ? $user->level->level_id : null;
+    $level_nama = $user->level ? $user->level->level_nama : 'Tidak ada level'; 
+
+    return view('profile.index', [
+        'breadcrumb' => $breadcrumb,
+        'page' => $page,
+        'activeMenu' => $activeMenu,
+        'user' => $user,
+        'level_id' => $level_id,
+        'level_nama' => $level_nama // Kirim level_nama dan level_id ke view
+    ]);
+}
+    public function update_profile(Request $request){
+        $avatar = $request->file('avatar')->store('avatars');
+        $request->user()->update([
+           'avatar' => $avatar
+        ]);
+
+        return redirect()->back();
+         
+}
+
+public function updateinfo(Request $request){
+    if($request->ajax() || $request->wantsJson()){
+        $rules = [
+        'level_id' => 'required|integer',
+        'username' => 'nullable|max:20|unique:m_user,username',
+        'nama'     => 'nullable|max:100',
+        ];
+
+        $validator = Validator::make($request->all(),$rules);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status'   => false, // respon json, true: berhasil, false: gagal
+                'message'  => 'Validasi gagal.',
+                'msgField' => $validator->errors() // menunjukkan field mana yang error
+            ]);
+        }
+
+        $user = $request->user();
+
+        if ($user){
+
+            $user->update($request->all());
+            return response()->json([
+                'status'  => true,
+                'message' => 'Data berhasil diupdate'
+            ]);
+        }
+        else {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Data tidak ditemukan'
+            ]);
+        }
+    }
+    return redirect('/');
+}
+
+public function update_password(Request $request)
+{
+    // Validasi input
+    $rules = [
+        'current_password' => 'required', // Menambahkan validasi password lama
+        'password' => 'required|min:5|confirmed', // Menggunakan field password_confirmation secara otomatis
+    ];
+
+    $validator = Validator::make($request->all(), $rules);
+
+    if ($validator->fails()) {
+        return response()->json([
+            'status' => false,
+            'message' => 'Validasi gagal.',
+            'msgField' => $validator->errors() // Mengembalikan pesan error untuk masing-masing field
+        ]);
+    }
+
+    // Ambil user yang sedang login
+    $user = $request->user();
+
+    
+    if ($user) {
+        // Cek apakah password lama cocok
+        if (!Hash::check($request->current_password, $user->password)) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Password lama tidak sesuai',
+            ]);
+        }
+
+        // Update password baru dengan hash
+        $user->password = Hash::make($request->password);
+        $user->save();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Password berhasil diupdate'
+        ]);
+    } else {
+        return response()->json([
+            'status' => false,
+            'message' => 'User tidak ditemukan'
+        ]);
+    }
+}
+
+public function deleteAvatar(Request $request)
+{
+    $user = $request->user(); // Get the authenticated user
+
+    if ($user) {
+        // If there's an existing avatar, delete it from storage
+        if ($user->avatar) {
+            $avatarPath = public_path('storage/' . $user->avatar);
+            if (file_exists($avatarPath)) {
+                unlink($avatarPath); // Delete the file
+            }
+
+            // Set the avatar attribute to null and save the user
+            $user->avatar = null;
+            $user->save();
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Foto profil berhasil dihapus.'
+        ]);
+    }
+
+    return response()->json([
+        'status' => false,
+        'message' => 'User tidak ditemukan.'
+    ]);
 }
 
 }
