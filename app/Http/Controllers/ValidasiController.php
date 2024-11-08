@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Mail\declineMail;
 use App\Mail\kirimEmail;
 use App\Models\detail_dosenModel;
 use App\Models\detail_kaprodiModel;
@@ -121,7 +122,7 @@ public function approve(string $id)
             return response()->json(['error' => 'User not found'], 404);
         }
 
-        Mail::to($pendingUser->email)->send(new kirimEmail(['nama'=>$pendingUser->nama]));
+        Mail::to($pendingUser->email)->send(new declineMail(['nama'=>$pendingUser->nama]));
         // Delete the user from t_pending_register
         $pendingUser->delete();
 
