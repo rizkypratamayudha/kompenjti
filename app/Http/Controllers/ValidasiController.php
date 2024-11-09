@@ -106,7 +106,7 @@ public function approve(string $id)
         ]);
     }
 
-    Mail::to($pendingUser->email)->send(new kirimEmail(['nama'=>$pendingUser->nama]));
+    Mail::to($pendingUser->email)->send(new kirimEmail(['nama'=>$pendingUser->nama,'prodi_id'=>$pendingUser->prodi_id,'angkatan'=>$pendingUser->angkatan]));
     $pendingUser->delete();
 
     return response()->json(['status' => true, 'message' => 'User approved and moved to respective detail table.']);
