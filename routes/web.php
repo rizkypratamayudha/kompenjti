@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\LevelController;
+use App\Http\Controllers\MahasiswaController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ValidasiController;
@@ -53,7 +54,6 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/export_pdf', [LevelController::class, 'export_pdf']);// export pdf
     });
 
-
     Route::group(['prefix' => 'user'], function () {
         Route::get('/', [UserController::class, 'index']);
         Route::post('/list', [UserController::class, 'list']);
@@ -71,5 +71,17 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/{id}/show_ajax', [ValidasiController::class, 'show_ajax']);
         Route::post('/approve/{id}', [ValidasiController::class, 'approve']);
         Route::post('/decline/{id}', [ValidasiController::class, 'decline']);
+    });
+
+    Route::group(['prefix' => 'mahasiswa'], function () {
+        Route::get('/', [MahasiswaController::class, 'index']);
+        Route::post('/list', [MahasiswaController::class, 'list']);
+        Route::get('/create_ajax', [MahasiswaController::class, 'create_ajax']);
+        Route::post('/ajax', [MahasiswaController::class, 'store_ajax']);
+        Route::get('/{id}/edit_ajax', [MahasiswaController::class, 'edit_ajax']);
+        Route::put('/{id}/update_ajax', [MahasiswaController::class, 'update_ajax']);
+        Route::get('/{id}/delete_ajax', [MahasiswaController::class, 'confirm_ajax']);
+        Route::delete('/{id}/delete_ajax', [MahasiswaController::class, 'delete_ajax']);
+        Route::get('/{id}/show_ajax', [MahasiswaController::class, 'show_ajax']);
     });
 });

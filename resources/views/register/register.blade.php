@@ -84,6 +84,24 @@
         .input-group .form-control.is-invalid ~ .input-group-text {
           border-color: #e3342f;
         }
+
+        .toggle-password {
+            border-top-right-radius: 10px;
+            border-bottom-right-radius: 10px;
+            border-left: none;
+        }
+
+        .toggle-password:focus {
+            box-shadow: none;
+        }
+
+        .input-group-append .input-group-text {
+            border-radius: 0;
+        }
+
+        .input-group-append button {
+            z-index: 0;
+        }
     
         .card-body {
           padding: 30px;
@@ -147,20 +165,27 @@
                     </div>
                     <div class="input-group mb-3">
                         <input id="password" name="password" type="password" class="form-control" placeholder="Password" required>
-                        <div class="input-group-append" >
+                        <div class="input-group-append">
+                            <span class="input-group-text border-0 bg-transparent" style="margin-left: -40px; z-index: 100;">
+                                <i class="fas fa-eye toggle-password" data-target="password" style="cursor: pointer;"></i>
+                            </span>
                             <div class="input-group-text">
                                 <span class="fas fa-lock"></span>
                             </div>
                         </div>
                     </div>
+
                     <div class="input-group mb-3">
-                        <input type="password" class="form-control" name="password_confirmation" placeholder="Ulang Password" required>
+                        <input id="password_confirmation" type="password" class="form-control" name="password_confirmation" placeholder="Ulang Password" required>
                         <div class="input-group-append">
-                          <div class="input-group-text">
-                            <span class="fas fa-lock"></span>
-                          </div>
+                            <span class="input-group-text border-0 bg-transparent" style="margin-left: -40px; z-index: 100;">
+                                <i class="fas fa-eye toggle-password" data-target="password_confirmation" style="cursor: pointer;"></i>
+                            </span>
+                            <div class="input-group-text">
+                                <span class="fas fa-lock"></span>
+                            </div>
                         </div>
-                      </div>
+                    </div>
                     <div id="additional-fields">
                         <div class="input-group mb-3" id="email-field" style="display: none;" >
                             <input id="email" name="email" type="email" class="form-control"
@@ -230,6 +255,20 @@
     <script src="adminlte/dist/js/adminlte.min.js"></script>
 
     <script>
+        $(document).on('click', '.toggle-password', function() {
+            const icon = $(this);
+            const targetId = icon.data('target');
+            const input = $(`#${targetId}`);
+            
+            // Toggle password visibility
+            if (input.attr('type') === 'password') {
+                input.attr('type', 'text');
+                icon.removeClass('fa-eye').addClass('fa-eye-slash');
+            } else {
+                input.attr('type', 'password');
+                icon.removeClass('fa-eye-slash').addClass('fa-eye');
+            }
+        });
         $(document).ready(function() {
             // Show/hide fields based on role selection
             $('#level_id').change(function() {
