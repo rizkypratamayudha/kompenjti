@@ -24,111 +24,122 @@
     <link rel="stylesheet" href="{{ asset('adminlte/dist/css/adminlte.min.css') }}">
 
     <style>
-        :root {
-          --blue: #024CAA;
-          --primary: #024CAA;
-        }
-        
-        /* Navbar (Header) tetap putih */
-        .main-header.navbar {
-          background-color: white;
-          border-bottom: 1px solid #dee2e6;
-        }
-        .main-header.navbar .nav-link {
-          color: #024CAA;
-        }
-        
-        /* Sidebar styling */
-        .main-sidebar {
-          background-color: #024CAA;
-        }
-        
-        /* Sidebar brand section */
-        .brand-link {
-          background-color: #091057;
-          border-bottom: 1px solid #EEEEEE;
-        }
-        .brand-link .brand-text {
-          color: white !important;
-        }
-        
-        /* Sidebar menu items */
-        .nav-sidebar .nav-item p {
-          color: white !important;
-        }
-        .nav-sidebar .nav-item i {
-          color: white !important;
-        }
-        .nav-sidebar .nav-header {
-          color: rgba(255,255,255,0.7) !important;
-          text-transform: uppercase;
-        }
-        
-        /* Hover effect pada menu */
-        .nav-sidebar .nav-link:hover {
-          background-color: rgba(255,255,255,0.1);
-        }
-        
-        /* Active menu state */
-        .nav-sidebar .nav-link.active {
-          background-color: rgba(255,255,255,0.2) !important;
-        }
-        .nav-sidebar .nav-link.active p,
-        .nav-sidebar .nav-link.active i {
-          color: white !important;
-        }
-        
-        /* Search box dalam sidebar */
-        .sidebar .form-control-sidebar {
-          background-color: rgba(255,255,255,0.2);
-          border: 1px solid rgba(255,255,255,0.1);
-          color: white;
-        }
-        .sidebar .form-control-sidebar::placeholder {
-          color: rgba(255,255,255,0.6);
-        }
-        .sidebar .btn-sidebar {
-          background-color: rgba(255,255,255,0.2);
-          border: 1px solid rgba(255,255,255,0.1);
-          color: white;
-        }
-        
-        /* Scrollbar styling untuk sidebar */
-        .sidebar::-webkit-scrollbar {
-          width: 5px;
-        }
-        .sidebar::-webkit-scrollbar-track {
-          background: rgba(255,255,255,0.1);
-        }
-        .sidebar::-webkit-scrollbar-thumb {
-          background: rgba(255,255,255,0.2);
-        }
-        
-        /* Other components */
-        .btn-primary {
-          background-color: #024CAA;
-          border-color: #024CAA;
-        }
-        .btn-primary:hover {
-          background-color: #023d88;
-          border-color: #023d88;
-        }
-        
-        .page-item.active .page-link {
-          background-color: #024CAA;
-          border-color: #024CAA;
-        }
-        
-        .card-primary.card-outline {
-          border-top: 3px solid #024CAA;
-        }
-        
-        a {
-          color: #024CAA;
-        }
-        a:hover {
-          color: #023d88;
-        }
+      :root {
+        --primary-blue: #024CAA; /* Prioritized blue */
+        --light-blue: #82C4F3;   /* Light blue */
+        --medium-blue: #008DDA;  /* Medium blue */
+        --dark-blue: #0C356A;    /* Dark blue */
+        --highlight-yellow: #FFFFB3; /* Light yellow for highlighting */
+      }
+
+      /* Navbar (Header) tetap putih */
+      .main-header.navbar {
+        background-color: white;
+        border-bottom: 1px solid #dee2e6;
+      }
+      .main-header.navbar .nav-link {
+        color: var(--primary-blue);
+      }
+
+      /* Sidebar styling */
+      .main-sidebar {
+        background-color: var(--primary-blue);
+      }
+
+      /* Sidebar brand section */
+      .brand-link {
+        background-color: var(--dark-blue);
+        border-bottom: 1px solid #EEEEEE;
+      }
+      .brand-link .brand-text {
+        color: white !important;
+      }
+
+      /* Sidebar menu items */
+      .nav-sidebar .nav-item p {
+        color: white !important;
+      }
+      .nav-sidebar .nav-item i {
+        color: white !important;
+      }
+      .nav-sidebar .nav-header {
+        color: rgba(255, 255, 255, 0.7) !important;
+        text-transform: uppercase;
+      }
+
+      /* Hover effect pada menu */
+      .nav-sidebar .nav-link:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+      }
+
+      /* Active menu state */
+      .nav-sidebar .nav-link.active {
+        background-color: rgba(255, 255, 255, 0.2) !important;
+      }
+      .nav-sidebar .nav-link.active p,
+      .nav-sidebar .nav-link.active i {
+        color: white !important;
+      }
+
+      /* Search box dalam sidebar */
+      .sidebar .form-control-sidebar {
+        background-color: rgba(255, 255, 255, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: white;
+      }
+      .sidebar .form-control-sidebar::placeholder {
+        color: rgba(255, 255, 255, 0.6);
+      }
+      .sidebar .btn-sidebar {
+        background-color: rgba(255, 255, 255, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: white;
+      }
+
+      /* Scrollbar styling untuk sidebar */
+      .sidebar::-webkit-scrollbar {
+        width: 5px;
+      }
+      .sidebar::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.1);
+      }
+      .sidebar::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.2);
+      }
+
+      /* Other components */
+      .btn-primary {
+        background-color: var(--primary-blue);
+        border-color: var(--primary-blue);
+      }
+      .btn-primary:hover {
+        background-color: var(--medium-blue);
+        border-color: var(--medium-blue);
+      }
+
+      .page-item.active .page-link {
+        background-color: var(--primary-blue);
+        border-color: var(--primary-blue);
+      }
+
+      .card-primary.card-outline {
+        border-top: 3px solid var(--primary-blue);
+      }
+
+      /* Links */
+      a {
+        color: var(--primary-blue);
+      }
+      a:hover {
+        color: var(--medium-blue);
+      }
+
+      /* Highlighting elements with yellow */
+      .highlight {
+        background-color: var(--highlight-yellow);
+        color: var(--primary-blue);
+      }
+
       </style>
 
     @stack('css')

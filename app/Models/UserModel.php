@@ -40,6 +40,10 @@ class UserModel extends Authenticatable implements JWTSubject
     {
         return $this->belongsTo(LevelModel::class, 'level_id');
     }
+    public function jamKompen(): BelongsTo
+    {
+        return $this->belongsTo(jamKompenModel::class, 'jam_kompen_id');
+    }
 
 
     public function getRoleName()
