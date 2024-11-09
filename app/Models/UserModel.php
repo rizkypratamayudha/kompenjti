@@ -43,11 +43,11 @@ class UserModel extends Authenticatable
 
     public function hasRole($role)
     {
-        return $this->level->level_kode == $role;
+        return $this->level->kode_level == $role;
     }
 
     public function getRole()
     {
-        return $this->level->level_kode;
+        return $this->level->kode_level;
     }
 }
