@@ -64,6 +64,10 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/{id}/delete_ajax', [UserController::class, 'confirm_ajax']);
         Route::delete('/{id}/delete_ajax', [UserController::class, 'delete_ajax']);
         Route::get('/{id}/show_ajax', [UserController::class, 'show_ajax']);
+        Route::get('/import', [userController::class, 'import']); // ajax form upload excel
+        Route::post('/import_ajax', [userController::class, 'import_ajax']); // ajax import excel
+        Route::get('/export_excel', [UserController::class, 'export_excel']); // ajax exsport excel
+        Route::get('/export_pdf', [UserController::class, 'export_pdf']);// export pdf
     });
 
     Route::group(['prefix' => 'validasi'], function () {
