@@ -60,7 +60,7 @@ class LevelController extends Controller
     public function store_ajax(Request $request){
         if($request->ajax()||$request->wantsJson()){
             $rules = [
-                'level_kode'=>'required|string|unique:m_level,level_kode',
+                'kode_level'=>'required|string|unique:m_level,kode_level',
                 'level_nama'=>'required|string|max:100'
             ];
 
@@ -91,7 +91,7 @@ class LevelController extends Controller
     public function update_ajax (Request $request, $level_id){
         if ($request->ajax() || $request->wantsJson()) {
             $rules = [
-                'level_kode' => 'required|string|unique:m_level,level_kode,' .$level_id.',level_id',
+                'kode_level' => 'required|string|unique:m_level,kode_level,' .$level_id.',level_id',
                 'level_nama'=>'required|string|max:100'
 
             ];

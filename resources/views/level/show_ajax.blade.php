@@ -34,7 +34,7 @@
                         </tr>
                         <tr>
                             <th class="text-right col-3">Kode Role :</th>
-                            <td class="col-9">{{ $level->level_kode }}</td>
+                            <td class="col-9">{{ $level->kode_level }}</td>
                         </tr>
                         <tr>
                             <th class="text-right col-3">Nama Role :</th>
