@@ -47,6 +47,10 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/{id}/delete_ajax', [LevelController::class, 'confirm_ajax']);
         Route::delete('/{id}/delete_ajax', [LevelController::class, 'delete_ajax']);
         Route::get('/{id}/show_ajax', [LevelController::class, 'show_ajax']);
+        Route::get('/import', [LevelController::class, 'import']); // ajax form upload excel
+        Route::post('/import_ajax', [LevelController::class, 'import_ajax']); // ajax import excel
+        Route::get('/export_excel', [LevelController::class, 'export_excel']); // ajax exsport excel
+        Route::get('/export_pdf', [LevelController::class, 'export_pdf']);// export pdf
     });
 
 

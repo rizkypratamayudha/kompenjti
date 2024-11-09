@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pemberitahuan Registrasi Ditolak</title>
+    <title>Pemberitahuan Registrasi</title>
     <style>
         body { font-family: Arial, sans-serif; background-color: #f9f9f9; color: #333; }
         .container { max-width: 400px; margin: 20px auto; background: #ffffff; padding: 20px; border: 1px solid #ddd; border-radius: 10px; font-size: 12px; }
-        
+
         /* Header Section */
         .header { text-align: center; margin-bottom: 10px; }
         .header img { height: 50px; width: auto; max-width: 100px; margin-right: 10px; }
@@ -16,12 +16,12 @@
         .header .small-text { font-size: 10px; color: #666; }
         .header-table { width: 100%; margin-bottom: 20px; }
         .header-table td { vertical-align: middle; }
-        
+
         /* Greeting Section */
         .greeting { font-size: 14px; font-weight: bold; margin-top: 15px; color: #333; }
 
         /* Notification Section */
-        .notification { background-color: #dc3545; color: #ffffff; padding: 10px; text-align: center; border-radius: 5px; margin-top: 10px; font-size: 12px; }
+        .notification { background-color: #dc2a2a; color: #ffffff; padding: 10px; text-align: center; border-radius: 5px; margin-top: 10px; font-size: 12px; }
 
         /* Details Section */
         .details { margin-top: 15px; font-size: 12px; }
@@ -46,7 +46,7 @@
         <table class="header-table">
             <tr>
                 <td width="15%" class="text-center">
-                    <img src="{{ asset('app/public/logo_polinema.jpg') }}" alt="Polinema Logo" class="image">
+                    <img src="https://i0.wp.com/www.hpi.or.id/wp-content/uploads/2021/08/Logo-Polinema.png?resize=300%2C300&ssl=1" alt="Polinema Logo" class="image">
                 </td>
                 <td width="85%">
                     <div class="font-bold">KEMENTERIAN PENDIDIKAN, KEBUDAYAAN, RISET, DAN TEKNOLOGI</div>
@@ -63,35 +63,41 @@
 
         <!-- Notification Section -->
         <div class="notification">
-            Kami menyesal menginformasikan bahwa registrasi Anda pada Aplikasi Kompensasi Politeknik Negeri Malang tidak dapat disetujui.
+            Mohon maaf kami menginformasikan bahwa registrasi Anda pada Aplikasi Kompensasi Politeknik Negeri Malang telah ditolak.
         </div>
 
         <!-- Details Section -->
         <div class="details">
             <table>
                 <tr>
-                    <td><strong>Nama Mahasiswa:</strong></td>
+                    <td><strong>Nama :</strong></td>
                     <td>{{ $data['nama'] }}</td>
                 </tr>
                 <tr>
+                    <td><strong>NIM / NIP :</strong></td>
+                    <td>{{ $data['nim'] }}</td>
+                </tr>
+                @if ($data['prodi_id'] && $data['angkatan'])
+                <tr>
                     <td><strong>Program Studi:</strong></td>
-                    <td>D4 Sistem Informasi Bisnis</td>
+                    <td>{{$data['prodi_id']}}</td>
                 </tr>
                 <tr>
                     <td><strong>Angkatan:</strong></td>
-                    <td>2022</td>
+                    <td>{{$data['angkatan']}}</td>
                 </tr>
+                @endif
             </table>
         </div>
 
         <!-- Message Section -->
         <p class="message">
-            Kami menyesal menginformasikan bahwa permintaan registrasi Anda telah ditolak. Jika Anda memiliki pertanyaan atau memerlukan informasi lebih lanjut, silakan hubungi kami untuk bantuan lebih lanjut.
+            Dengan ini, Anda resmi terdaftar sebagai pengguna aplikasi kompensasi kami yang akan mendukung berbagai kebutuhan akademik dan administrasi Anda. Silakan gunakan aplikasi ini untuk mengelola tugas dan keperluan akademik Anda dengan lebih mudah.
         </p>
 
         <!-- Button Section -->
         <div class="button">
-            <a href="https://yourapplication.com/contact" target="_blank">Hubungi Kami</a>
+            <a href="#" target="_blank">Kunjungi</a>
         </div>
 
         <!-- Footer Section -->

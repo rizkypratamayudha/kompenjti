@@ -14,7 +14,9 @@ class ProdiModel extends Model
 
     protected $fillable = ['prodi_nama'];
 
-    public function getProdiNama(){
-        return $this->prodi->prodi_nama;
+    public static function getProdiNama($prodiId)
+    {
+        $prodi = self::find($prodiId);
+        return $prodi ? $prodi->prodi_nama : null;
     }
 }
