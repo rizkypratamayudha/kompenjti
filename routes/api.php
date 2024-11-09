@@ -23,4 +23,8 @@ use Illuminate\Support\Facades\Route;
 Route::post('/registerWithDetails', [RegisterController::class, 'registerWithDetails']);
 Route::post('/loginAPI', [LoginController::class, 'loginAPI']);
 
+Route::middleware(['auth:api'])->group(function(){
+    
+});
+
 

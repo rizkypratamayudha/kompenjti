@@ -13,4 +13,8 @@ class ProdiModel extends Model
     protected $primaryKey = 'prodi_id';
 
     protected $fillable = ['prodi_nama'];
+
+    public function getProdiNama(){
+        return $this->prodi->prodi_nama;
+    }
 }
