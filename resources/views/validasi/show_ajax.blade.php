@@ -56,11 +56,12 @@
                             <th class="text-right col-3">No HP :</th>
                             <td class="col-9" >{{$user->no_hp}}</td>
                         </tr>
-                        @if ($user->prodi_id && $user->angkatan)
+                        @if ($user->prodi_id)
                         <tr>
-                            <th class="text-right col-3">Prodi ID :</th>
+                            <th class="text-right col-3">Prodi:</th>
                             <td class="col-9">{{ $user->prodi->prodi_nama }}</td>
                         </tr>
+                        @elseif ($user->angkatan)                            
                         <tr>
                             <th class="text-right col-3">Angkatan :</th>
                             <td class="col-9" >{{$user->angkatan}}</td>
