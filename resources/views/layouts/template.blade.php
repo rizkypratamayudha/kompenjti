@@ -7,7 +7,6 @@
     <title>{{ config('app.name', 'PWL Laravel Starter Code') }}</title>
 
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <!-- Untuk mengirimkan token laravel CSRF pada setiap request ajax -->
 
     <!-- Google Font: Source Sans Pro -->
     <link rel="stylesheet"
@@ -24,7 +23,115 @@
     <!-- Theme style -->
     <link rel="stylesheet" href="{{ asset('adminlte/dist/css/adminlte.min.css') }}">
 
-    @stack('css') <!-- Digunakan untuk memanggil custom css dari perintah push('css') pada masing-masing view -->
+    <style>
+        :root {
+          --blue: #024CAA;
+          --primary: #024CAA;
+        }
+        
+        /* Navbar (Header) tetap putih */
+        .main-header.navbar {
+          background-color: white;
+          border-bottom: 1px solid #dee2e6;
+        }
+        .main-header.navbar .nav-link {
+          color: #024CAA;
+        }
+        
+        /* Sidebar styling */
+        .main-sidebar {
+          background-color: #024CAA;
+        }
+        
+        /* Sidebar brand section */
+        .brand-link {
+          background-color: #091057;
+          border-bottom: 1px solid #EEEEEE;
+        }
+        .brand-link .brand-text {
+          color: white !important;
+        }
+        
+        /* Sidebar menu items */
+        .nav-sidebar .nav-item p {
+          color: white !important;
+        }
+        .nav-sidebar .nav-item i {
+          color: white !important;
+        }
+        .nav-sidebar .nav-header {
+          color: rgba(255,255,255,0.7) !important;
+          text-transform: uppercase;
+        }
+        
+        /* Hover effect pada menu */
+        .nav-sidebar .nav-link:hover {
+          background-color: rgba(255,255,255,0.1);
+        }
+        
+        /* Active menu state */
+        .nav-sidebar .nav-link.active {
+          background-color: rgba(255,255,255,0.2) !important;
+        }
+        .nav-sidebar .nav-link.active p,
+        .nav-sidebar .nav-link.active i {
+          color: white !important;
+        }
+        
+        /* Search box dalam sidebar */
+        .sidebar .form-control-sidebar {
+          background-color: rgba(255,255,255,0.2);
+          border: 1px solid rgba(255,255,255,0.1);
+          color: white;
+        }
+        .sidebar .form-control-sidebar::placeholder {
+          color: rgba(255,255,255,0.6);
+        }
+        .sidebar .btn-sidebar {
+          background-color: rgba(255,255,255,0.2);
+          border: 1px solid rgba(255,255,255,0.1);
+          color: white;
+        }
+        
+        /* Scrollbar styling untuk sidebar */
+        .sidebar::-webkit-scrollbar {
+          width: 5px;
+        }
+        .sidebar::-webkit-scrollbar-track {
+          background: rgba(255,255,255,0.1);
+        }
+        .sidebar::-webkit-scrollbar-thumb {
+          background: rgba(255,255,255,0.2);
+        }
+        
+        /* Other components */
+        .btn-primary {
+          background-color: #024CAA;
+          border-color: #024CAA;
+        }
+        .btn-primary:hover {
+          background-color: #023d88;
+          border-color: #023d88;
+        }
+        
+        .page-item.active .page-link {
+          background-color: #024CAA;
+          border-color: #024CAA;
+        }
+        
+        .card-primary.card-outline {
+          border-top: 3px solid #024CAA;
+        }
+        
+        a {
+          color: #024CAA;
+        }
+        a:hover {
+          color: #023d88;
+        }
+      </style>
+
+    @stack('css')
 </head>
 
 <body class="hold-transition sidebar-mini">

@@ -1,9 +1,9 @@
 <aside class="main-sidebar sidebar-dark-primary elevation-4 position-fixed">
     <!-- Brand Logo -->
     <a href="{{ url('/') }}" class="brand-link">
-        <img src="{{ asset('adminlte/dist/img/AdminLTELogo.png') }}" alt="AdminLTE Logo"
+        <img src="{{ asset('logo_polinema.jpg') }}" alt="AdminLTE Logo"
             class="brand-image img-circle elevation-3" style="opacity: .8">
-        <span class="brand-text font-weight-light">PWL - Starter Code</span>
+        <span class="brand-text font-weight-light">Kompensasi JTI</span>
     </a>
 
     <!-- Sidebar -->
@@ -48,6 +48,12 @@
                     <a href="{{ url('/user') }}" class="nav-link {{ $activeMenu == 'user' ? 'active' : '' }}">
                         <i class="nav-icon far fa-user"></i>
                         <p>Data User</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url('/mahasiswa') }}" class="nav-link {{ $activeMenu == 'mhs' ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-user-graduate"></i>
+                        <p>Data Mahasiswa</p>
                     </a>
                 </li>
                 <li class="nav-header">Manage Riwayat Kompen</li>
