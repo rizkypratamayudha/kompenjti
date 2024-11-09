@@ -99,29 +99,39 @@
         Maaf, kami harus memberitahukan bahwa registrasi Anda pada Aplikasi Kompensasi Politeknik Negeri Malang tidak disetujui.
     </div>
 
-    <!-- Details Section -->
-    <div class="details">
-        <table>
-            <tr>
-                <td><strong>Nama :</strong></td>
-                <td>{{ $data['nama'] }}</td>
-            </tr>
-            <tr>
-                <td><strong>NIM / NIP :</strong></td>
-                <td>{{ $data['nim'] }}</td>
-            </tr>
-            @if ($data['prodi_id'] && $data['angkatan'])
-            <tr>
-                <td><strong>Program Studi:</strong></td>
-                <td>{{$data['prodi_id']}}</td>
-            </tr>
-            <tr>
-                <td><strong>Angkatan:</strong></td>
-                <td>{{$data['angkatan']}}</td>
-            </tr>
-            @endif
-        </table>
-    </div>
+<!-- Details Section -->
+<div class="details">
+    <table>
+        <tr>
+            <td><strong>Nama :</strong></td>
+            <td>{{ $data['nama'] }}</td>
+        </tr>
+        <tr>
+            <td><strong>NIM / NIP :</strong></td>
+            <td>{{ $data['nim'] }}</td>
+        </tr>
+        
+        <!-- Logika untuk menampilkan Program Studi dan Angkatan -->
+        @if ($data['prodi_id'] && $data['angkatan'])
+        <tr>
+            <td><strong>Program Studi:</strong></td>
+            <td>{{ $data['prodi_id'] }}</td>
+        </tr>
+        <tr>
+            <td><strong>Angkatan:</strong></td>
+            <td>{{ $data['angkatan'] }}</td>
+        </tr>
+        
+        <!-- Jika hanya Program Studi yang ada, tampilkan Nama, NIM/NIP dan Program Studi -->
+        @elseif ($data['prodi_id'])
+        <tr>
+            <td><strong>Program Studi:</strong></td>
+            <td>{{ $data['prodi_id'] }}</td>
+        </tr>
+        @endif
+    </table>
+</div>
+
 
     <!-- Message Section -->
     <p class="message">
