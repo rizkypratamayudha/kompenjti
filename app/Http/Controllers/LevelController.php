@@ -201,7 +201,7 @@ class LevelController extends Controller
                 foreach ($data as $baris => $value) { 
                     if($baris > 1){ // baris ke 1 adalah header, maka lewati 
                         $insert[] = [ 
-                            'level_kode' => $value['A'], 
+                            'kode_level' => $value['A'], 
                             'level_nama' => $value['B'],
                             'created_at' => now(), 
                         ]; 
@@ -229,7 +229,7 @@ class LevelController extends Controller
         public function export_excel()
     {
         // Ambil data dari Levelmodel
-        $barang = Levelmodel::select('level_kode', 'level_nama')->get();
+        $barang = Levelmodel::select('kode_level', 'level_nama')->get();
 
         // Inisialisasi Spreadsheet
         $spreadsheet = new Spreadsheet();
@@ -237,7 +237,7 @@ class LevelController extends Controller
 
         // Set Header Kolom
         $sheet->setCellValue('A1', 'No');
-        $sheet->setCellValue('B1', 'Level Kode');
+        $sheet->setCellValue('B1', 'kode Level');
         $sheet->setCellValue('C1', 'Nama Level');
 
         // Buat header menjadi bold
@@ -248,7 +248,7 @@ class LevelController extends Controller
         $baris = 2; // Baris data dimulai dari baris ke-2
         foreach ($barang as $key => $value) {
             $sheet->setCellValue('A' . $baris, $no);
-            $sheet->setCellValue('B' . $baris, $value->level_kode);
+            $sheet->setCellValue('B' . $baris, $value->kode_level);
             $sheet->setCellValue('C' . $baris, $value->level_nama);
 
             $baris++;
@@ -283,7 +283,7 @@ class LevelController extends Controller
     public function export_pdf()
     {
         // Ambil data barang dari database
-        $level = LevelModel::select('level_kode', 'level_nama') 
+        $level = LevelModel::select('kode_level', 'level_nama') 
         ->get();
 
         // Gunakan library Dompdf untuk membuat PDF
