@@ -12,10 +12,14 @@ class detail_kaprodiModel extends Model
 
     protected $table = 'detail_kaprodi';
     protected $primaryKey = 'detail_kaprodi_id';
-    protected $fillable = ['user_id','email','no_hp','created_at','updated_at'];
+    protected $fillable = ['user_id','email','no_hp', 'prodi_id','created_at','updated_at'];
 
     public function user(): BelongsTo
     {
         return $this->belongsTo(UserModel::class, 'user_id');
+    }
+    public function prodi(): BelongsTo
+    {
+        return $this->belongsTo(ProdiModel::class, 'prodi_id');
     }
 }
