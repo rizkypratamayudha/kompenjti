@@ -8,7 +8,7 @@
     <style>
         body { font-family: Arial, sans-serif; background-color: #f9f9f9; color: #333; }
         .container { max-width: 400px; margin: 20px auto; background: #ffffff; padding: 20px; border: 1px solid #ddd; border-radius: 10px; font-size: 12px; }
-        
+
         /* Header Section */
         .header { text-align: center; margin-bottom: 10px; }
         .header img { height: 50px; width: auto; max-width: 100px; margin-right: 10px; }
@@ -16,7 +16,7 @@
         .header .small-text { font-size: 10px; color: #666; }
         .header-table { width: 100%; margin-bottom: 20px; }
         .header-table td { vertical-align: middle; }
-        
+
         /* Greeting Section */
         .greeting { font-size: 14px; font-weight: bold; margin-top: 15px; color: #333; }
 
@@ -46,7 +46,7 @@
         <table class="header-table">
             <tr>
                 <td width="15%" class="text-center">
-                    <img url="{{ asset('logo_polinema.jpg') }}" alt="Polinema Logo" class="image">
+                    <img src="https://i0.wp.com/www.hpi.or.id/wp-content/uploads/2021/08/Logo-Polinema.png?resize=300%2C300&ssl=1" alt="gambar_polinema" class="image">
                 </td>
                 <td width="85%">
                     <div class="font-bold">KEMENTERIAN PENDIDIKAN, KEBUDAYAAN, RISET, DAN TEKNOLOGI</div>
