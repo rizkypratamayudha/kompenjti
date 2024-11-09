@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\UserModel;
 use Illuminate\Support\Facades\Hash;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class LoginController extends Controller
 {
@@ -35,6 +36,8 @@ class LoginController extends Controller
             ], 403);
         }
 
+        $token = JWTAuth::fromUser($user);
+
         return response()->json([
             'success' => true,
             'message' => 'Login berhasil',
@@ -42,7 +45,8 @@ class LoginController extends Controller
                 'id' => $user->user_id,
                 'name' => $user->nama,
                 'role' => $user->getRoleName()
-            ]
+            ],
+            'token' => $token
         ]);
     }
 }

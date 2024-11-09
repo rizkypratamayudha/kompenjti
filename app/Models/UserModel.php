@@ -6,10 +6,21 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class UserModel extends Authenticatable
+class UserModel extends Authenticatable implements JWTSubject
 {
     use HasFactory;
+
+    public function getJWTIdentifier()
+    {
+            return $this->getKey();
+    }
+
+    public function getJWTCustomClaims()
+    {
+        return [];
+    }
     protected $table = 'm_user';
     protected $primaryKey = 'user_id';
     protected $fillable = [
@@ -43,11 +54,11 @@ class UserModel extends Authenticatable
 
     public function hasRole($role)
     {
-        return $this->level->level_kode == $role;
+        return $this->level->kode_level == $role;
     }
 
     public function getRole()
     {
-        return $this->level->level_kode;
+        return $this->level->kode_level;
     }
 }
