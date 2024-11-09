@@ -8,6 +8,7 @@ use App\Models\detail_kaprodiModel;
 use App\Models\detail_mahasiswaModel;
 use App\Models\LevelModel;
 use App\Models\PendingRegister;
+use App\Models\ProdiModel;
 use App\Models\UserModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -106,7 +107,9 @@ public function approve(string $id)
         ]);
     }
 
-    Mail::to($pendingUser->email)->send(new kirimEmail(['nama'=>$pendingUser->nama,'prodi_id'=>$pendingUser->prodi_id,'angkatan'=>$pendingUser->angkatan]));
+    $prodiNama = ProdiModel::getProdiNama($pendingUser->prodi_id);
+
+    Mail::to($pendingUser->email)->send(new kirimEmail(['nama'=>$pendingUser->nama,'prodi_id'=>$prodiNama,'angkatan'=>$pendingUser->angkatan,'nim'=>$pendingUser->username]));
     $pendingUser->delete();
 
     return response()->json(['status' => true, 'message' => 'User approved and moved to respective detail table.']);
@@ -122,8 +125,8 @@ public function approve(string $id)
             return response()->json(['error' => 'User not found'], 404);
         }
 
-        Mail::to($pendingUser->email)->send(new declineMail(['nama'=>$pendingUser->nama]));
-        // Delete the user from t_pending_register
+        $prodiNama = ProdiModel::getProdiNama($pendingUser->prodi_id);
+        Mail::to($pendingUser->email)->send(new declineMail(['nama'=>$pendingUser->nama,'prodi_id'=>$prodiNama,'angkatan'=>$pendingUser->angkatan,'nim'=>$pendingUser->username]));
         $pendingUser->delete();
 
         return response()->json(['status' => true, 'message' => 'User registration declined and removed from pending list.']);
