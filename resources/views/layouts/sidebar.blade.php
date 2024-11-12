@@ -60,6 +60,13 @@
                 <li class="nav-item">
 
                 </li>
+                <li class="nav-header">Dosen/Tendik</li>
+                <li class="nav-item">
+                    <a href="{{ url('/dosen') }}" class="nav-link {{ $activeMenu == 'dosen' ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-plus"></i>
+                        <p>Tambah Pekerjaan</p>
+                    </a>
+                </li>
             </ul>
         </nav>
     </div>

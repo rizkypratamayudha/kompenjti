@@ -32,7 +32,7 @@ class RegisterController extends Controller
                 'password' => 'required|min:6|confirmed',
                 'email' => 'required|email',
                 'no_hp' => 'required|string',
-                'prodi_id' => 'required_if:level_id,3',
+                'prodi_id' => 'required_if:level_id,3,4',
                 'angkatan' => 'required_if:level_id,3'
 
             ];
