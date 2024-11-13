@@ -23,6 +23,6 @@ class jamKompenModel extends Model
 
     public function semester(): BelongsTo
     {
-        return $this->belongsTo(UserModel::class, 'semester_id');
+        return $this->belongsTo(SemesterModel::class, 'semester_id');
     }
 }

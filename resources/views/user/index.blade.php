@@ -38,7 +38,6 @@
                     </div>
                 </div>
             </div>
-            <div class="table-responsive">
                 <table class="table table-bordered table-striped table-hover table-sm" id="table_user">
                     <thead>
                         <tr>
@@ -50,7 +49,6 @@
                         </tr>
                     </thead>
                 </table>
-            </div>
         </div>
     </div>
     <div id="myModal" class="modal fade animate shake" tabindex="-1" role="dialog" data-backdrop="static"
