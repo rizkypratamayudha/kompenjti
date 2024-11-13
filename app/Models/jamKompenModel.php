@@ -14,15 +14,15 @@ class jamKompenModel extends Model
 
     protected $primaryKey = 'jam_kompen_id';
 
-    protected $fillable = ['user_id','semester_id','akumulasi_jam', 'created_at','updated_at'];
+    protected $fillable = ['user_id','periode_id','akumulasi_jam', 'created_at','updated_at'];
 
     public function user(): BelongsTo
     {
         return $this->belongsTo(UserModel::class, 'user_id');
     }
 
-    public function semester(): BelongsTo
+    public function periode(): BelongsTo
     {
-        return $this->belongsTo(SemesterModel::class, 'semester_id');
+        return $this->belongsTo(PeriodeModel::class, 'periode_id');
     }
 }
