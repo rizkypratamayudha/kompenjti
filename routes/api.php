@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\RegisterController;
 use App\Http\Controllers\Api\LoginController;
+use App\Http\Controllers\Api\ProfileController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -26,5 +27,10 @@ Route::post('/loginAPI', [LoginController::class, 'loginAPI']);
 Route::middleware(['auth:api'])->group(function(){
     
 });
-
-
+Route::middleware(['auth:api'])->group(function () {
+     Route::post('/updatePhoto', [ProfileController::class, 'updatePhoto']);
+     Route::put('/updatePassword', [ProfileController::class, 'updatePassword']);
+     Route::delete('/deleteAvatar', [ProfileController::class, 'deleteAvatar']);
+ });
+ 
+ 
