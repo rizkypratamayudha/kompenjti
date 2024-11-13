@@ -19,6 +19,6 @@ class PekerjanController extends Controller
 
         $activeMenu = 'pekerjaan';
         $pekerjaan = PekerjaanModel::all();
-        return  view('pekerjaan.index',['breadcrumb' => $breadcrumb,'page'=> $page,'activeMenu'=> $activeMenu,'pekerjaan' => $pekerjaan]);
+        return  view('dosen.index',['breadcrumb' => $breadcrumb,'page'=> $page,'activeMenu'=> $activeMenu,'tugas' => $pekerjaan]);
     }
 }

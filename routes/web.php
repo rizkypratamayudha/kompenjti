@@ -91,7 +91,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/{id}/show_ajax', [MahasiswaController::class, 'show_ajax']);
     });
 
-    Route::group(['prefix'=> 'pekerjaan'], function () {
+    Route::group(['prefix'=> 'dosen'], function () {
         Route::get('/', [PekerjanController::class, 'index']);
         Route::post('/list', [PekerjanController::class, 'list']);
         Route::get('/create_ajax', [PekerjanController::class, 'create_ajax']);
