@@ -2,7 +2,10 @@
 
 use App\Http\Controllers\Api\RegisterController;
 use App\Http\Controllers\Api\LoginController;
+use App\Http\Controllers\Api\KompetensiController;
 use App\Http\Controllers\Api\ProfileController;
+use App\Http\Controllers\Api\SemesterController;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -23,6 +26,10 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('/registerWithDetails', [RegisterController::class, 'registerWithDetails']);
 Route::post('/loginAPI', [LoginController::class, 'loginAPI']);
+Route::get('kompetensi/{user_id}', [KompetensiController::class, 'index']);
+Route::post('kompetensi', [KompetensiController::class, 'store']);
+Route::get('semester/user/{user_id}', [SemesterController::class, 'getSemesterByUserId']);
+
 
 Route::middleware(['auth:api'])->group(function(){
     

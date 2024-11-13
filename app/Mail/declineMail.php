@@ -27,7 +27,7 @@ class declineMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Decline Mail',
+            subject: 'Penolakan Registrasi',
         );
     }
 

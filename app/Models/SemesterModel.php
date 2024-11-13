@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class SemesterModel extends Model
 {
@@ -13,5 +14,10 @@ class SemesterModel extends Model
 
     protected $primaryKey = 'semester_id';
 
-    protected $fillable = ['semester', 'created_at', 'updated_at'];
+    protected $fillable = ['user_id', 'semester', 'created_at', 'updated_at'];
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(UserModel::class, 'user_id');
+    }
 }

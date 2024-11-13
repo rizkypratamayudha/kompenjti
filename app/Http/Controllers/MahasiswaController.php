@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\jamKompenModel;
+use App\Models\SemesterModel;
 use App\Models\UserModel;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
@@ -21,15 +22,18 @@ class MahasiswaController extends Controller
 
         $activeMenu = 'mhs';
         $user = UserModel::all();
-        return view('mahasiswa.index',['breadcrumb'=>$breadcrumb,'page'=>$page,'activeMenu'=>$activeMenu,'user'=>$user]);
+        $semester = SemesterModel::all();
+        return view('mahasiswa.index',['breadcrumb'=>$breadcrumb,'page'=>$page,'activeMenu'=>$activeMenu,'user'=>$user,'semester'=>$semester]);
     }
 
     public function list(Request $request)
     {
-        $jamKompen = jamKompenModel::select('jam_kompen_id', 'akumulasi_jam', 'user_id') -> with('user');
+        $jamKompen = jamKompenModel::select('jam_kompen_id', 'akumulasi_jam', 'user_id', 'semester_id') 
+        -> with('user')
+        -> with('semester');
 
-        if ($request->user_id){
-            $jamKompen->where('user_id',$request->user_id);
+        if ($request->semester_id){
+            $jamKompen->where('semester_id',$request->semester_id);
         }
         return DataTables::of($jamKompen)
             ->addIndexColumn()

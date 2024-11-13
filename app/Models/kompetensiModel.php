@@ -6,15 +6,23 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class jamKompenModel extends Model
+class kompetensiModel extends Model
 {
     use HasFactory;
 
-    protected $table = 'jam_kompen';
+    protected $table = 'kompetensi';
 
-    protected $primaryKey = 'jam_kompen_id';
+    protected $primaryKey = 'kompetensi_id';
 
-    protected $fillable = ['user_id','semester_id','akumulasi_jam', 'created_at','updated_at'];
+    protected $fillable = [
+        'user_id',
+        'semester_id',
+        'kompetensi_nama',
+        'pengalaman',
+        'bukti',
+        'created_at',
+        'upload_at',
+    ];
 
     public function user(): BelongsTo
     {
