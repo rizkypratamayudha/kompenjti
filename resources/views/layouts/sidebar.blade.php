@@ -30,6 +30,12 @@
                         <p>Dashboard</p>
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a href="{{ url('/riwayat') }}" class="nav-link {{ $activeMenu == 'riwayat' ? 'active' : '' }} ">
+                        <i class="nav-icon fas fa-history"></i>
+                        <p>Riwayat Kompensasi</p>
+                    </a>
+                </li>
                 <li class="nav-header">Validasi Registrasi</li>
                 <li class="nav-item">
                     <a href="{{ url('/validasi') }}" class="nav-link {{ $activeMenu == 'validasi' ? 'active' : '' }} ">
@@ -56,8 +62,6 @@
                         <p>Data Mahasiswa</p>
                     </a>
                 </li>
-                <li class="nav-header">Manage Riwayat Kompen</li>
-                <li class="nav-item">
 
                 </li>
                 <li class="nav-header">Dosen/Tendik</li>
@@ -65,6 +69,50 @@
                     <a href="{{ url('/dosen') }}" class="nav-link {{ $activeMenu == 'dosen' ? 'active' : '' }}">
                         <i class="nav-icon fas fa-plus"></i>
                         <p>Tambah Pekerjaan</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url('/penerimaan') }}" class="nav-link {{ $activeMenu == 'penerimaan' ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-clipboard-check"></i>
+                        <p>Penerimaan</p>
+                    </a>
+                </li>
+                <li class="nav-header">Kaprodi</li>
+                <li class="nav-item">
+                    <a href="{{ url('/penerimaan') }}" class="nav-link {{ $activeMenu == 'penerimaan' ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-clipboard-check"></i>
+                        <p>Penerimaan</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url('/riwayat') }}" class="nav-link {{ $activeMenu == 'riwayat' ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-history"></i>
+                        <p>Riwayat Penerimaan</p>
+                    </a>
+                </li>
+                <li class="nav-header">Mahasiswa</li>
+                <li class="nav-item">
+                    <a href="{{ url('/pekerjaan') }}" class="nav-link {{ $activeMenu == 'pekerjaan' ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-tasks"></i>
+                        <p>Pekerjaan</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url('/riwayat') }}" class="nav-link {{ $activeMenu == 'riwayat' ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-history"></i>
+                        <p>Riwayat Pekerjaan</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url('/notifikasi') }}" class="nav-link {{ $activeMenu == 'notifikasi' ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-bell"></i>
+                        <p>Notifikasi</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url('/kompetensi') }}" class="nav-link {{ $activeMenu == 'kompetensi' ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-id-card"></i>
+                        <p>Kompetensi</p>
                     </a>
                 </li>
             </ul>
