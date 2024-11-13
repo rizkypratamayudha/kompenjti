@@ -89,7 +89,7 @@
             </td>
         </tr>
     </table>
-    
+
 
     <!-- Greeting Section -->
     <p class="greeting">Halo, {{ $data['nama'] }}</p>
@@ -110,7 +110,7 @@
             <td><strong>NIM / NIP :</strong></td>
             <td>{{ $data['nim'] }}</td>
         </tr>
-        
+
         <!-- Logika untuk menampilkan Program Studi dan Angkatan -->
         @if ($data['prodi_id'] && $data['angkatan'])
         <tr>
@@ -121,7 +121,7 @@
             <td><strong>Angkatan:</strong></td>
             <td>{{ $data['angkatan'] }}</td>
         </tr>
-        
+
         <!-- Jika hanya Program Studi yang ada, tampilkan Nama, NIM/NIP dan Program Studi -->
         @elseif ($data['prodi_id'])
         <tr>
@@ -135,7 +135,8 @@
 
     <!-- Message Section -->
     <p class="message">
-        Mohon maaf atas ketidaknyamanan ini. Jika Anda merasa ini adalah kesalahan atau memiliki pertanyaan lebih lanjut, Anda dapat menghubungi tim admin kami.
+        Mohon maaf atas ketidaknyamanan ini,dikarenakan adanya {{$data['alasan']}}.
+        Jika Anda merasa ini adalah kesalahan atau memiliki pertanyaan lebih lanjut, Anda dapat menghubungi tim admin kami.
     </p>
 
     <!-- Button Section -->
