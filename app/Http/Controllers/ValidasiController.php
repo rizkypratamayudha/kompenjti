@@ -13,6 +13,7 @@ use App\Models\UserModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Yajra\DataTables\Facades\DataTables;
 
 class ValidasiController extends Controller
 {
@@ -30,22 +31,30 @@ class ValidasiController extends Controller
         $activeMenu = 'validasi';
         $level = LevelModel::all();
 
-        $userQuery = PendingRegister::with('level');
-
-        // Filter by level_id if provided
-        if ($request->level_id) {
-            $userQuery->where('level_id', $request->level_id);
-        }
-
-        $user = $userQuery->get();
-
         return view('validasi.index', [
             'breadcrumb' => $breadcrumb,
             'activeMenu' => $activeMenu,
             'page' => $page,
-            'user' => $user,
             'level' => $level
         ]);
+    }
+
+    public function list(Request $request){
+        $users = PendingRegister::select('user_id','level_id','username','nama','email','no_hp','angkatan','prodi_id')->with('level','prodi');
+
+        if($request->level_id){
+            $users->where('level_id',$request->level_id);
+        }
+
+        return DataTables::of($users)
+        ->addIndexColumn()
+        ->addColumn('aksi', function ($user) { 
+            $btn  = '<button onclick="modalAction(\'' . url('/validasi/' . $user->user_id .
+                '/show_ajax') . '\')" class="btn btn-info btn-sm">Detail</button> ';
+            return $btn;
+        })
+        ->rawColumns(['aksi']) // memberitahu bahwa kolom aksi adalah html
+        ->make(true);
     }
 
     public function show_ajax(string $id)

@@ -25,11 +25,11 @@ Route::get('login', [AuthController::class, 'login'])->name('login');
 Route::post('login', [AuthController::class, 'postlogin']);
 Route::get('register', [RegisterController::class, 'register']);
 Route::post('register', [RegisterController::class, 'store']);
-Route::get('logout', [AuthController::class, 'logout'])->middleware('auth');
+Route::post('logout', [AuthController::class, 'logout'])->middleware('auth');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/', [welcomeController::class, 'index']);
-    
+
     Route::group(['prefix'=>'profile'], function(){
         Route::get('/edit', [UserController::class, 'profile']);
         Route::post('/update_profile', [UserController::class, 'update_profile']);
@@ -72,6 +72,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::group(['prefix' => 'validasi'], function () {
         Route::get('/', [ValidasiController::class, 'index']);
+        Route::post('/list', [ValidasiController::class, 'list']);
         Route::get('/{id}/show_ajax', [ValidasiController::class, 'show_ajax']);
         Route::post('/approve/{id}', [ValidasiController::class, 'approve']);
         Route::post('/decline/{id}', [ValidasiController::class, 'decline']);
