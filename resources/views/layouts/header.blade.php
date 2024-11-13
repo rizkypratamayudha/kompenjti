@@ -45,7 +45,7 @@
 </li>
 
         <!-- Logout Form -->
-        <form id="logout-form" action="{{ url('logout') }}" method="get" style="display: none;">
+        <form id="logout-form" action="{{ url('logout') }}" method="post" style="display: none;">
             @csrf
         </form>
     </ul>
@@ -102,18 +102,19 @@
     });
 
     document.getElementById('logout-link').addEventListener('click', function(e) {
-        e.preventDefault();
-        Swal.fire({
-            title: 'Apakah Anda yakin ingin keluar?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Ya, keluar!',
-            cancelButtonColor: '#d33',
-            cancelButtonText: 'Batal'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                document.getElementById('logout-form').submit();
-            }
-        });
+    e.preventDefault();
+    Swal.fire({
+        title: 'Apakah Anda yakin ingin keluar?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Ya, keluar!',
+        cancelButtonColor: '#d33',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            document.getElementById('logout-form').submit();
+        }
     });
+});
+
 </script>
