@@ -30,54 +30,77 @@
                     </div>
                 </div>
             </div>
-
-            <div class="row">
-                @if($user->isEmpty())
-                    <div class="col-md-12">
-                        <div class="alert alert-danger">
-                            <h5><i class="icon fas fa-ban"></i> Data Kosong atau tidak ada</h5>
-                        </div>
-                    </div>
-                @else
-                    @foreach ($user as $userItem) <!-- Changed variable name to avoid conflicts -->
-                        <div class="col-md-4">
-                            <div class="card mb-4">
-                                <h5 class="card-header">{{ $userItem->nama }}</h5>
-                                <div class="card-body">
-                                    <h5 class="card-title">{{ $userItem->level->level_nama ?? '-' }}</h5>
-                                    <p class="card-text">{{ $userItem->username }}</p>
-                                    <a href="{{ url('/validasi/' . $userItem->user_id . '/show_ajax') }}" class="btn btn-primary btn-detail">Detail Pengguna</a>
-                                </div>
-                            </div>
-                        </div>
-                    @endforeach
-                @endif
-            </div>
+            <table class="table table-bordered table-striped table-hover table-sm" id="table_validasi">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>NIM</th>
+                        <th>Nama</th>
+                        <th>Role</th>
+                        <th>Email</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+            </table>
         </div>
     </div>
-
     <div id="myModal" class="modal fade animate shake" tabindex="-1" role="dialog" data-backdrop="static"
         data-keyboard="false" data-width="75%" aria-hidden="true"></div>
 @endsection
 
 @push('js')
-    <script>
-        function modalAction(url = '') {
-            $('#myModal').load(url, function() {
-                $('#myModal').modal('show');
-            });
-        }
-        $(document).ready(function() {
-    $('.btn-detail').on('click', function(e) {
-        e.preventDefault();
-        var url = $(this).attr('href');
-
-        // Load the content into the modal
+<script>
+    function modalAction(url = '') {
         $('#myModal').load(url, function() {
             $('#myModal').modal('show');
         });
+    }
+    $(document).ready(function() {
+        dataUser = $('#table_validasi').DataTable({
+            serverSide: true,
+            ajax: {
+                "url": "{{ url('validasi/list') }}",
+                "dataType": "json",
+                "type": "POST",
+                "data": function(d) {
+                    d.level_id = $('#level_id').val();
+                }
+            },
+            columns: [{
+                data: "DT_RowIndex",
+                className: "text-center",
+                orderable: false,
+                searchable: false
+            }, {
+                data: "username",
+                className: "",
+                orderable: true,
+                searchable: true
+            }, {
+                data: "nama",
+                className: "",
+                orderable: true,
+                searchable: true
+            }, {
+                data: "level.level_nama",
+                className: "",
+                orderable: false,
+                searchable: false
+            },{
+                data: "email",
+                className: "",
+                orderable: false,
+                searchable: false
+            },{
+                data: "aksi",
+                className: "text-center",
+                orderable: false,
+                searchable: false
+            }]
+        });
+        $('#level_id').on('change', function() {
+            dataUser.ajax.reload();
+        });
     });
-});
-
     </script>
 @endpush
