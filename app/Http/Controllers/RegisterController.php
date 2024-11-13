@@ -16,7 +16,7 @@ class RegisterController extends Controller
 {
     public function register()
     {
-        $level = LevelModel::all();
+        $level = LevelModel::whereIn('level_id', [2, 3])->get();
         $user = UserModel::all();
         $prodi = ProdiModel::all();
         return view('register.register', ['level' => $level, 'user' => $user, 'prodi' => $prodi]);
