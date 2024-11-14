@@ -69,4 +69,24 @@ class UserModel extends Authenticatable implements JWTSubject
     {
         return $this->level->kode_level;
     }
+
+     // Relasi ke tabel detail_mahasiswa
+public function detailMahasiswa()
+{
+    return $this->hasOne(detail_mahasiswaModel::class, 'user_id', 'user_id');
+}
+
+// Relasi ke tabel detail_dosen
+public function detailDosen()
+{
+    return $this->hasOne(detail_dosenModel::class, 'user_id', 'user_id');
+}
+
+// Relasi ke tabel detail_kaprodi
+public function detailKaprodi()
+{
+    return $this->hasOne(detail_kaprodiModel::class, 'user_id', 'user_id');
+}
+
+
 }

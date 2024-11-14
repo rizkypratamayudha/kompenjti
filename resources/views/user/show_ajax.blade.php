@@ -45,6 +45,35 @@
                             <td class="col-9">{{ $user->nama }}</td>
                         </tr>
                         <tr>
+                            <tr>
+                                <th class="text-right col-3">No HP :</th>
+                                <td class="col-9">
+                                    @if ($user->detailMahasiswa)
+                                        {{ $user->detailMahasiswa->no_hp }}
+                                    @elseif ($user->detailDosen)
+                                        {{ $user->detailDosen->no_hp }}
+                                    @elseif ($user->detailKaprodi)
+                                        {{ $user->detailKaprodi->no_hp }}
+                                    @else
+                                        -
+                                    @endif
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="text-right col-3">Email :</th>
+                                <td class="col-9">
+                                    @if ($user->detailMahasiswa)
+                                        {{ $user->detailMahasiswa->email }}
+                                    @elseif ($user->detailDosen)
+                                        {{ $user->detailDosen->email }}
+                                    @elseif ($user->detailKaprodi)
+                                        {{ $user->detailKaprodi->email }}
+                                    @else
+                                        -
+                                    @endif
+                                </td>
+                            </tr>
+                            
                             <th class="text-right col-3">Password :</th>
                             <td class="col-9" type="password">*******</td>
                         </tr>
