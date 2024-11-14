@@ -10,14 +10,18 @@ class detail_jamKompenModel extends Model
 {
     use HasFactory;
 
-    protected $table = 'jam_kompen';
+    protected $table = 'detail_jam_kompen';
 
-    protected $primaryKey = 'jam_kompen_id';
+    protected $primaryKey = 'detail_jam_kompen_id';
 
-    protected $fillable = ['user_id','semester_id','akumulasi_jam', 'created_at','updated_at'];
+    protected $fillable = ['jam_kompen_id, matkul_id','jam','jumlah_jam', 'created_at','updated_at'];
 
-    public function semester(): BelongsTo
+    public function jamKompen(): BelongsTo
     {
-        return $this->belongsTo(UserModel::class, 'semester_id');
+        return $this->belongsTo(jamKompenModel::class, 'jam_kompen_id');
+    }
+    public function matkul(): BelongsTo
+    {
+        return $this->belongsTo(MatkulModel::class, 'matkul_id');
     }
 }

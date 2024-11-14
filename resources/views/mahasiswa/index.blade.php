@@ -5,8 +5,8 @@
         <div class="card-header">
             <h3 class="card-title">{{ $page->title }}</h3>
             <div class="card-tools"> 
-                <a href="{{ url('/mahasiswa/export_excel') }}" class="btn btn-sm btn-primary mt-1"><i class="fa fa-file-excel"></i> Export Level</a> 
-                <a href="{{ url('/mahasiswa/export_pdf') }}" class="btn btn-sm btn-warning mt-1"><i class="fa fa-file-pdf"></i> Export Level</a>
+                <a href="{{ url('/mahasiswa/export_excel') }}" class="btn btn-sm btn-primary mt-1"><i class="fa fa-file-excel"></i> Export Mahasiswa</a> 
+                <a href="{{ url('/mahasiswa/export_pdf') }}" class="btn btn-sm btn-warning mt-1"><i class="fa fa-file-pdf"></i> Export Mahasiswa</a>
                 <button onclick="modalAction('{{ url('/mahasiswa/import') }}')" class="btn btn-sm btn-info mt-1"><i class="fas fa-file-import"></i> Import Mahasiswa</button>  
                 <button onclick="modalAction('{{ url('/mahasiswa/create_ajax') }}')" class="btn btn-sm btn-success mt-1"><i class="fas fa-user-plus"></i> Tambah Mahasiswa</button>
             </div> 
@@ -24,10 +24,10 @@
                     <div class="form-group row">
                         <label class="col-1 control-label col-form-label">Filter:</label>
                         <div class="col-3">
-                            <select class="form-control" id="semester_id" name="semester_id" required>
+                            <select class="form-control" id="periode_id" name="periode_id" required>
                                 <option value="">- Semua -</option>
-                                @foreach ($semester as $item)
-                                    <option value="{{ $item->semester_id }}">{{ $item->semester }}</option>
+                                @foreach ($periode as $item)
+                                    <option value="{{ $item->periode_id }}">{{ $item->periode_nama }}</option>
                                 @endforeach
                             </select>
                             <small class="form-text text-muted">Periode</small>
@@ -39,10 +39,10 @@
                     <thead>
                         <tr>
                             <th>No</th>
-                            <th>Username</th>
+                            <th>NIM</th>
                             <th>Nama</th>
+                            <th>Periode</th>
                             <th>Jam Kompen</th>
-                            <th>Semester</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -71,7 +71,7 @@
                     "dataType": "json",
                     "type": "POST",
                     "data": function(d) {
-                        d.semester_id = $('#semester_id').val();
+                        d.periode_id = $('#periode_id').val();
                     }
                 },
                 columns: [
@@ -91,15 +91,15 @@
                     orderable: true,
                     searchable: true
                 },{
+                    data: "periode.periode_nama",
+                    className: "",
+                    orderable: true,
+                    searchable: true
+                },{
                     data: "akumulasi_jam",
                     className: "",
                     orderable: false,
                     searchable: false
-                },{
-                    data: "semester.semester",
-                    className: "",
-                    orderable: true,
-                    searchable: true
                 },{
                     data: "aksi",
                     className: "",
@@ -107,7 +107,7 @@
                     searchable: false
                 }]
             });
-            $('#semester_id').on('change', function() {
+            $('#periode_id').on('change', function() {
                 dataMahasiswa.ajax.reload();
             })
         });

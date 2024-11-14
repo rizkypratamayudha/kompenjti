@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\LevelController;
 use App\Http\Controllers\MahasiswaController;
+use App\Http\Controllers\PekerjanController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ValidasiController;
@@ -25,11 +26,11 @@ Route::get('login', [AuthController::class, 'login'])->name('login');
 Route::post('login', [AuthController::class, 'postlogin']);
 Route::get('register', [RegisterController::class, 'register']);
 Route::post('register', [RegisterController::class, 'store']);
-Route::get('logout', [AuthController::class, 'logout'])->middleware('auth');
+Route::post('logout', [AuthController::class, 'logout'])->middleware('auth');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/', [welcomeController::class, 'index']);
-    
+
     Route::group(['prefix'=>'profile'], function(){
         Route::get('/edit', [UserController::class, 'profile']);
         Route::post('/update_profile', [UserController::class, 'update_profile']);
@@ -72,6 +73,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::group(['prefix' => 'validasi'], function () {
         Route::get('/', [ValidasiController::class, 'index']);
+        Route::post('/list', [ValidasiController::class, 'list']);
         Route::get('/{id}/show_ajax', [ValidasiController::class, 'show_ajax']);
         Route::post('/approve/{id}', [ValidasiController::class, 'approve']);
         Route::post('/decline/{id}', [ValidasiController::class, 'decline']);
@@ -87,5 +89,17 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/{id}/delete_ajax', [MahasiswaController::class, 'confirm_ajax']);
         Route::delete('/{id}/delete_ajax', [MahasiswaController::class, 'delete_ajax']);
         Route::get('/{id}/show_ajax', [MahasiswaController::class, 'show_ajax']);
+    });
+
+    Route::group(['prefix'=> 'dosen'], function () {
+        Route::get('/', [PekerjanController::class, 'index']);
+        Route::post('/list', [PekerjanController::class, 'list']);
+        Route::get('/create_ajax', [PekerjanController::class, 'create_ajax']);
+        Route::post('/ajax', [PekerjanController::class, 'store_ajax']);
+        Route::get('/{id}/edit_ajax', [PekerjanController::class, 'edit_ajax']);
+        Route::put('/{id}/update_ajax', [PekerjanController::class, 'update_ajax']);
+        Route::get('/{id}/delete_ajax', [PekerjanController::class, 'confirm_ajax']);
+        Route::delete('/{id}/delete_ajax', [PekerjanController::class, 'delete_ajax']);
+        Route::get('/{id}/show_ajax', [PekerjanController::class, 'show_ajax']);
     });
 });

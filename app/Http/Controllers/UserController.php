@@ -267,67 +267,67 @@ public function confirm_ajax(string $id)
 
     return redirect('/');
 }
- public function import() 
-    { 
-        return view('user.import'); 
+ public function import()
+    {
+        return view('user.import');
     }
-    public function import_ajax(Request $request) 
-    { 
-        if($request->ajax() || $request->wantsJson()){ 
-            $rules = [ 
-                // validasi file harus xls atau xlsx, max 1MB 
-                'file_user' => ['required', 'mimes:xlsx', 'max:1024'] 
-            ]; 
- 
-            $validator = Validator::make($request->all(), $rules); 
-            if($validator->fails()){ 
-                return response()->json([ 
-                    'status' => false, 
-                    'message' => 'Validasi Gagal', 
-                    'msgField' => $validator->errors() 
-                ]); 
-            } 
- 
-            $file = $request->file('file_user');  // ambil file dari request 
- 
-            $reader = IOFactory::createReader('Xlsx');  // load reader file excel 
-            $reader->setReadDataOnly(true);             // hanya membaca data 
-            $spreadsheet = $reader->load($file->getRealPath()); // load file excel 
-            $sheet = $spreadsheet->getActiveSheet();    // ambil sheet yang aktif 
- 
-            $data = $sheet->toArray(null, false, true, true);   // ambil data excel 
- 
-            $insert = []; 
-            if(count($data) > 1){ // jika data lebih dari 1 baris 
-                foreach ($data as $baris => $value) { 
-                    if($baris > 1){ // baris ke 1 adalah header, maka lewati 
-                        $insert[] = [ 
-                            'level_id' => $value['A'], 
-                            'username' => $value['B'], 
-                            'nama' => $value['C'], 
-                            'password' =>Hash::make($value['D']),  
-                            'created_at' => now(), 
-                        ]; 
-                    } 
-                } 
- 
-                if(count($insert) > 0){ 
-                    // insert data ke database, jika data sudah ada, maka diabaikan 
-                    UserModel::insertOrIgnore($insert);    
-                } 
- 
-                return response()->json([ 
-                    'status' => true, 
-                    'message' => 'Data berhasil diimport' 
-                ]); 
-            }else{ 
-                return response()->json([ 
-                    'status' => false, 
-                    'message' => 'Tidak ada data yang diimport' 
-                ]); 
-            } 
-        } 
-        return redirect('/'); 
+    public function import_ajax(Request $request)
+    {
+        if($request->ajax() || $request->wantsJson()){
+            $rules = [
+                // validasi file harus xls atau xlsx, max 1MB
+                'file_user' => ['required', 'mimes:xlsx', 'max:1024']
+            ];
+
+            $validator = Validator::make($request->all(), $rules);
+            if($validator->fails()){
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Validasi Gagal',
+                    'msgField' => $validator->errors()
+                ]);
+            }
+
+            $file = $request->file('file_user');  // ambil file dari request
+
+            $reader = IOFactory::createReader('Xlsx');  // load reader file excel
+            $reader->setReadDataOnly(true);             // hanya membaca data
+            $spreadsheet = $reader->load($file->getRealPath()); // load file excel
+            $sheet = $spreadsheet->getActiveSheet();    // ambil sheet yang aktif
+
+            $data = $sheet->toArray(null, false, true, true);   // ambil data excel
+
+            $insert = [];
+            if(count($data) > 1){ // jika data lebih dari 1 baris
+                foreach ($data as $baris => $value) {
+                    if($baris > 1){ // baris ke 1 adalah header, maka lewati
+                        $insert[] = [
+                            'level_id' => $value['A'],
+                            'username' => $value['B'],
+                            'nama' => $value['C'],
+                            'password' =>Hash::make($value['D']),
+                            'created_at' => now(),
+                        ];
+                    }
+                }
+
+                if(count($insert) > 0){
+                    // insert data ke database, jika data sudah ada, maka diabaikan
+                    UserModel::insertOrIgnore($insert);
+                }
+
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Data berhasil diimport'
+                ]);
+            }else{
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Tidak ada data yang diimport'
+                ]);
+            }
+        }
+        return redirect('/');
     }
     public function export_excel()
     {
@@ -394,7 +394,7 @@ public function confirm_ajax(string $id)
     $user = usermodel::select('level_id', 'username', 'nama') // Pilih kolom yang diperlukan
         ->orderBy('level_id')
         ->orderBy('username')
-        ->with('level') 
+        ->with('level')
         ->get();
 
     // Gunakan library Dompdf untuk membuat PDF
@@ -405,10 +405,10 @@ public function confirm_ajax(string $id)
 
     // Aktifkan opsi untuk memuat gambar dari URL (jika ada)
     $pdf->setOption('isRemoteEnabled', true);
-    
+
     // Render PDF dan tampilkan di browser
     return $pdf->stream('Data User ' . date('Y-m-d H:i:s') . '.pdf');
-}   
+}
 
 public function profile()
 {
@@ -420,7 +420,7 @@ public function profile()
     $page = (object)[
         'title' => 'Edit Profil Pengguna'
     ];
-    
+
     $activeMenu = 'profile'; // Set menu yang aktif
 
     // Ambil data pengguna yang sedang login
@@ -433,7 +433,7 @@ public function profile()
 
     // Ambil level_id dan level_nama dari tabel m_level
     $level_id = $user->level ? $user->level->level_id : null;
-    $level_nama = $user->level ? $user->level->level_nama : 'Tidak ada level'; 
+    $level_nama = $user->level ? $user->level->level_nama : 'Tidak ada level';
 
     return view('profile.index', [
         'breadcrumb' => $breadcrumb,
@@ -451,14 +451,14 @@ public function profile()
         ]);
 
         return redirect()->back();
-         
+
 }
 
 public function updateinfo(Request $request){
     if($request->ajax() || $request->wantsJson()){
         $rules = [
         'level_id' => 'required|integer',
-        'username' => 'nullable|max:20|unique:m_user,username',
+        'username' => 'nullable|max:20|unique:m_user,username,' . $request->user()->user_id . ',user_id',
         'nama'     => 'nullable|max:100',
         ];
 
@@ -513,7 +513,7 @@ public function update_password(Request $request)
     // Ambil user yang sedang login
     $user = $request->user();
 
-    
+
     if ($user) {
         // Cek apakah password lama cocok
         if (!Hash::check($request->current_password, $user->password)) {
