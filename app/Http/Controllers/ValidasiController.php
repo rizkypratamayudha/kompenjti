@@ -9,6 +9,7 @@ use App\Models\detail_kaprodiModel;
 use App\Models\detail_mahasiswaModel;
 use App\Models\LevelModel;
 use App\Models\PendingRegister;
+use App\Models\PeriodeModel;
 use App\Models\ProdiModel;
 use App\Models\UserModel;
 use Illuminate\Http\Request;
@@ -42,7 +43,7 @@ class ValidasiController extends Controller
 
     public function list(Request $request)
     {
-        $users = PendingRegister::select('user_id', 'level_id', 'username', 'nama', 'email', 'no_hp', 'angkatan', 'prodi_id')->with('level', 'prodi');
+        $users = PendingRegister::select('user_id', 'level_id', 'username', 'nama', 'email', 'no_hp', 'angkatan', 'prodi_id','periode_id')->with('level', 'prodi','periode');
 
         if ($request->level_id) {
             $users->where('level_id', $request->level_id);
@@ -62,7 +63,7 @@ class ValidasiController extends Controller
     public function show_ajax(string $id)
     {
 
-        $user = PendingRegister::with(['level', 'prodi'])->find($id);
+        $user = PendingRegister::with(['level', 'prodi','periode'])->find($id);
 
         if (!$user) {
             return response()->json(['error' => 'Data yang anda cari tidak ditemukan'], 404);
@@ -85,10 +86,9 @@ class ValidasiController extends Controller
             'level_id' => $pendingUser->level_id,
             'nama' => $pendingUser->nama,
             'username' => $pendingUser->username,
-            'password' => $pendingUser->password,  // Pastikan password di-hash
+            'password' => $pendingUser->password,
         ]);
 
-        // Move additional data based on level_id
         if ($pendingUser->level_id == 2) {
             detail_dosenModel::create([
                 'user_id' => $user->user_id,
@@ -104,7 +104,7 @@ class ValidasiController extends Controller
                 'email' => $pendingUser->email,
                 'no_hp' => $pendingUser->no_hp,
                 'angkatan' => $pendingUser->angkatan,
-
+                'periode_id' => $pendingUser->periode_id,
             ]);
         } elseif ($pendingUser->level_id == 4) {
             detail_kaprodiModel::create([
@@ -117,8 +117,9 @@ class ValidasiController extends Controller
         }
 
         $prodiNama = ProdiModel::getProdiNama($pendingUser->prodi_id);
+        $periodeNama = PeriodeModel::getPeriodeNama( $pendingUser->periode_id );
 
-        Mail::to($pendingUser->email)->send(new kirimEmail(['nama' => $pendingUser->nama, 'prodi_id' => $prodiNama, 'angkatan' => $pendingUser->angkatan, 'nim' => $pendingUser->username]));
+        Mail::to($pendingUser->email)->send(new kirimEmail(['nama' => $pendingUser->nama, 'prodi_id' => $prodiNama, 'angkatan' => $pendingUser->angkatan, 'nim' => $pendingUser->username, 'periode' => $periodeNama]));
         $pendingUser->delete();
 
         return response()->json(['status' => true, 'message' => 'User approved and moved to respective detail table.']);

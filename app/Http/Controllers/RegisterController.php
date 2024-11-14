@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\DetailMhsModel;
 use App\Models\LevelModel;
 use App\Models\PendingRegister;
+use App\Models\PeriodeModel;
 use App\Models\ProdiModel;
 use App\Models\UserModel;
 use Illuminate\Http\Request;
@@ -19,7 +20,8 @@ class RegisterController extends Controller
         $level = LevelModel::whereIn('level_id', [2, 3])->get();
         $user = UserModel::all();
         $prodi = ProdiModel::all();
-        return view('register.register', ['level' => $level, 'user' => $user, 'prodi' => $prodi]);
+        $periode = PeriodeModel::all();
+        return view('register.register', ['level' => $level, 'user' => $user, 'prodi' => $prodi,'periode'=> $periode]);
     }
 
     public function store(Request $request)
@@ -33,10 +35,9 @@ class RegisterController extends Controller
                 'email' => 'required|email',
                 'no_hp' => 'required|string',
                 'prodi_id' => 'required_if:level_id,3,4',
-                'angkatan' => 'required_if:level_id,3'
-
+                'angkatan' => 'required_if:level_id,3',
+                'periode_id' => 'required|integer',
             ];
-
             $validator = Validator::make($request->all(), $rules);
             if ($validator->fails()) {
                 return response()->json([

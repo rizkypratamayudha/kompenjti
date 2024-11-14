@@ -17,72 +17,79 @@
     <link rel="stylesheet" href="adminlte/dist/css/adminlte.min.css">
     <style>
         body {
-          background: linear-gradient(#050C9C, #3572EF, #3ABEF9, #A7E6FF) !important; /* Gradasi biru */
-          font-family: 'Source Sans Pro', sans-serif;
-          position: relative;
-          overflow: hidden;
+            background: linear-gradient(#050C9C, #3572EF, #3ABEF9, #A7E6FF) !important;
+            /* Gradasi biru */
+            font-family: 'Source Sans Pro', sans-serif;
+            position: relative;
+            overflow: hidden;
         }
-    
+
         /* Adding background image with blur */
         body::before {
-          content: "";
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background: url('download.jpeg') no-repeat center center;
-          background-size: cover;
-          filter: blur(15px); /* Apply blur to the background image */
-          z-index: 1;
-          opacity: 0.5; /* Adjust opacity to blend with gradient */
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('download.jpeg') no-repeat center center;
+            background-size: cover;
+            filter: blur(15px);
+            /* Apply blur to the background image */
+            z-index: 1;
+            opacity: 0.5;
+            /* Adjust opacity to blend with gradient */
         }
-    
+
         .register-box {
-          position: relative;
-          z-index: 2; /* Ensures the form appears above the background */
-          width: 400px;
-          margin: 80px auto;
+            position: relative;
+            z-index: 2;
+            /* Ensures the form appears above the background */
+            width: 400px;
+            margin: 80px auto;
         }
-    
+
         .card {
-          border-radius: 15px;
-          box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.2);
         }
-    
+
         .card-header {
-          background: linear-gradient(135deg, #0077B6, #023E8A); /* Gradasi biru tua */
-          color: white;
-          font-weight: bold;
-          font-size: 20px;
-          border-radius: 15px 15px 0 0;
+            background: linear-gradient(135deg, #0077B6, #023E8A);
+            /* Gradasi biru tua */
+            color: white;
+            font-weight: bold;
+            font-size: 20px;
+            border-radius: 15px 15px 0 0;
         }
-    
+
         .btn-primary {
-          background: linear-gradient(135deg, #0077B6, #023E8A); /* Gradasi biru untuk tombol */
-          border-color: #00509D;
+            background: linear-gradient(135deg, #0077B6, #023E8A);
+            /* Gradasi biru untuk tombol */
+            border-color: #00509D;
         }
-    
+
         .btn-primary:hover {
-          background: linear-gradient(135deg, #00509D, #004080); /* Gradasi biru lebih gelap untuk hover */
-          border-color: #004080;
+            background: linear-gradient(135deg, #00509D, #004080);
+            /* Gradasi biru lebih gelap untuk hover */
+            border-color: #004080;
         }
-    
+
         .form-control {
-          border-radius: 10px;
+            border-radius: 10px;
         }
-    
+
         .input-group-text {
-          border-radius: 0 10px 10px 0;
-          background-color: #EAEAEA;
+            border-radius: 0 10px 10px 0;
+            background-color: #EAEAEA;
         }
-    
+
         .input-group .form-control.is-invalid {
-          border-color: #e3342f;
+            border-color: #e3342f;
         }
-    
-        .input-group .form-control.is-invalid ~ .input-group-text {
-          border-color: #e3342f;
+
+        .input-group .form-control.is-invalid~.input-group-text {
+            border-color: #e3342f;
         }
 
         .toggle-password {
@@ -102,26 +109,26 @@
         .input-group-append button {
             z-index: 0;
         }
-    
+
         .card-body {
-          padding: 30px;
+            padding: 30px;
         }
-    
+
         .mb-0 a {
-          color: #0077B6;
-          font-weight: bold;
+            color: #0077B6;
+            font-weight: bold;
         }
-    
+
         .mb-0 a:hover {
-          text-decoration: underline;
-          color: #004080;
+            text-decoration: underline;
+            color: #004080;
         }
-    
+
         .custom-margin {
-            margin-top: 20px; /* Adjust the value as needed */
+            margin-top: 20px;
+            /* Adjust the value as needed */
         }
-    
-      </style>
+    </style>
 </head>
 
 <body class="hold-transition register-page">
@@ -131,7 +138,7 @@
                 <a href="../../index2.html" class="h1">Register</a>
             </div>
             <div class="card-body">
-  
+
                 <form action="{{ url('register') }}" method="POST" id="form-register">
                     @csrf
                     <div class="input-group mb-3">
@@ -148,7 +155,8 @@
                         </div>
                     </div>
                     <div class="input-group mb-3">
-                        <input id="nama" name="nama" type="text" class="form-control" placeholder="Full Name" required>
+                        <input id="nama" name="nama" type="text" class="form-control" placeholder="Full Name"
+                            required>
                         <div class="input-group-append">
                             <div class="input-group-text">
                                 <span class="fas fa-user-tag"></span>
@@ -156,7 +164,8 @@
                         </div>
                     </div>
                     <div class="input-group mb-3">
-                        <input id="username" name="username" type="number" class="form-control" placeholder="NIM/NIP" required>
+                        <input id="username" name="username" type="number" class="form-control" placeholder="NIM/NIP"
+                            required>
                         <div class="input-group-append">
                             <div class="input-group-text">
                                 <span class="fas fa-envelope"></span>
@@ -164,10 +173,13 @@
                         </div>
                     </div>
                     <div class="input-group mb-3">
-                        <input id="password" name="password" type="password" class="form-control" placeholder="Password" required>
+                        <input id="password" name="password" type="password" class="form-control"
+                            placeholder="Password" required>
                         <div class="input-group-append">
-                            <span class="input-group-text border-0 bg-transparent" style="margin-left: -40px; z-index: 100;">
-                                <i class="fas fa-eye toggle-password" data-target="password" style="cursor: pointer;"></i>
+                            <span class="input-group-text border-0 bg-transparent"
+                                style="margin-left: -40px; z-index: 100;">
+                                <i class="fas fa-eye toggle-password" data-target="password"
+                                    style="cursor: pointer;"></i>
                             </span>
                             <div class="input-group-text">
                                 <span class="fas fa-lock"></span>
@@ -176,10 +188,13 @@
                     </div>
 
                     <div class="input-group mb-3">
-                        <input id="password_confirmation" type="password" class="form-control" name="password_confirmation" placeholder="Ulang Password" required>
+                        <input id="password_confirmation" type="password" class="form-control"
+                            name="password_confirmation" placeholder="Ulang Password" required>
                         <div class="input-group-append">
-                            <span class="input-group-text border-0 bg-transparent" style="margin-left: -40px; z-index: 100;">
-                                <i class="fas fa-eye toggle-password" data-target="password_confirmation" style="cursor: pointer;"></i>
+                            <span class="input-group-text border-0 bg-transparent"
+                                style="margin-left: -40px; z-index: 100;">
+                                <i class="fas fa-eye toggle-password" data-target="password_confirmation"
+                                    style="cursor: pointer;"></i>
                             </span>
                             <div class="input-group-text">
                                 <span class="fas fa-lock"></span>
@@ -187,9 +202,9 @@
                         </div>
                     </div>
                     <div id="additional-fields">
-                        <div class="input-group mb-3" id="email-field" style="display: none;" >
-                            <input id="email" name="email" type="email" class="form-control"
-                                placeholder="Email" required>
+                        <div class="input-group mb-3" id="email-field" style="display: none;">
+                            <input id="email" name="email" type="email" class="form-control" placeholder="Email"
+                                required>
                             <div class="input-group-append">
                                 <div class="input-group-text">
                                     <span class="fas fa-envelope"></span>
@@ -197,9 +212,9 @@
                             </div>
                         </div>
 
-                        <div class="input-group mb-3" id="no-hp-field" style="display: none;" >
-                            <input id="no_hp" name="no_hp" type="number" class="form-control"
-                                placeholder="No HP" required>
+                        <div class="input-group mb-3" id="no-hp-field" style="display: none;">
+                            <input id="no_hp" name="no_hp" type="number" class="form-control" placeholder="No HP"
+                                required>
                             <div class="input-group-append">
                                 <div class="input-group-text">
                                     <span class="fas fa-phone"></span>
@@ -222,23 +237,38 @@
                         </div>
 
                         <div class="input-group mb-3" id="angkatan-field" style="display: none;">
-                            <input id="angkatan" name="angkatan" type="number" min="2018" max="2024" class="form-control"
-                                placeholder="Angkatan" required>
+                            <input id="angkatan" name="angkatan" type="number" min="2018" max="2024"
+                                class="form-control" placeholder="Angkatan" required>
                             <div class="input-group-append">
                                 <div class="input-group-text">
                                     <span class="fas fa-calendar-alt"></span>
                                 </div>
                             </div>
                         </div>
+
+                        <div class="input-group mb-3" id="periode-field" style="display: none;">
+                            <select class="form-control" id="periode_id" name="periode_id" required>
+                                <option value="">- Pilih Periode -</option>
+                                @foreach ($periode as $item)
+                                    <option value="{{ $item->periode_id }}">{{ $item->periode_nama }}</option>
+                                @endforeach
+                            </select>
+                            <div class="input-group-append">
+                                <div class="input-group-text">
+                                    <span class="fas fa-level-down-alt"></span>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
 
                     <div class="row">
                         <button type="submit" class="btn btn-primary btn-block">Register</button>
-                      </div>
-                    </form>
-                    <p class="mb-0 text-center custom-margin"> <!-- Added custom class -->
-                      <a href="{{ url('login') }}">I already have a membership</a>
-                  </p>
+                    </div>
+                </form>
+                <p class="mb-0 text-center custom-margin"> <!-- Added custom class -->
+                    <a href="{{ url('login') }}">I already have a membership</a>
+                </p>
             </div>
         </div>
     </div>
@@ -259,7 +289,7 @@
             const icon = $(this);
             const targetId = icon.data('target');
             const input = $(`#${targetId}`);
-            
+
             // Toggle password visibility
             if (input.attr('type') === 'password') {
                 input.attr('type', 'text');
@@ -273,29 +303,53 @@
             // Show/hide fields based on role selection
             $('#level_id').change(function() {
                 var selectedRole = $(this).val();
-                
-                $('#email-field, #no-hp-field, #prodi-field, #angkatan-field').hide();
-                
-                if (selectedRole == '3' ) {
-                    $('#email-field, #no-hp-field, #prodi-field, #angkatan-field').show();
-                    $("#email").rules("add", { required: true, email: true });
-                    $("#no_hp").rules("add", { required: true });
-                    $("#prodi_id").rules("add", { required: true });
-                    $("#angkatan").rules("add", { required: true });
-                } 
-                else if (selectedRole == '4') {
-                    $('#email-field, #no-hp-field, #prodi-field').show(); 
-                    $("#email").rules("add", { required: true, email: true });
-                    $("#no_hp").rules("add", { required: true });
-                    $("#prodi_id").rules("add", { required: true }); 
-                    $("#angkatan").rules("remove", "required"); 
-                }
-                else if (selectedRole == '1' || selectedRole == '2') {
+
+                $('#email-field, #no-hp-field, #prodi-field, #angkatan-field, #periode-field').hide();
+
+                if (selectedRole == '3') {
+                    $('#email-field, #no-hp-field, #prodi-field, #angkatan-field, #periode-field').show();
+                    $("#email").rules("add", {
+                        required: true,
+                        email: true
+                    });
+                    $("#no_hp").rules("add", {
+                        required: true
+                    });
+                    $("#prodi_id").rules("add", {
+                        required: true
+                    });
+                    $("#angkatan").rules("add", {
+                        required: true
+                    });
+                    $("#periode_id").rules("add", {
+                        required: true
+                    });
+                } else if (selectedRole == '4') {
+                    $('#email-field, #no-hp-field, #prodi-field').show();
+                    $("#email").rules("add", {
+                        required: true,
+                        email: true
+                    });
+                    $("#no_hp").rules("add", {
+                        required: true
+                    });
+                    $("#prodi_id").rules("add", {
+                        required: true
+                    });
+                    $("#angkatan").rules("remove", "required");
+                    $("#periode_id").rules("remove", "required");
+                } else if (selectedRole == '1' || selectedRole == '2') {
                     $('#email-field, #no-hp-field').show();
-                    $("#email").rules("add", { required: true, email: true });
-                    $("#no_hp").rules("add", { required: true });
+                    $("#email").rules("add", {
+                        required: true,
+                        email: true
+                    });
+                    $("#no_hp").rules("add", {
+                        required: true
+                    });
                     $("#prodi_id").rules("remove", "required");
                     $("#angkatan").rules("remove", "required");
+                    $("#periode_id").rules("remove", "required");
                 }
             });
 

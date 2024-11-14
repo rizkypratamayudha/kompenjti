@@ -15,4 +15,10 @@ class PeriodeModel extends Model
     protected $primaryKey = 'periode_id';
 
     protected $fillable = ['periode_nama'];
+
+    public static function getPeriodeNama($periodeId)
+    {
+        $periode = self::find($periodeId);
+        return $periode ? $periode->periode_nama : null;
+    }
 }

@@ -112,7 +112,7 @@
         </tr>
 
         <!-- Logika untuk menampilkan Program Studi dan Angkatan -->
-        @if ($data['prodi_id'] && $data['angkatan'])
+        @if ($data['prodi_id'] && $data['angkatan'] && $data['periode'])
         <tr>
             <td><strong>Program Studi:</strong></td>
             <td>{{ $data['prodi_id'] }}</td>
@@ -120,6 +120,10 @@
         <tr>
             <td><strong>Angkatan:</strong></td>
             <td>{{ $data['angkatan'] }}</td>
+        </tr>
+        <tr>
+            <td><strong>Periode:</strong></td>
+            <td>{{ $data['periode'] }}</td>
         </tr>
 
         <!-- Jika hanya Program Studi yang ada, tampilkan Nama, NIM/NIP dan Program Studi -->
@@ -135,7 +139,7 @@
 
     <!-- Message Section -->
     <p class="message">
-        Mohon maaf atas ketidaknyamanan ini,dikarenakan adanya {{$data['alasan']}}.
+        Mohon maaf atas ketidaknyamanan ini,dikarenakan adanya <strong>{{$data['alasan']}}.</strong>
         Jika Anda merasa ini adalah kesalahan atau memiliki pertanyaan lebih lanjut, Anda dapat menghubungi tim admin kami.
     </p>
 

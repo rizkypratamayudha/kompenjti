@@ -5,7 +5,7 @@
         <div class="card-header">
             <h3 class="card-title">{{ $page->title }}</h3>
             <div class="card-tools">
-                <button class="btn btn-sm mt-1 btn-primary" onclick="modalAction('{{ '/dosen/create_ajax' }}')"><i
+                <button class="btn btn-sm mt-1 btn-primary" onclick="modalAction('{{ 'dosen/create_ajax' }}')"><i
                         class="fas fa-plus-circle"></i> Pekerjaan</button>
             </div>
         </div>
@@ -41,7 +41,7 @@
                     <p class="mt-3">Belum membuat pekerjaan!!!</p>
                 </div>
             @endif
-            <h2>halooo</h2>
+
         </div>
     </div>
     <div id="myModal" class="modal fade animate shake" tabindex="-1" role="dialog" data-backdrop="static"
