@@ -78,6 +78,8 @@ class UserController extends Controller
             'level_id' => 'required|integer',
             'username' => 'required|string|min:3|unique:m_user,username',
             'nama' => 'required|string|max:100',
+            'email' => 'required|email',
+            'no_hp' => 'required|string',
             'password' => 'required|min:6'
         ];
 
@@ -106,28 +108,57 @@ class UserController extends Controller
 
 public function show_ajax(string $id)
     {
-        $user   = UserModel::find($id);
+        $user = UserModel::with(['detailMahasiswa', 'detailDosen', 'detailKaprodi'])->find($id);
 
-        return view('user.show_ajax', ['user' => $user]);
+    // Tentukan sumber data no_hp dan email berdasarkan peran
+    if ($user->role == 'mahasiswa' && $user->detailMahasiswa) {
+        $contact = $user->detailMahasiswa;
+    } elseif ($user->role == 'dosen' && $user->detailDosen) {
+        $contact = $user->detailDosen;
+    } elseif ($user->role == 'kaprodi' && $user->detailKaprodi) {
+        $contact = $user->detailKaprodi;
+    } else {
+        $contact = null;
+    }
+
+    return view('user.show_ajax', [
+        'user' => $user,
+        'contact' => $contact,
+    ]);
     }
 
     public function edit_ajax(string $id)
     {
-        $user = UserModel::find($id);
+        $user = UserModel::with(['detailMahasiswa', 'detailDosen', 'detailKaprodi'])->find($id);
         $level = LevelModel::select('level_id', 'level_nama')->get();
 
-        return view('user.edit_ajax', ['user' => $user, 'level' => $level]);
+    if ($user->role == 'mahasiswa' && $user->detailMahasiswa) {
+        $contact = $user->detailMahasiswa;
+    } elseif ($user->role == 'dosen' && $user->detailDosen) {
+        $contact = $user->detailDosen;
+    } elseif ($user->role == 'kaprodi' && $user->detailKaprodi) {
+        $contact = $user->detailKaprodi;
+    } else {
+        $contact = null;
+    }
+
+    return view('user.edit_ajax', [
+        'user' => $user,
+        'level' => $level,
+        'contact' => $contact,
+    ]);
     }
 
     public function update_ajax(Request $request, $id)
 {
-    // cek apakah request dari ajax
     if ($request->ajax() || $request->wantsJson()) {
         $rules = [
             'level_id' => 'required|integer',
             'username' => 'required|max:20|unique:m_user,username,' . $id . ',user_id',
             'nama'     => 'required|max:100',
-            'password' => 'nullable|min:6|max:20' // Password masih bisa diisi atau dibiarkan kosong
+            'email' => 'required|email',
+            'no_hp' => 'required|string',
+            'password' => 'nullable|min:6|max:20'
         ];
 
         // Validasi request
@@ -135,9 +166,9 @@ public function show_ajax(string $id)
 
         if ($validator->fails()) {
             return response()->json([
-                'status'   => false, // respon json, true: berhasil, false: gagal
+                'status'   => false,
                 'message'  => 'Validasi gagal.',
-                'msgField' => $validator->errors() // menunjukkan field mana yang error
+                'msgField' => $validator->errors()
             ]);
         }
 
@@ -153,6 +184,25 @@ public function show_ajax(string $id)
 
             // Update data user
             $user->update($request->all());
+
+            // Update no_hp dan email sesuai dengan peran menggunakan hasRole
+            if ($user->hasRole('mahasiswa') && $user->detailMahasiswa) {
+                $user->detailMahasiswa->update([
+                    'no_hp' => $request->no_hp,
+                    'email' => $request->email,
+                ]);
+            } elseif ($user->hasRole('dosen') && $user->detailDosen) {
+                $user->detailDosen->update([
+                    'no_hp' => $request->no_hp,
+                    'email' => $request->email,
+                ]);
+            } elseif ($user->hasRole('kaprodi') && $user->detailKaprodi) {
+                $user->detailKaprodi->update([
+                    'no_hp' => $request->no_hp,
+                    'email' => $request->email,
+                ]);
+            }
+
             return response()->json([
                 'status'  => true,
                 'message' => 'Data berhasil diupdate'
@@ -166,6 +216,7 @@ public function show_ajax(string $id)
     }
     return redirect('/');
 }
+
 
 public function confirm_ajax(string $id)
     {
