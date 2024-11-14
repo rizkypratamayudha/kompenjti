@@ -14,7 +14,7 @@ class detail_mahasiswaModel extends Model
 
     protected $primaryKey = 'detail_mahasiswa_id';
 
-    protected $fillable = ['user_id','email','no_hp','angkatan','prodi_id','created_at','updated_at'];
+    protected $fillable = ['user_id','email','no_hp','angkatan','prodi_id','periode_id','created_at','updated_at'];
 
     public function user(): BelongsTo
     {
@@ -24,5 +24,10 @@ class detail_mahasiswaModel extends Model
     public function prodi(): BelongsTo
     {
         return $this->belongsTo(ProdiModel::class, 'prodi_id');
+    }
+
+    public function periode(): BelongsTo
+    {
+        return $this->belongsTo(PeriodeModel::class, 'periode_id');
     }
 }
