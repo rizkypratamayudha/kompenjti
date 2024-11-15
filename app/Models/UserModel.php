@@ -29,7 +29,6 @@ class UserModel extends Authenticatable implements JWTSubject
         'username',
         'nama',
         'password',
-        'avatar'
     ];
 
     protected $hidden = ['password'];
@@ -87,6 +86,10 @@ public function detailKaprodi()
 {
     return $this->hasOne(detail_kaprodiModel::class, 'user_id', 'user_id');
 }
-
+// Relasi ke tabel profile untuk mengambil avatar
+public function profile()
+{
+    return $this->hasOne(ProfileModel::class, 'user_id', 'user_id');
+}
 
 }
