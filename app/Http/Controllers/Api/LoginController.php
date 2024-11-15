@@ -18,7 +18,7 @@ class LoginController extends Controller
             'role' => 'required|string'
         ]);
 
-        // Cari user berdasarkan username
+        // Find user by username
         $user = UserModel::where('username', $request->username)->first();
 
         if (!$user || !Hash::check($request->password, $user->password)) {
@@ -28,7 +28,7 @@ class LoginController extends Controller
             ], 401);
         }
 
-        // Cek apakah role sesuai
+        // Check if role matches
         if ($user->getRoleName() !== $request->role) {
             return response()->json([
                 'success' => false,
@@ -46,7 +46,8 @@ class LoginController extends Controller
                 'name' => $user->nama,
                 'username' => $user->username,
                 'password' => $user->password,
-                'role' => $user->getRoleName()
+                'role' => $user->getRoleName(),
+                'avatar' => $user->avatar ? asset('storage/' . $user->avatar) : null
             ],
             'token' => $token
         ]);

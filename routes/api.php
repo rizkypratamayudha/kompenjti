@@ -5,7 +5,7 @@ use App\Http\Controllers\Api\RegisterController;
 use App\Http\Controllers\Api\LoginController;
 use App\Http\Controllers\Api\KompetensiController;
 use App\Http\Controllers\Api\ProfileController;
-use App\Http\Controllers\Api\SemesterController;
+use App\Http\Controllers\Api\DetailMahasiswaController;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -29,7 +29,11 @@ Route::post('/registerWithDetails', [RegisterController::class, 'registerWithDet
 Route::post('/loginAPI', [LoginController::class, 'loginAPI']);
 Route::get('kompetensi/{user_id}', [KompetensiController::class, 'index']);
 Route::post('kompetensi', [KompetensiController::class, 'store']);
-Route::get('semester/user/{user_id}', [SemesterController::class, 'getSemesterByUserId']);
+Route::get('kompetensi/periode/{user_id}', [KompetensiController::class, 'getPeriodeByUserId']);
+Route::get('detail-mahasiswa/user/{user_id}', [DetailMahasiswaController::class, 'getDetailByUserId']);
+Route::put('kompetensi/update/{id}', [KompetensiController::class, 'update']);
+Route::delete('kompetensi/delete/{id}', [KompetensiController::class, 'destroy']);
+
 
 
 

@@ -16,7 +16,6 @@ class kompetensiModel extends Model
 
     protected $fillable = [
         'user_id',
-        'semester_id',
         'kompetensi_nama',
         'pengalaman',
         'bukti',
@@ -27,10 +26,5 @@ class kompetensiModel extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(UserModel::class, 'user_id');
-    }
-
-    public function semester(): BelongsTo
-    {
-        return $this->belongsTo(SemesterModel::class, 'semester_id');
     }
 }
