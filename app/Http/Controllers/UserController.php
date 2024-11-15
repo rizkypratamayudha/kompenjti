@@ -66,65 +66,66 @@ class UserController extends Controller
             ->make(true);
     }
 
-    public function create_ajax (){
-        $level = LevelModel::select('level_id','level_nama')->get();
-        return view('user.create_ajax',['level'=>$level]);
+    public function create_ajax()
+    {
+        $level = LevelModel::select('level_id', 'level_nama')->get();
+        return view('user.create_ajax', ['level' => $level]);
     }
 
     public function store_ajax(Request $request)
-{
-    if ($request->ajax() || $request->wantsJson()) {
-        $rules = [
-            'level_id' => 'required|integer',
-            'username' => 'required|string|min:3|unique:m_user,username',
-            'nama' => 'required|string|max:100',
-            'email' => 'required|email',
-            'no_hp' => 'required|string',
-            'password' => 'required|min:6'
-        ];
+    {
+        if ($request->ajax() || $request->wantsJson()) {
+            $rules = [
+                'level_id' => 'required|integer',
+                'username' => 'required|string|min:3|unique:m_user,username',
+                'nama' => 'required|string|max:100',
+                'email' => 'required|email',
+                'no_hp' => 'required|string',
+                'password' => 'required|min:6'
+            ];
 
-        $validator = Validator::make($request->all(), $rules);
-        if ($validator->fails()) {
+            $validator = Validator::make($request->all(), $rules);
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Validasi Gagal',
+                    'msgField' => $validator->errors(),
+                ]);
+            }
+
+            // Hash the password before saving the user
+            $data = $request->all();
+            $data['password'] = Hash::make($request->password); // Hash the password
+
+            UserModel::create($data);
+
             return response()->json([
-                'status' => false,
-                'message' => 'Validasi Gagal',
-                'msgField' => $validator->errors(),
+                'status' => true,
+                'message' => 'Data user berhasil disimpan'
             ]);
         }
-
-        // Hash the password before saving the user
-        $data = $request->all();
-        $data['password'] = Hash::make($request->password); // Hash the password
-
-        UserModel::create($data);
-
-        return response()->json([
-            'status' => true,
-            'message' => 'Data user berhasil disimpan'
-        ]);
+        return redirect('/');
     }
-    return redirect('/');
-}
 
-public function show_ajax(string $id)
+    public function show_ajax(string $id)
     {
         $user = UserModel::with(['detailMahasiswa', 'detailDosen', 'detailKaprodi'])->find($id);
 
-    // Tentukan sumber data no_hp dan email berdasarkan peran
-    if ($user->role == 'mahasiswa' && $user->detailMahasiswa) {
-        $contact = $user->detailMahasiswa;
-    } elseif ($user->role == 'dosen' && $user->detailDosen) {
-        $contact = $user->detailDosen;
-    } elseif ($user->role == 'kaprodi' && $user->detailKaprodi) {
-        $contact = $user->detailKaprodi;
-    } else {
-        $contact = null;
-    }
+        // Tentukan sumber data no_hp dan email berdasarkan peran
+        if ($user->role == 'mahasiswa' && $user->detailMahasiswa) {
+            $contact = $user->detailMahasiswa;
+        } elseif ($user->role == 'dosen' && $user->detailDosen) {
+            $contact = $user->detailDosen;
+        } elseif ($user->role == 'kaprodi' && $user->detailKaprodi) {
+            $contact = $user->detailKaprodi;
+        } else {
+            $contact = null;
+        }
 
-    return view('user.show_ajax', [
-        'user' => $user,
-        'contact' => $contact,
-    ]);
+        return view('user.show_ajax', [
+            'user' => $user,
+            'contact' => $contact,
+        ]);
     }
 
     public function edit_ajax(string $id)
@@ -132,93 +133,93 @@ public function show_ajax(string $id)
         $user = UserModel::with(['detailMahasiswa', 'detailDosen', 'detailKaprodi'])->find($id);
         $level = LevelModel::select('level_id', 'level_nama')->get();
 
-    if ($user->role == 'mahasiswa' && $user->detailMahasiswa) {
-        $contact = $user->detailMahasiswa;
-    } elseif ($user->role == 'dosen' && $user->detailDosen) {
-        $contact = $user->detailDosen;
-    } elseif ($user->role == 'kaprodi' && $user->detailKaprodi) {
-        $contact = $user->detailKaprodi;
-    } else {
-        $contact = null;
-    }
+        if ($user->role == 'mahasiswa' && $user->detailMahasiswa) {
+            $contact = $user->detailMahasiswa;
+        } elseif ($user->role == 'dosen' && $user->detailDosen) {
+            $contact = $user->detailDosen;
+        } elseif ($user->role == 'kaprodi' && $user->detailKaprodi) {
+            $contact = $user->detailKaprodi;
+        } else {
+            $contact = null;
+        }
 
-    return view('user.edit_ajax', [
-        'user' => $user,
-        'level' => $level,
-        'contact' => $contact,
-    ]);
+        return view('user.edit_ajax', [
+            'user' => $user,
+            'level' => $level,
+            'contact' => $contact,
+        ]);
     }
 
     public function update_ajax(Request $request, $id)
-{
-    if ($request->ajax() || $request->wantsJson()) {
-        $rules = [
-            'level_id' => 'required|integer',
-            'username' => 'required|max:20|unique:m_user,username,' . $id . ',user_id',
-            'nama'     => 'required|max:100',
-            'email' => 'required|email',
-            'no_hp' => 'required|string',
-            'password' => 'nullable|min:6|max:20'
-        ];
+    {
+        if ($request->ajax() || $request->wantsJson()) {
+            $rules = [
+                'level_id' => 'required|integer',
+                'username' => 'required|max:20|unique:m_user,username,' . $id . ',user_id',
+                'nama'     => 'required|max:100',
+                'email' => 'required|email',
+                'no_hp' => 'required|string',
+                'password' => 'nullable|min:6|max:20'
+            ];
 
-        // Validasi request
-        $validator = Validator::make($request->all(), $rules);
+            // Validasi request
+            $validator = Validator::make($request->all(), $rules);
 
-        if ($validator->fails()) {
-            return response()->json([
-                'status'   => false,
-                'message'  => 'Validasi gagal.',
-                'msgField' => $validator->errors()
-            ]);
-        }
+            if ($validator->fails()) {
+                return response()->json([
+                    'status'   => false,
+                    'message'  => 'Validasi gagal.',
+                    'msgField' => $validator->errors()
+                ]);
+            }
 
-        $user = UserModel::find($id);
-        if ($user) {
-            // Jika password diisi, hash password sebelum menyimpan
-            if ($request->filled('password')) {
-                $request->merge(['password' => Hash::make($request->password)]);
+            $user = UserModel::find($id);
+            if ($user) {
+                // Jika password diisi, hash password sebelum menyimpan
+                if ($request->filled('password')) {
+                    $request->merge(['password' => Hash::make($request->password)]);
+                } else {
+                    // Jika tidak diisi, hapus password dari request
+                    $request->request->remove('password');
+                }
+
+                // Update data user
+                $user->update($request->all());
+
+                // Update no_hp dan email sesuai dengan peran menggunakan hasRole
+                if ($user->hasRole('mahasiswa') && $user->detailMahasiswa) {
+                    $user->detailMahasiswa->update([
+                        'no_hp' => $request->no_hp,
+                        'email' => $request->email,
+                    ]);
+                } elseif ($user->hasRole('dosen') && $user->detailDosen) {
+                    $user->detailDosen->update([
+                        'no_hp' => $request->no_hp,
+                        'email' => $request->email,
+                    ]);
+                } elseif ($user->hasRole('kaprodi') && $user->detailKaprodi) {
+                    $user->detailKaprodi->update([
+                        'no_hp' => $request->no_hp,
+                        'email' => $request->email,
+                    ]);
+                }
+
+                return response()->json([
+                    'status'  => true,
+                    'message' => 'Data berhasil diupdate'
+                ]);
             } else {
-                // Jika tidak diisi, hapus password dari request
-                $request->request->remove('password');
-            }
-
-            // Update data user
-            $user->update($request->all());
-
-            // Update no_hp dan email sesuai dengan peran menggunakan hasRole
-            if ($user->hasRole('mahasiswa') && $user->detailMahasiswa) {
-                $user->detailMahasiswa->update([
-                    'no_hp' => $request->no_hp,
-                    'email' => $request->email,
-                ]);
-            } elseif ($user->hasRole('dosen') && $user->detailDosen) {
-                $user->detailDosen->update([
-                    'no_hp' => $request->no_hp,
-                    'email' => $request->email,
-                ]);
-            } elseif ($user->hasRole('kaprodi') && $user->detailKaprodi) {
-                $user->detailKaprodi->update([
-                    'no_hp' => $request->no_hp,
-                    'email' => $request->email,
+                return response()->json([
+                    'status'  => false,
+                    'message' => 'Data tidak ditemukan'
                 ]);
             }
-
-            return response()->json([
-                'status'  => true,
-                'message' => 'Data berhasil diupdate'
-            ]);
-        } else {
-            return response()->json([
-                'status'  => false,
-                'message' => 'Data tidak ditemukan'
-            ]);
         }
+        return redirect('/');
     }
-    return redirect('/');
-}
 
 
-public function confirm_ajax(string $id)
+    public function confirm_ajax(string $id)
     {
         $user   = UserModel::find($id);
 
@@ -226,61 +227,61 @@ public function confirm_ajax(string $id)
     }
 
     public function delete_ajax(Request $request, $id)
-{
-    if ($request->ajax() || $request->wantsJson()) {
-        $user = UserModel::find($id);
+    {
+        if ($request->ajax() || $request->wantsJson()) {
+            $user = UserModel::find($id);
 
-        if ($user) {
-            DB::beginTransaction(); // Mulai transaksi untuk memastikan integritas data
-            try {
-                // Hapus data terkait berdasarkan level_id
-                if ($user->level_id == 2) {
-                    detail_dosenModel::where('user_id', $id)->delete();
-                } elseif ($user->level_id == 3) {
-                    detail_mahasiswaModel::where('user_id', $id)->delete();
-                } elseif ($user->level_id == 4) {
-                    detail_kaprodiModel::where('user_id', $id)->delete();
+            if ($user) {
+                DB::beginTransaction(); // Mulai transaksi untuk memastikan integritas data
+                try {
+                    // Hapus data terkait berdasarkan level_id
+                    if ($user->level_id == 2) {
+                        detail_dosenModel::where('user_id', $id)->delete();
+                    } elseif ($user->level_id == 3) {
+                        detail_mahasiswaModel::where('user_id', $id)->delete();
+                    } elseif ($user->level_id == 4) {
+                        detail_kaprodiModel::where('user_id', $id)->delete();
+                    }
+
+                    // Hapus data utama dari UserModel
+                    $user->delete();
+
+                    DB::commit(); // Commit transaksi jika semua operasi berhasil
+                    return response()->json([
+                        'status' => true,
+                        'message' => 'Data berhasil dihapus beserta data terkait'
+                    ]);
+                } catch (\Exception $e) {
+                    DB::rollBack(); // Batalkan transaksi jika terjadi kesalahan
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Data gagal dihapus karena terjadi kesalahan: ' . $e->getMessage()
+                    ]);
                 }
-
-                // Hapus data utama dari UserModel
-                $user->delete();
-
-                DB::commit(); // Commit transaksi jika semua operasi berhasil
-                return response()->json([
-                    'status' => true,
-                    'message' => 'Data berhasil dihapus beserta data terkait'
-                ]);
-            } catch (\Exception $e) {
-                DB::rollBack(); // Batalkan transaksi jika terjadi kesalahan
+            } else {
                 return response()->json([
                     'status' => false,
-                    'message' => 'Data gagal dihapus karena terjadi kesalahan: ' . $e->getMessage()
+                    'message' => 'Data tidak ditemukan'
                 ]);
             }
-        } else {
-            return response()->json([
-                'status' => false,
-                'message' => 'Data tidak ditemukan'
-            ]);
         }
-    }
 
-    return redirect('/');
-}
- public function import()
+        return redirect('/');
+    }
+    public function import()
     {
         return view('user.import');
     }
     public function import_ajax(Request $request)
     {
-        if($request->ajax() || $request->wantsJson()){
+        if ($request->ajax() || $request->wantsJson()) {
             $rules = [
                 // validasi file harus xls atau xlsx, max 1MB
                 'file_user' => ['required', 'mimes:xlsx', 'max:1024']
             ];
 
             $validator = Validator::make($request->all(), $rules);
-            if($validator->fails()){
+            if ($validator->fails()) {
                 return response()->json([
                     'status' => false,
                     'message' => 'Validasi Gagal',
@@ -298,20 +299,20 @@ public function confirm_ajax(string $id)
             $data = $sheet->toArray(null, false, true, true);   // ambil data excel
 
             $insert = [];
-            if(count($data) > 1){ // jika data lebih dari 1 baris
+            if (count($data) > 1) { // jika data lebih dari 1 baris
                 foreach ($data as $baris => $value) {
-                    if($baris > 1){ // baris ke 1 adalah header, maka lewati
+                    if ($baris > 1) { // baris ke 1 adalah header, maka lewati
                         $insert[] = [
                             'level_id' => $value['A'],
                             'username' => $value['B'],
                             'nama' => $value['C'],
-                            'password' =>Hash::make($value['D']),
+                            'password' => Hash::make($value['D']),
                             'created_at' => now(),
                         ];
                     }
                 }
 
-                if(count($insert) > 0){
+                if (count($insert) > 0) {
                     // insert data ke database, jika data sudah ada, maka diabaikan
                     UserModel::insertOrIgnore($insert);
                 }
@@ -320,7 +321,7 @@ public function confirm_ajax(string $id)
                     'status' => true,
                     'message' => 'Data berhasil diimport'
                 ]);
-            }else{
+            } else {
                 return response()->json([
                     'status' => false,
                     'message' => 'Tidak ada data yang diimport'
@@ -389,183 +390,182 @@ public function confirm_ajax(string $id)
         exit;
     }
     public function export_pdf()
-{
-    // Ambil data user dari database
-    $user = usermodel::select('level_id', 'username', 'nama') // Pilih kolom yang diperlukan
-        ->orderBy('level_id')
-        ->orderBy('username')
-        ->with('level')
-        ->get();
+    {
+        // Ambil data user dari database
+        $user = usermodel::select('level_id', 'username', 'nama') // Pilih kolom yang diperlukan
+            ->orderBy('level_id')
+            ->orderBy('username')
+            ->with('level')
+            ->get();
 
-    // Gunakan library Dompdf untuk membuat PDF
-    $pdf = Pdf::loadView('user.export_pdf', ['user' => $user]); // Ganti 'User' menjadi 'user'
+        // Gunakan library Dompdf untuk membuat PDF
+        $pdf = Pdf::loadView('user.export_pdf', ['user' => $user]); // Ganti 'User' menjadi 'user'
 
-    // Atur ukuran kertas dan orientasi
-    $pdf->setPaper('A4', 'portrait');
+        // Atur ukuran kertas dan orientasi
+        $pdf->setPaper('A4', 'portrait');
 
-    // Aktifkan opsi untuk memuat gambar dari URL (jika ada)
-    $pdf->setOption('isRemoteEnabled', true);
+        // Aktifkan opsi untuk memuat gambar dari URL (jika ada)
+        $pdf->setOption('isRemoteEnabled', true);
 
-    // Render PDF dan tampilkan di browser
-    return $pdf->stream('Data User ' . date('Y-m-d H:i:s') . '.pdf');
-}
-
-public function profile()
-{
-    $breadcrumb = (object)[
-        'title' => 'Profil Saya',
-        'list' => ['Home', 'Profil'],
-    ];
-
-    $page = (object)[
-        'title' => 'Edit Profil Pengguna'
-    ];
-
-    $activeMenu = 'profile'; // Set menu yang aktif
-
-    // Ambil data pengguna yang sedang login
-    $user = Auth::user();
-
-    // Pastikan user tidak null
-    if (!$user) {
-        return redirect()->route('login')->with('error', 'Silakan login terlebih dahulu.');
+        // Render PDF dan tampilkan di browser
+        return $pdf->stream('Data User ' . date('Y-m-d H:i:s') . '.pdf');
     }
 
-    // Ambil level_id dan level_nama dari tabel m_level
-    $level_id = $user->level ? $user->level->level_id : null;
-    $level_nama = $user->level ? $user->level->level_nama : 'Tidak ada level';
+    public function profile()
+    {
+        $breadcrumb = (object)[
+            'title' => 'Profil Saya',
+            'list' => ['Home', 'Profil'],
+        ];
 
-    return view('profile.index', [
-        'breadcrumb' => $breadcrumb,
-        'page' => $page,
-        'activeMenu' => $activeMenu,
-        'user' => $user,
-        'level_id' => $level_id,
-        'level_nama' => $level_nama // Kirim level_nama dan level_id ke view
-    ]);
-}
-    public function update_profile(Request $request){
+        $page = (object)[
+            'title' => 'Edit Profil Pengguna'
+        ];
+
+        $activeMenu = 'profile'; // Set menu yang aktif
+
+        // Ambil data pengguna yang sedang login
+        $user = Auth::user();
+
+        // Pastikan user tidak null
+        if (!$user) {
+            return redirect()->route('login')->with('error', 'Silakan login terlebih dahulu.');
+        }
+
+        // Ambil level_id dan level_nama dari tabel m_level
+        $level_id = $user->level ? $user->level->level_id : null;
+        $level_nama = $user->level ? $user->level->level_nama : 'Tidak ada level';
+
+        return view('profile.index', [
+            'breadcrumb' => $breadcrumb,
+            'page' => $page,
+            'activeMenu' => $activeMenu,
+            'user' => $user,
+            'level_id' => $level_id,
+            'level_nama' => $level_nama // Kirim level_nama dan level_id ke view
+        ]);
+    }
+    public function update_profile(Request $request)
+    {
         $avatar = $request->file('avatar')->store('avatars');
         $request->user()->update([
-           'avatar' => $avatar
+            'avatar' => $avatar
         ]);
 
         return redirect()->back();
+    }
 
-}
+    public function updateinfo(Request $request)
+    {
+        if ($request->ajax() || $request->wantsJson()) {
+            $rules = [
+                'level_id' => 'required|integer',
+                'username' => 'nullable|max:20|unique:m_user,username,' . $request->user()->user_id . ',user_id',
+                'nama'     => 'nullable|max:100',
+            ];
 
-public function updateinfo(Request $request){
-    if($request->ajax() || $request->wantsJson()){
+            $validator = Validator::make($request->all(), $rules);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'status'   => false, // respon json, true: berhasil, false: gagal
+                    'message'  => 'Validasi gagal.',
+                    'msgField' => $validator->errors() // menunjukkan field mana yang error
+                ]);
+            }
+
+            $user = $request->user();
+
+            if ($user) {
+
+                $user->update($request->all());
+                return response()->json([
+                    'status'  => true,
+                    'message' => 'Data berhasil diupdate'
+                ]);
+            } else {
+                return response()->json([
+                    'status'  => false,
+                    'message' => 'Data tidak ditemukan'
+                ]);
+            }
+        }
+        return redirect('/');
+    }
+
+    public function update_password(Request $request)
+    {
+        // Validasi input
         $rules = [
-        'level_id' => 'required|integer',
-        'username' => 'nullable|max:20|unique:m_user,username,' . $request->user()->user_id . ',user_id',
-        'nama'     => 'nullable|max:100',
+            'current_password' => 'required', // Menambahkan validasi password lama
+            'password' => 'required|min:5|confirmed', // Menggunakan field password_confirmation secara otomatis
         ];
 
-        $validator = Validator::make($request->all(),$rules);
+        $validator = Validator::make($request->all(), $rules);
 
         if ($validator->fails()) {
             return response()->json([
-                'status'   => false, // respon json, true: berhasil, false: gagal
-                'message'  => 'Validasi gagal.',
-                'msgField' => $validator->errors() // menunjukkan field mana yang error
+                'status' => false,
+                'message' => 'Validasi gagal.',
+                'msgField' => $validator->errors() // Mengembalikan pesan error untuk masing-masing field
             ]);
         }
 
+        // Ambil user yang sedang login
         $user = $request->user();
 
-        if ($user){
 
-            $user->update($request->all());
-            return response()->json([
-                'status'  => true,
-                'message' => 'Data berhasil diupdate'
-            ]);
-        }
-        else {
-            return response()->json([
-                'status'  => false,
-                'message' => 'Data tidak ditemukan'
-            ]);
-        }
-    }
-    return redirect('/');
-}
-
-public function update_password(Request $request)
-{
-    // Validasi input
-    $rules = [
-        'current_password' => 'required', // Menambahkan validasi password lama
-        'password' => 'required|min:5|confirmed', // Menggunakan field password_confirmation secara otomatis
-    ];
-
-    $validator = Validator::make($request->all(), $rules);
-
-    if ($validator->fails()) {
-        return response()->json([
-            'status' => false,
-            'message' => 'Validasi gagal.',
-            'msgField' => $validator->errors() // Mengembalikan pesan error untuk masing-masing field
-        ]);
-    }
-
-    // Ambil user yang sedang login
-    $user = $request->user();
-
-
-    if ($user) {
-        // Cek apakah password lama cocok
-        if (!Hash::check($request->current_password, $user->password)) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Password lama tidak sesuai',
-            ]);
-        }
-
-        // Update password baru dengan hash
-        $user->password = Hash::make($request->password);
-        $user->save();
-
-        return response()->json([
-            'status' => true,
-            'message' => 'Password berhasil diupdate'
-        ]);
-    } else {
-        return response()->json([
-            'status' => false,
-            'message' => 'User tidak ditemukan'
-        ]);
-    }
-}
-
-public function deleteAvatar(Request $request)
-{
-    $user = $request->user(); // Get the authenticated user
-
-    if ($user) {
-        // If there's an existing avatar, delete it from storage
-        if ($user->avatar) {
-            $avatarPath = public_path('storage/' . $user->avatar);
-            if (file_exists($avatarPath)) {
-                unlink($avatarPath); // Delete the file
+        if ($user) {
+            // Cek apakah password lama cocok
+            if (!Hash::check($request->current_password, $user->password)) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Password lama tidak sesuai',
+                ]);
             }
 
-            // Set the avatar attribute to null and save the user
-            $user->avatar = null;
+            // Update password baru dengan hash
+            $user->password = Hash::make($request->password);
             $user->save();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Password berhasil diupdate'
+            ]);
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => 'User tidak ditemukan'
+            ]);
+        }
+    }
+
+    public function deleteAvatar(Request $request)
+    {
+        $user = $request->user(); // Get the authenticated user
+
+        if ($user) {
+            // If there's an existing avatar, delete it from storage
+            if ($user->avatar) {
+                $avatarPath = public_path('storage/' . $user->avatar);
+                if (file_exists($avatarPath)) {
+                    unlink($avatarPath); // Delete the file
+                }
+
+                // Set the avatar attribute to null and save the user
+                $user->avatar = null;
+                $user->save();
+            }
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Foto profil berhasil dihapus.'
+            ]);
         }
 
         return response()->json([
-            'status' => true,
-            'message' => 'Foto profil berhasil dihapus.'
+            'status' => false,
+            'message' => 'User tidak ditemukan.'
         ]);
     }
-
-    return response()->json([
-        'status' => false,
-        'message' => 'User tidak ditemukan.'
-    ]);
-}
-
 }

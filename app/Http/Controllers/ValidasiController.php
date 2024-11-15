@@ -37,7 +37,7 @@ class ValidasiController extends Controller
             'breadcrumb' => $breadcrumb,
             'activeMenu' => $activeMenu,
             'page' => $page,
-            'level' => $level
+            'level' => $level,
         ]);
     }
 
@@ -137,9 +137,14 @@ class ValidasiController extends Controller
 
         $prodiNama = ProdiModel::getProdiNama($pendingUser->prodi_id);
         $alasan = $request->input('reason');
-        Mail::to($pendingUser->email)->send(new declineMail(['nama' => $pendingUser->nama, 'prodi_id' => $prodiNama, 'angkatan' => $pendingUser->angkatan, 'nim' => $pendingUser->username,'alasan'=> $alasan]));
+        Mail::to($pendingUser->email)->send(new declineMail(['nama' => $pendingUser->nama, 'prodi_id' => $prodiNama, 'angkatan' => $pendingUser->angkatan, 'nim' => $pendingUser->username,'alasan'=> $alasan, 'periode'=>$pendingUser->periode]));
         $pendingUser->delete();
 
         return response()->json(['status' => true, 'message' => 'User registration declined and removed from pending list.']);
+    }
+
+    public function hitung_notif(){
+        $jumlah = PendingRegister::count();
+        return ['jumlah' => $jumlah];
     }
 }

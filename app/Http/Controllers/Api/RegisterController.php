@@ -39,6 +39,7 @@ class RegisterController extends Controller
         'no_hp' => 'required|string',
         'prodi_id' => 'nullable|exists:prodi,prodi_id',
         'angkatan' => 'nullable|integer',
+        'periode_id' => 'nullable|integer',
     ]);
 
     if ($validator->fails()) {
@@ -71,6 +72,7 @@ class RegisterController extends Controller
             'level_id' => $request->level_id,
             'prodi_id' => $prodiId,
             'angkatan' => $angkatan,
+            'periode_id' => $request->periode_id,
             'email' => $request->email,
             'no_hp' => $request->no_hp,
             'created_at' => now(),

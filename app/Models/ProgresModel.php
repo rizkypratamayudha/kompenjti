@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ProgresModel extends Model
 {
@@ -11,5 +12,9 @@ class ProgresModel extends Model
 
     protected $table = 'progres';
     protected $primaryKey = 'progres_id';
-    protected $fillable = ['progres_id','pekerjaan_id','pengumpulan_id','judul_progres','jam_kompen','status'];
+    protected $fillable = ['progres_id','pekerjaan_id','pengumpulan_id','judul_progres','jam_kompen','status','hari'];
+
+    public function pekerjaan():BelongsTo{
+        return $this->belongsTo(PekerjaanModel::class,'pekerjaan_id','pekerjaan_id');
+    }
 }

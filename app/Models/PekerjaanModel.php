@@ -18,5 +18,11 @@ class PekerjaanModel extends Model
         return $this->belongsTo(UserModel::class,'user_id');
     }
 
-    
+    public function detail_pekerjaan():BelongsTo{
+        return $this->belongsTo(detail_pekerjaanModel::class,'pekerjaan_id','pekerjaan_id');
+    }
+    public function progres():BelongsTo{
+        return $this->belongsTo(ProgresModel::class,'pekerjaan_id','pekerjaan_id');
+    }
+
 }

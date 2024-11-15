@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
 use App\Models\detail_pekerjaanModel;
 use App\Models\PekerjaanModel;
 use App\Models\ProgresModel;
@@ -10,31 +11,15 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
-class PekerjanController extends Controller
+class PekerjaanController extends Controller
 {
-    public function index()
-    {
-        $breadcrumb = (object)[
-            'title' => 'Buat Pekerjaan',
-            'list' => ['Home', 'Buat Pekerjaan']
-        ];
-
-        $page = (object)[
-            'title' => 'Page Buat Pekerjaan'
-        ];
-
-        $activeMenu = 'dosen';
-        $pekerjaan = PekerjaanModel::with('detail_pekerjaan', 'progres')->where('user_id', Auth::id())->get();
-        return  view('dosen.index', ['breadcrumb' => $breadcrumb, 'page' => $page, 'activeMenu' => $activeMenu, 'tugas' => $pekerjaan]);
+    public function index(){
+        $pekerjaan = PekerjaanModel::with('detail_pekerjaan','progres')->get();
+        return response()->json($pekerjaan);
     }
-
-    public function create_ajax()
+    public function store(Request $request)
     {
-        return view('dosen.create_ajax');
-    }
-
-    public function store_ajax(Request $request)
-    {
+        // Validasi input yang diterima melalui API
         $validator = Validator::make($request->all(), [
             'jenis_pekerjaan' => 'required|string|in:Teknis,Pengabdian,Penelitian',
             'pekerjaan_nama' => 'required|string|max:255',
@@ -58,11 +43,13 @@ class PekerjanController extends Controller
             ], 422);
         }
 
+        // Dapatkan ID pengguna yang sedang login
         $user_id = Auth::id();
         $jumlah_jam_kompen = array_sum($request->jam_kompen);
 
         DB::beginTransaction();
         try {
+            // Simpan data utama pekerjaan
             $pekerjaan = PekerjaanModel::create([
                 'user_id' => $user_id,
                 'jenis_pekerjaan' => $request->jenis_pekerjaan,
@@ -70,6 +57,7 @@ class PekerjanController extends Controller
                 'jumlah_jam_kompen' => $jumlah_jam_kompen,
             ]);
 
+            // Simpan detail pekerjaan
             $detailPekerjaan = detail_pekerjaanModel::create([
                 'pekerjaan_id' => $pekerjaan->pekerjaan_id,
                 'jumlah_anggota' => $request->jumlah_anggota,
@@ -77,6 +65,7 @@ class PekerjanController extends Controller
                 'deskripsi_tugas' => $request->deskripsi_tugas
             ]);
 
+            // Simpan setiap progres
             foreach ($request->judul_progres as $index => $judul) {
                 ProgresModel::create([
                     'pekerjaan_id' => $pekerjaan->pekerjaan_id,
@@ -91,6 +80,7 @@ class PekerjanController extends Controller
                 'status' => true,
                 'message' => 'Data pekerjaan berhasil disimpan'
             ]);
+
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
@@ -101,20 +91,5 @@ class PekerjanController extends Controller
         }
     }
 
-    public function enter_pekerjaan(string $id)
-    {
-        $breadcrumb = (object)[
-            'title' => 'Pekerjaan',
-            'list' => ['Home', 'Pekerjaan']
-        ];
-
-        $page = (object)[
-            'title' => 'Pekerjaan'
-        ];
-
-        $activeMenu = 'dosen';
-        $activeTab = 'progres';
-        $pekerjaan = PekerjaanModel::with('detail_pekerjaan', 'progres')->where('pekerjaan_id', $id)->first();
-        return view('dosen.pekerjaan', ['pekerjaan' => $pekerjaan,'breadcrumb'=>$breadcrumb,'page'=>$page,'activeMenu'=>$activeMenu,'activeTab'=>$activeTab]);
-    }
+    
 }

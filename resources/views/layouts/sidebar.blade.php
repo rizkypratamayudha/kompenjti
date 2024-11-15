@@ -38,9 +38,11 @@
                 </li>
                 <li class="nav-header">Validasi Registrasi</li>
                 <li class="nav-item">
-                    <a href="{{ url('/validasi') }}" class="nav-link {{ $activeMenu == 'validasi' ? 'active' : '' }} ">
+                    <a href="{{ url('/validasi') }}" class="nav-link {{ $activeMenu == 'validasi' ? 'active' : '' }}">
                         <i class="nav-icon fas fa-check-double"></i>
                         <p>Validasi Registrasi</p>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                        </span>
                     </a>
                 </li>
                 <li class="nav-header">Manage Pengguna</li>
@@ -120,3 +122,22 @@
     </div>
     <!-- /.sidebar -->
 </aside>
+
+@push('js')
+    <script>
+        $(document).ready(function() {
+    $.ajax({
+        url: '{{ url("/hitung-notif") }}',
+        method: 'GET',
+        success: function(response) {
+            var jumlahNotif = response.jumlah;
+            if (jumlahNotif > 99) {
+                $('.badge').text('99+');
+            } else {
+                $('.badge').text(jumlahNotif);
+            }
+        }
+    });
+});
+    </script>
+@endpush

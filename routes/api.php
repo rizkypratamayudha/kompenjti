@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\PekerjaanController;
 use App\Http\Controllers\Api\RegisterController;
 use App\Http\Controllers\Api\LoginController;
 use App\Http\Controllers\Api\KompetensiController;
@@ -31,13 +32,16 @@ Route::post('kompetensi', [KompetensiController::class, 'store']);
 Route::get('semester/user/{user_id}', [SemesterController::class, 'getSemesterByUserId']);
 
 
-Route::middleware(['auth:api'])->group(function(){
-    
-});
+
+
 Route::middleware(['auth:api'])->group(function () {
-     Route::post('/updatePhoto', [ProfileController::class, 'updatePhoto']);
-     Route::put('/updatePassword', [ProfileController::class, 'updatePassword']);
-     Route::delete('/deleteAvatar', [ProfileController::class, 'deleteAvatar']);
- });
- 
- 
+    Route::post('/updatePhoto', [ProfileController::class, 'updatePhoto']);
+    Route::put('/updatePassword', [ProfileController::class, 'updatePassword']);
+    Route::delete('/deleteAvatar', [ProfileController::class, 'deleteAvatar']);
+
+
+    Route::group(['prefix' => 'pekerjaan'], function(){
+        Route::get('/',[PekerjaanController::class,'index']);
+        Route::post('/store',[PekerjaanController::class,'store']);
+    });
+});

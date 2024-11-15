@@ -4,8 +4,9 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLabel">Tambah Pekerjaan</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
-                        aria-hidden="true">&times;</span></button>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
             <div class="modal-body">
                 <div class="form-group">
@@ -20,24 +21,21 @@
                 </div>
                 <div class="form-group">
                     <label>Nama Pekerjaan</label>
-                    <input value="" type="text" name="pekerjaan_nama" id="pekerjaan_nama" class="form-control"
-                        required>
+                    <input value="" type="text" name="pekerjaan_nama" id="pekerjaan_nama" class="form-control" required>
                     <small id="error-pekerjaan_nama" class="error-text form-text text-danger"></small>
                 </div>
                 <div class="form-group">
                     <label>Jumlah Anggota</label>
-                    <input value="" type="number" name="jumlah_anggota" id="jumlah_anggota" class="form-control"
-                        required>
+                    <input value="" type="number" name="jumlah_anggota" id="jumlah_anggota" class="form-control" required>
                     <small id="error-jumlah_anggota" class="error-text form-text text-danger"></small>
                 </div>
                 <div class="form-group">
                     <label>Persyaratan</label>
-                    <div id="tag-container" class="form-control"
-                        style="display: flex; flex-wrap: wrap; min-height: 38px;">
-                        <input type="text" id="tag-input" class="tag-input" placeholder="Tambah persyaratan"
-                            style="border: none; outline: none; flex-grow: 1;">
+                    <div id="tag-container" class="form-control" style="display: flex; flex-wrap: wrap; min-height: 38px;">
+                        <input type="text" id="tag-input" class="tag-input" placeholder="Tambah persyaratan" style="border: none; outline: none; flex-grow: 1;">
                     </div>
                     <small id="error-password" class="error-text form-text text-danger"></small>
+                    <input type="hidden" name="persyaratan[]" id="persyaratan-hidden">
                 </div>
                 <div class="form-group">
                     <label>Deskripsi Pekerjaan</label>
@@ -46,8 +44,7 @@
                 </div>
                 <div class="form-group">
                     <label>Jumlah Progres</label>
-                    <input value="" type="number" name="jumlah_progres" id="jumlah_progres" class="form-control"
-                        required>
+                    <input value="" type="number" name="jumlah_progres" id="jumlah_progres" class="form-control" required>
                     <small id="error-jumlah_progres" class="error-text form-text text-danger"></small>
                 </div>
                 <div class="modal-body">
@@ -56,6 +53,7 @@
                             <tr>
                                 <th>Judul Progres</th>
                                 <th>Nilai Jam Kompen</th>
+                                <th>Hari</th>
                             </tr>
                         </thead>
                         <tbody id="dynamic-inputs"></tbody>
@@ -65,7 +63,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="modal-footer">
                 <button type="button" data-dismiss="modal" class="btn btn-warning">Batal</button>
                 <button type="submit" class="btn btn-primary">Simpan</button>
@@ -73,6 +70,7 @@
         </div>
     </div>
 </form>
+
 <style>
     .tag {
         display: inline-block;
@@ -89,9 +87,10 @@
         color: #ffffff;
     }
 </style>
+
 <script>
     $(document).ready(function() {
-        // Tambahkan event listener untuk input jumlah_progres
+        // Event untuk input jumlah_progres
         $('#jumlah_progres').on('input', function() {
             var count = $(this).val();
             generateProgressFields(count);
@@ -99,7 +98,7 @@
 
         // Fungsi untuk membuat input dinamis di table-progres berdasarkan jumlah_progres
         function generateProgressFields(count) {
-            $('#dynamic-inputs').empty(); // Bersihkan baris sebelumnya
+            $('#dynamic-inputs').empty();
 
             for (var i = 0; i < count; i++) {
                 var row = `
@@ -110,25 +109,24 @@
                     <td>
                         <input type="number" name="jam_kompen[]" class="form-control nilai-jam-kompen" placeholder="Nilai Jam Kompen" required>
                     </td>
-
+                    <td>
+                        <input type="text" name="hari[]" class="form-control" placeholder="Hari" required>
+                    </td>
                 </tr>
-            `;
+                `;
                 $('#dynamic-inputs').append(row);
             }
 
-            // Attach event untuk perhitungan total jam kompen setelah baris dibuat
             attachInputEvent();
         }
 
         // Fungsi untuk menghitung total nilai jam kompen
         function calculateTotalNilai() {
             var totalNilai = 0;
-
             $('input[name="jam_kompen[]"]').each(function() {
                 var nilai = parseFloat($(this).val()) || 0;
                 totalNilai += nilai;
             });
-
             $('#total-nilai').text(totalNilai);
         }
 
@@ -139,29 +137,10 @@
             });
         }
 
-
-    $(document).ready(function() {
+        // Validasi dan Ajax Submit
         $("#form-tambah").validate({
             rules: {
-                level_id: {
-                    required: true,
-                    number: true
-                },
-                username: {
-                    required: true,
-                    minlength: 3,
-                    maxlength: 20
-                },
-                nama: {
-                    required: true,
-                    minlength: 3,
-                    maxlength: 100
-                },
-                password: {
-                    required: true,
-                    minlength: 6,
-                    maxlength: 20
-                }
+                // Tambahkan aturan validasi lainnya sesuai kebutuhan
             },
             submitHandler: function(form) {
                 $.ajax({
@@ -176,10 +155,9 @@
                                 title: 'Berhasil',
                                 text: response.message
                             });
-                            dataUser.ajax.reload();
                         } else {
                             $('.error-text').text('');
-                            $.each(response.msgField, function(prefix, val) {
+                            $.each(response.errors, function(prefix, val) {
                                 $('#error-' + prefix).text(val[0]);
                             });
                             Swal.fire({
@@ -191,45 +169,45 @@
                     }
                 });
                 return false;
-            },
-            errorElement: 'span',
-            errorPlacement: function(error, element) {
-                error.addClass('invalid-feedback');
-                element.closest('.form-group').append(error);
-            },
-            highlight: function(element, errorClass, validClass) {
-                $(element).addClass('is-invalid');
-            },
-            unhighlight: function(element, errorClass, validClass) {
-                $(element).removeClass('is-invalid');
             }
         });
-    });
 
-    const tagInput = document.getElementById("tag-input");
-    const tagContainer = document.getElementById("tag-container");
+        // Tag input untuk persyaratan
+        const tagInput = document.getElementById("tag-input");
+        const tagContainer = document.getElementById("tag-container");
 
-    tagInput.addEventListener("keypress", function(event) {
-        if (event.key === "Enter" && tagInput.value.trim() !== "") {
-            event.preventDefault();
-            addTag(tagInput.value.trim());
-            tagInput.value = "";
+        tagInput.addEventListener("keypress", function(event) {
+            if (event.key === "Enter" && tagInput.value.trim() !== "") {
+                event.preventDefault();
+                addTag(tagInput.value.trim());
+                tagInput.value = "";
+            }
+        });
+
+        function addTag(text) {
+            const tag = document.createElement("span");
+            tag.classList.add("tag");
+            tag.innerText = text;
+
+            const removeIcon = document.createElement("span");
+            removeIcon.classList.add("remove-tag");
+            removeIcon.innerHTML = "&times;";
+            removeIcon.onclick = () => {
+                tagContainer.removeChild(tag);
+                updatePersyaratanInput();
+            };
+
+            tag.appendChild(removeIcon);
+            tagContainer.insertBefore(tag, tagInput);
+            updatePersyaratanInput();
+        }
+
+        function updatePersyaratanInput() {
+            let tags = [];
+            document.querySelectorAll('#tag-container .tag').forEach(tag => {
+                tags.push(tag.innerText.replace("×", "").trim());
+            });
+            document.getElementById('persyaratan-hidden').value = JSON.stringify(tags);
         }
     });
-
-    function addTag(text) {
-        const tag = document.createElement("span");
-        tag.classList.add("tag");
-        tag.innerText = text;
-
-        const removeIcon = document.createElement("span");
-        removeIcon.classList.add("remove-tag");
-        removeIcon.innerHTML = "&times;";
-        removeIcon.onclick = () => tagContainer.removeChild(tag);
-
-        tag.appendChild(removeIcon);
-        tagContainer.insertBefore(tag, tagInput);
-    }
-    });
-
 </script>

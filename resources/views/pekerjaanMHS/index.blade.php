@@ -4,10 +4,6 @@
     <div class="card card-outline card-primary">
         <div class="card-header">
             <h3 class="card-title">{{ $page->title }}</h3>
-            <div class="card-tools">
-                <button class="btn btn-sm mt-1 btn-primary" onclick="modalAction('{{ 'dosen/create_ajax' }}')"><i
-                        class="fas fa-plus-circle"></i> Pekerjaan</button>
-            </div>
         </div>
         <div class="card-body">
             @if (session('success'))
@@ -55,7 +51,7 @@
                             </p>
                             <div class="d-flex justify-content-between align-items-center">
                                 <small class="text-muted">Jumlah Anggota : {{$item->detail_pekerjaan->jumlah_anggota}}</small>
-                                <a href="{{url('dosen/'.$item->pekerjaan_id.'/pekerjaan')}}" class="btn btn-outline-primary btn-sm">Masuk</a>
+                                <a href="" class="btn btn-outline-primary btn-sm">Detail</a>
                             </div>
                         </div>
                         <div class="card-footer bg-light">
