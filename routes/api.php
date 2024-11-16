@@ -6,6 +6,8 @@ use App\Http\Controllers\Api\LoginController;
 use App\Http\Controllers\Api\KompetensiController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\DetailMahasiswaController;
+use App\Http\Controllers\Api\DosenBuatPekerjaanController;
+
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -34,6 +36,7 @@ Route::get('detail-mahasiswa/user/{user_id}', [DetailMahasiswaController::class,
 Route::put('kompetensi/update/{id}', [KompetensiController::class, 'update']);
 Route::delete('kompetensi/delete/{id}', [KompetensiController::class, 'destroy']);
 Route::get('kompetensi/show/{id}', [KompetensiController::class, 'getKompetensiDetail']);
+Route::get('/dosen/pekerjaan/{user_id}', [DosenBuatPekerjaanController::class, 'index']);
 
 
 Route::middleware(['auth:api'])->group(function () {

@@ -12,7 +12,7 @@ class ProgresModel extends Model
 
     protected $table = 'progres';
     protected $primaryKey = 'progres_id';
-    protected $fillable = ['progres_id','pekerjaan_id','pengumpulan_id','judul_progres','jam_kompen','status','hari'];
+    protected $fillable = ['progres_id','pekerjaan_id','pengumpulan_id','judul_progres','jam_kompen','status','hari', 'deadline'];
 
     public function pekerjaan():BelongsTo{
         return $this->belongsTo(PekerjaanModel::class,'pekerjaan_id','pekerjaan_id');
