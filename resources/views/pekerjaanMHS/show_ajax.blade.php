@@ -16,8 +16,10 @@
         </div>
     </div>
 @else
-    <form action="" method="POST" id="form-pelamaran">
+    <form action="{{url('pekerjaan/apply')}}" method="POST" id="form-pelamaran">
         @csrf
+        <input name="pekerjaan_id" value="{{ $pekerjaan->pekerjaan_id}}" hidden>
+        <input name="user_id" value="{{Auth::id()}}" hidden>
         <div id="modal-master" class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -52,35 +54,35 @@
                         </tr>
                         <tr>
                             <th class="text-right col-3">Nilai Total Jam Kompen :</th>
-                            <td class="col-9">{{ $pekerjaan->jumlah_jam_kompen}}</td>
+                            <td class="col-9">{{ $pekerjaan->jumlah_jam_kompen }}</td>
                         </tr>
                         <tr>
                             <th class="text-right col-3">Jumlah Anggota :</th>
-                            <td class="col-9">{{ $pekerjaan->detail_pekerjaan->jumlah_anggota}}</td>
+                            <td class="col-9">{{ $pekerjaan->detail_pekerjaan->jumlah_anggota }}</td>
                         </tr>
                         <tr>
                             <th class="text-right col-3">Persyaratan :</th>
                             <td class="col-9">
-                                @if(is_array($pekerjaan->detail_pekerjaan->persyaratan))
-                                    <ul>
-                                        @foreach($pekerjaan->detail_pekerjaan->persyaratan as $item)
-                                            <li>{{ $item }}</li>
-                                        @endforeach
-                                    </ul>
-                                @else
-                                    {{ $pekerjaan->detail_pekerjaan->persyaratan }}
-                                @endif
+                                <ul>
+                                    @foreach ($persyaratan as $item)
+                                        <li>{{ $item->persyaratan_nama }}</li>
+                                    @endforeach
+                                </ul>
                             </td>
                         </tr>
-
                         <tr>
                             <th class="text-right col-3">Deskripsi Tugas :</th>
-                            <td class="col-9">{{ $pekerjaan->detail_pekerjaan->deskripsi_tugas}}</td>
+                            <td class="col-9">{{ $pekerjaan->detail_pekerjaan->deskripsi_tugas }}</td>
                         </tr>
                     </table>
                 </div>
+                <div class="modal-footer">
+                    <button type="button" data-dismiss="modal" class="btn btnwarning">Batal</button>
+                    <button type="submit" class="btn btn-outline-success btn-sm">Apply</button>
+                </div>
             </div>
         </div>
+    </form>
     <script>
         $(document).ready(function() {
             $("#form-delete").validate({

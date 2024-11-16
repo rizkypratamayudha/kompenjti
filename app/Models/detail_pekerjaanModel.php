@@ -17,4 +17,9 @@ class detail_pekerjaanModel extends Model
     public function pekerjaan():BelongsTo{
         return $this->belongsTo(PekerjaanModel::class,'pekerjaan_id','pekerjaan_id');
     }
+
+    public function persyaratan() {
+        return $this->hasMany(PersyaratanModel::class, 'detail_pekerjaan_id', 'detail_pekerjaan_id');
+    }
+
 }
