@@ -57,14 +57,16 @@
                                 <small class="text-muted">Jumlah Anggota : {{$item->detail_pekerjaan->jumlah_anggota}}</small>
                                 <a href="{{url('dosen/'.$item->pekerjaan_id.'/pekerjaan')}}" class="btn btn-outline-primary btn-sm">Masuk</a>
                             </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">Jumlah Nilai Jam Kompen : {{$item->jumlah_jam_kompen}}</small>
+                            </div>
                         </div>
                         <div class="card-footer bg-light">
                             <i class="fas fa-clock text-muted"></i>
-                            Terakhir diperbarui: {{$item->updated_at->format('d M Y, H:i')}}
+                            Terakhir diperbarui: {{$item->updated_at->locale('in_id')->diffForHumans()}}
                         </div>
                     </div>
                 </div>
-
                 @endforeach
             </div>
         </div>

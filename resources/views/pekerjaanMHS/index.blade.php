@@ -39,28 +39,34 @@
             @endif
             <div class="row">
                 @foreach ($tugas as $item)
-                <div class="col-sm-6 mb-4">
-                    <div class="card shadow-sm border-0 rounded-lg">
-                        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                            <h5 class="card-title mb-0">{{$item->pekerjaan_nama}}</h5>
-                        </div>
-                        <div class="card-body">
-                            <p class="card-text">
-                                <small class="text-muted" >Deskripsi Tugas :</small><br>
-                                {{$item->detail_pekerjaan->deskripsi_tugas}}
-                            </p>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <small class="text-muted">Jumlah Anggota : {{$item->detail_pekerjaan->jumlah_anggota}}</small>
-                                <a href="" class="btn btn-outline-primary btn-sm">Detail</a>
+                    <div class="col-sm-6 mb-4">
+                        <div class="card shadow-sm border-0 rounded-lg">
+                            <div
+                                class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                                <h5 class="card-title mb-0">{{ $item->pekerjaan_nama }}</h5>
+                            </div>
+                            <div class="card-body">
+                                <p class="card-text">
+                                    <small class="text-muted">Deskripsi Tugas :</small><br>
+                                    {{ $item->detail_pekerjaan->deskripsi_tugas }}
+                                </p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">Jumlah Anggota :
+                                        {{ $item->detail_pekerjaan->jumlah_anggota }}</small>
+                                    <a onclick="modalAction('{{ url('dosen/' . $item->pekerjaan_id . '/show_ajax') }}')"    
+                                        class="btn btn-outline-success btn-sm">Apply</a>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">Jumlah Nilai Jam Kompen :
+                                        {{ $item->jumlah_jam_kompen }}</small>
+                                </div>
+                            </div>
+                            <div class="card-footer bg-light">
+                                <i class="fas fa-clock text-muted"></i>
+                                Terakhir diperbarui: {{ $item->updated_at->locale('in_id')->diffForHumans() }}
                             </div>
                         </div>
-                        <div class="card-footer bg-light">
-                            <i class="fas fa-clock text-muted"></i>
-                            Terakhir diperbarui: {{$item->updated_at->format('d M Y, H:i')}}
-                        </div>
                     </div>
-                </div>
-
                 @endforeach
             </div>
         </div>

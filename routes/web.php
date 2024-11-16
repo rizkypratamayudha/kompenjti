@@ -99,11 +99,13 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/create_ajax', [PekerjanController::class, 'create_ajax']);
         Route::post('/ajax', [PekerjanController::class, 'store_ajax']);
         Route::get('/{id}/pekerjaan', [PekerjanController::class, 'enter_pekerjaan']);
+        Route::get('/{id}/get-progres', [PekerjanController::class, 'getProgres'])->name('dosen.get-progres');
+        Route::get('{id}/show_ajax',[PekerjanController::class,'show_ajax']);
         Route::put('/{id}/update_ajax', [PekerjanController::class, 'update_ajax']);
         Route::get('/{id}/delete_ajax', [PekerjanController::class, 'confirm_ajax']);
         Route::delete('/{id}/delete_ajax', [PekerjanController::class, 'delete_ajax']);
-        Route::get('/{id}/show_ajax', [PekerjanController::class, 'show_ajax']);
     });
+
 
     Route::group(['prefix'=> 'pekerjaan'], function () {
         Route::get('/', [ListPekerjaanMHSController::class, 'index']);
