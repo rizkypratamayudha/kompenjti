@@ -21,21 +21,25 @@
                 </div>
                 <div class="form-group">
                     <label>Nama Pekerjaan</label>
-                    <input value="" type="text" name="pekerjaan_nama" id="pekerjaan_nama" class="form-control" required>
+                    <input value="" type="text" name="pekerjaan_nama" id="pekerjaan_nama" class="form-control"
+                        required>
                     <small id="error-pekerjaan_nama" class="error-text form-text text-danger"></small>
                 </div>
                 <div class="form-group">
                     <label>Jumlah Anggota</label>
-                    <input value="" type="number" name="jumlah_anggota" id="jumlah_anggota" class="form-control" required>
+                    <input value="" type="number" name="jumlah_anggota" id="jumlah_anggota" class="form-control"
+                        required>
                     <small id="error-jumlah_anggota" class="error-text form-text text-danger"></small>
                 </div>
                 <div class="form-group">
                     <label>Persyaratan</label>
-                    <div id="tag-container" class="form-control" style="display: flex; flex-wrap: wrap; min-height: 38px;">
-                        <input type="text" id="tag-input" class="tag-input" placeholder="Tambah persyaratan" style="border: none; outline: none; flex-grow: 1;">
+                    <div id="tag-container" class="form-control"
+                        style="display: flex; flex-wrap: wrap; min-height: 38px;">
+                        <input type="text" id="tag-input" class="tag-input" placeholder="Tambah persyaratan"
+                            style="border: none; outline: none; flex-grow: 1;">
                     </div>
                     <small id="error-password" class="error-text form-text text-danger"></small>
-                    <input type="hidden" name="persyaratan[]" id="persyaratan-hidden">
+                    <input type="hidden" name="persyaratan" id="persyaratan-hidden">
                 </div>
                 <div class="form-group">
                     <label>Deskripsi Pekerjaan</label>
@@ -44,9 +48,11 @@
                 </div>
                 <div class="form-group">
                     <label>Jumlah Progres</label>
-                    <input value="" type="number" name="jumlah_progres" id="jumlah_progres" class="form-control" required>
+                    <input value="" type="number" name="jumlah_progres" id="jumlah_progres" class="form-control"
+                        required>
                     <small id="error-jumlah_progres" class="error-text form-text text-danger"></small>
                 </div>
+                <input type="text" value="open" name="status" id="status" hidden>
                 <div class="modal-body">
                     <table class="table table-bordered" id="table-progres">
                         <thead>
@@ -207,7 +213,8 @@
             document.querySelectorAll('#tag-container .tag').forEach(tag => {
                 tags.push(tag.innerText.replace("×", "").trim());
             });
-            document.getElementById('persyaratan-hidden').value = JSON.stringify(tags);
+            document.getElementById('persyaratan-hidden').value = JSON.stringify(tags); // Ubah array ke JSON
         }
+
     });
 </script>
