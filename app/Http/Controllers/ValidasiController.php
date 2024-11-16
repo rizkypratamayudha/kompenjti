@@ -136,8 +136,9 @@ class ValidasiController extends Controller
         }
 
         $prodiNama = ProdiModel::getProdiNama($pendingUser->prodi_id);
+        $periodeNama = PeriodeModel::getPeriodeNama( $pendingUser->periode_id );
         $alasan = $request->input('reason');
-        Mail::to($pendingUser->email)->send(new declineMail(['nama' => $pendingUser->nama, 'prodi_id' => $prodiNama, 'angkatan' => $pendingUser->angkatan, 'nim' => $pendingUser->username,'alasan'=> $alasan, 'periode'=>$pendingUser->periode]));
+        Mail::to($pendingUser->email)->send(new declineMail(['nama' => $pendingUser->nama, 'prodi_id' => $prodiNama, 'angkatan' => $pendingUser->angkatan, 'nim' => $pendingUser->username,'alasan'=> $alasan, 'periode'=>$periodeNama]));
         $pendingUser->delete();
 
         return response()->json(['status' => true, 'message' => 'User registration declined and removed from pending list.']);

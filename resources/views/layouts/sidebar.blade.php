@@ -124,20 +124,23 @@
 </aside>
 
 @push('js')
-    <script>
-        $(document).ready(function() {
-    $.ajax({
-        url: '{{ url("/hitung-notif") }}',
-        method: 'GET',
-        success: function(response) {
-            var jumlahNotif = response.jumlah;
-            if (jumlahNotif > 99) {
-                $('.badge').text('99+');
-            } else {
-                $('.badge').text(jumlahNotif);
+<script>
+    $(document).ready(function() {
+        $.ajax({
+            url: '{{ url("/hitung-notif") }}',
+            method: 'GET',
+            success: function(response) {
+                var jumlahNotif = response.jumlah;
+                if (jumlahNotif > 99) {
+                    $('.badge').text('99+');
+                } else if (jumlahNotif == 0) {
+                    $('.badge').remove(); // Menghapus elemen span badge
+                } else {
+                    $('.badge').text(jumlahNotif);
+                }
             }
-        }
+        });
     });
-});
-    </script>
+</script>
+
 @endpush

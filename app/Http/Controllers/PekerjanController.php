@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\detail_dosenModel;
 use App\Models\detail_pekerjaanModel;
 use App\Models\PekerjaanModel;
 use App\Models\ProgresModel;
@@ -115,6 +116,29 @@ class PekerjanController extends Controller
         $activeMenu = 'dosen';
         $activeTab = 'progres';
         $pekerjaan = PekerjaanModel::with('detail_pekerjaan', 'progres')->where('pekerjaan_id', $id)->first();
-        return view('dosen.pekerjaan', ['pekerjaan' => $pekerjaan,'breadcrumb'=>$breadcrumb,'page'=>$page,'activeMenu'=>$activeMenu,'activeTab'=>$activeTab]);
+        return view('dosen.pekerjaan', ['pekerjaan' => $pekerjaan, 'breadcrumb' => $breadcrumb, 'page' => $page, 'activeMenu' => $activeMenu, 'activeTab' => $activeTab]);
+    }
+
+    public function getProgres(Request $request, $id)
+    {
+        $progres = ProgresModel::where('pekerjaan_id', $id)->get();
+        if ($progres->isEmpty()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Tidak ada data progres untuk pekerjaan ini.'
+            ], 404);
+        }
+        return response()->json([
+            'status' => true,
+            'data' => $progres
+        ]);
+    }
+
+    public function show_ajax($id){
+        $pekerjaan = PekerjaanModel::with('detail_pekerjaan','progres','user')->where('pekerjaan_id', $id)->first();
+        $jumlahProgres = ProgresModel::where( 'pekerjaan_id',$id)->count();
+        $persyaratan = $pekerjaan->detail_pekerjaan->persyaratan = json_decode($pekerjaan->detail_pekerjaan->persyaratan);
+
+        return view('pekerjaanMHS.show_ajax',['pekerjaan'=>$pekerjaan,'jumlahProgres'=>$jumlahProgres,'persyaratan'=>$persyaratan,]);
     }
 }

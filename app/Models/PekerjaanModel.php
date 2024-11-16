@@ -15,7 +15,7 @@ class PekerjaanModel extends Model
     protected $fillable = ['user_id','jenis_pekerjaan','pekerjaan_nama','jumlah_jam_kompen','status','created_at','updated_at'];
 
     public function user(): BelongsTo{
-        return $this->belongsTo(UserModel::class,'user_id');
+        return $this->belongsTo(UserModel::class,'user_id','user_id');
     }
 
     public function detail_pekerjaan():BelongsTo{
