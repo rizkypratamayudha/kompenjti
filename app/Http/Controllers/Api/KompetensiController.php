@@ -82,4 +82,24 @@ class KompetensiController extends Controller
             return response()->json(['message' => 'Data Kompetensi tidak ditemukan'], 404);
         }
     }
+
+    public function getKompetensiDetail($id)
+    {
+        // Gunakan model kompetensiModel dan perbaiki properti id
+        $kompetensi = kompetensiModel::where('kompetensi_id', $id)
+            ->with(['user']) // Pastikan relasi user didefinisikan di model
+            ->first();
+
+        if ($kompetensi) {
+            return response()->json([
+                'success' => true,
+                'data' => $kompetensi
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Kompetensi tidak ditemukan'
+            ], 404);
+        }
+    }
 }

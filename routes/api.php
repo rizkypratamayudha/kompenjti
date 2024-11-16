@@ -33,9 +33,7 @@ Route::get('kompetensi/periode/{user_id}', [KompetensiController::class, 'getPer
 Route::get('detail-mahasiswa/user/{user_id}', [DetailMahasiswaController::class, 'getDetailByUserId']);
 Route::put('kompetensi/update/{id}', [KompetensiController::class, 'update']);
 Route::delete('kompetensi/delete/{id}', [KompetensiController::class, 'destroy']);
-
-
-
+Route::get('kompetensi/show/{id}', [KompetensiController::class, 'getKompetensiDetail']);
 
 
 Route::middleware(['auth:api'])->group(function () {
