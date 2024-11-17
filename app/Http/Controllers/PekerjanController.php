@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ApprovePekerjaanModel;
 use App\Models\detail_dosenModel;
 use App\Models\detail_pekerjaanModel;
 use App\Models\PekerjaanModel;
 use App\Models\PendingPekerjaanController;
+use App\Models\PendingPekerjaanModel;
 use App\Models\PersyaratanModel;
 use App\Models\ProgresModel;
 use Illuminate\Http\Request;
@@ -16,29 +18,29 @@ use Illuminate\Support\Facades\Validator;
 class PekerjanController extends Controller
 {
     public function index()
-{
-    $breadcrumb = (object)[
-        'title' => 'Buat Pekerjaan',
-        'list' => ['Home', 'Buat Pekerjaan']
-    ];
+    {
+        $breadcrumb = (object)[
+            'title' => 'Buat Pekerjaan',
+            'list' => ['Home', 'Buat Pekerjaan']
+        ];
 
-    $page = (object)[
-        'title' => 'Page Buat Pekerjaan'
-    ];
+        $page = (object)[
+            'title' => 'Page Buat Pekerjaan'
+        ];
 
-    $activeMenu = 'dosen';
-    $activeTab = 'progres'; // Menetapkan tab aktif default ke 'progres'
+        $activeMenu = 'dosen';
+        $activeTab = 'progres'; // Menetapkan tab aktif default ke 'progres'
 
-    $pekerjaan = PekerjaanModel::with('detail_pekerjaan', 'progres')->where('user_id', Auth::id())->get();
+        $pekerjaan = PekerjaanModel::with('detail_pekerjaan', 'progres')->where('user_id', Auth::id())->get();
 
-    return view('dosen.index', [
-        'breadcrumb' => $breadcrumb,
-        'page' => $page,
-        'activeMenu' => $activeMenu,
-        'tugas' => $pekerjaan,
-        'activeTab' => $activeTab
-    ]);
-}
+        return view('dosen.index', [
+            'breadcrumb' => $breadcrumb,
+            'page' => $page,
+            'activeMenu' => $activeMenu,
+            'tugas' => $pekerjaan,
+            'activeTab' => $activeTab
+        ]);
+    }
 
 
     public function create_ajax()
@@ -159,27 +161,95 @@ class PekerjanController extends Controller
     }
 
     public function getPelamaran($id)
-{
-    // Ambil data pelamaran berdasarkan pekerjaan_id
-    $pelamaran = PendingPekerjaanController::with('user.detailMahasiswa.prodi')->where('pekerjaan_id',$id)->get();
+    {
 
-    // Kembalikan data dalam bentuk JSON
-    return response()->json([
-        'status' => true,
-        'data' => $pelamaran,
-    ]);
-}
+        $pelamaran = PendingPekerjaanModel::with('user.detailMahasiswa.prodi')->where('pekerjaan_id', $id)->get();
+
+        return response()->json([
+            'status' => true,
+            'data' => $pelamaran,
+        ]);
+    }
+
+    public function getAnggota($id){
+        $anggota = ApprovePekerjaanModel::with('user.detailMahasiswa.prodi')->where('pekerjaan_id',$id)->get();
+
+        return response()->json([
+            'status'=> true,
+            'data' => $anggota
+        ]);
+    }
 
     public function show_ajax($id)
-{
-    $pekerjaan = PekerjaanModel::with('detail_pekerjaan.persyaratan')->where('pekerjaan_id', $id)->first();
-    $jumlahProgres = ProgresModel::where('pekerjaan_id', $id)->count();
+    {
+        $pekerjaan = PekerjaanModel::with('detail_pekerjaan.persyaratan')->where('pekerjaan_id', $id)->first();
+        $jumlahProgres = ProgresModel::where('pekerjaan_id', $id)->count();
 
-    return view('pekerjaanMHS.show_ajax', [
-        'pekerjaan' => $pekerjaan,
-        'jumlahProgres' => $jumlahProgres,
-        'persyaratan' => $pekerjaan->detail_pekerjaan->persyaratan ?? collect(),
-    ]);
-}
+        return view('pekerjaanMHS.show_ajax', [
+            'pekerjaan' => $pekerjaan,
+            'jumlahProgres' => $jumlahProgres,
+            'persyaratan' => $pekerjaan->detail_pekerjaan->persyaratan ?? collect(),
+        ]);
+    }
 
+    public function approvePekerjaan(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'pekerjaan_id' => 'required|exists:pekerjaan,pekerjaan_id',
+            'user_id' => 'required|exists:m_user,user_id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Validasi gagal',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        ApprovePekerjaanModel::create([
+            'pekerjaan_id' => $request->pekerjaan_id,
+            'user_id' => $request->user_id,
+        ]);
+
+        PendingPekerjaanModel::where('user_id',$request->user_id)->where('pekerjaan_id',$request->pekerjaan_id)->delete();
+
+        return response()->json(['status' => true, 'message' => 'Pekerjaan berhasil disetujui']);
+    }
+
+    public function declinePekerjaan(Request $request){
+        $validator = Validator::make($request->all(), [
+            'pekerjaan_id' => 'required|exists:pekerjaan,pekerjaan_id',
+            'user_id' => 'required|exists:m_user,user_id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Validasi gagal',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        PendingPekerjaanModel::where('user_id',$request->user_id)->where('pekerjaan_id',$request->pekerjaan_id)->delete();
+        return response()->json(['status' => true, 'message' => 'Pelamar berhasil ditolak']);
+    }
+
+    public function kickPekerjaan(Request $request){
+        $validator = Validator::make($request->all(), [
+            'pekerjaan_id' => 'required|exists:pekerjaan,pekerjaan_id',
+            'user_id' => 'required|exists:m_user,user_id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Validasi gagal',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        ApprovePekerjaanModel::where('user_id',$request->user_id)->where('pekerjaan_id',$request->pekerjaan_id)->delete();
+        return response()->json(['status' => true, 'message' => 'Anggota berhasil dikick']);
+    }
 }

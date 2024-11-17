@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\PekerjaanModel;
 use App\Models\PendingPekerjaanController;
+use App\Models\PendingPekerjaanModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -38,7 +39,7 @@ class ListPekerjaanMHSController extends Controller
             ], 422);
         }
 
-        PendingPekerjaanController::create([
+        PendingPekerjaanModel::create([
             'pekerjaan_id' => $request->pekerjaan_id,
             'user_id' => $request->user_id,
         ]);
