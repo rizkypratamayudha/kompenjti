@@ -51,29 +51,37 @@ public function updatePhoto(Request $request)
 }
 public function updatePassword(Request $request)
 {
-    $validator = Validator::make($request->all(), [
+    $input = $request->all();
+
+    $validator = Validator::make($input, [
         'current_password' => 'required',
         'password' => 'required|min:5|confirmed',
     ]);
 
     if ($validator->fails()) {
-        return response()->json(['errors' => $validator->errors()], 422);
+        return response()->json([
+            'success' => false,
+            'errors' => $validator->errors()
+        ], 422);
     }
 
     $user = $request->user();
 
-    // Ensure that the current password is correct
-    if (!Hash::check($request->current_password, $user->password)) {
-        return response()->json(['error' => 'Incorrect current password'], 401);
+    if (!Hash::check($request->input('current_password'), $user->password)) {
+        return response()->json([
+            'success' => false,
+            'error' => 'Incorrect current password'
+        ], 401);
     }
 
-    // Update password if current password is correct
-    $user->password = Hash::make($request->password);
+    $user->password = Hash::make($request->input('password'));
     $user->save();
 
-    return response()->json(['message' => 'Password updated successfully'], 200);
+    return response()->json([
+        'success' => true,
+        'message' => 'Password updated successfully'
+    ], 200);
 }
-
 
     // Fungsi untuk hapus foto profil
     public function deleteAvatar(Request $request)
