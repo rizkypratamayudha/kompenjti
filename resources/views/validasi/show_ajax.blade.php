@@ -89,27 +89,42 @@
     </div>
     {{-- alasan --}}
     <div class="modal fade" id="declineReasonModal" tabindex="-1" role="dialog" aria-labelledby="declineReasonModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="declineReasonModalLabel">Decline</h5>
-                    <button type="button" class="close" onclick="closeDeclineModal()" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="declineReasonModalLabel">Decline</h5>
+                <button type="button" class="close" onclick="closeDeclineModal()" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Pilih Alasan</p>
+                <!-- Radio Options -->
+                <div class="form-check">
+                    <input type="radio" class="form-check-input" name="declineOption" id="reason1" value="Data tidak sesuai">
+                    <label class="form-check-label" for="reason1">Data tidak sesuai</label>
                 </div>
-                <div class="modal-body">
-                    <p>Berikan Alasan</p>
-                    <textarea id="declineReason" class="form-control" rows="3" placeholder="Masukkan alasan disini"></textarea>
+                <div class="form-check">
+                    <input type="radio" class="form-check-input" name="declineOption" id="reason2" value="Data tidak ditemukan">
+                    <label class="form-check-label" for="reason2">Data tidak ditemukan</label>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-danger"
-                        onclick="submitDeclineReason('{{ $user->user_id }}')">Decline</button>
+                <div class="form-check">
+                    <input type="radio" class="form-check-input" name="declineOption" id="reasonOther" value="Lainnya">
+                    <label class="form-check-label" for="reasonOther">Lainnya</label>
                 </div>
+                <!-- Textarea for Custom Reason -->
+                <textarea id="declineReason" class="form-control mt-2" rows="3" placeholder="Masukkan alasan di sini"
+                    disabled></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger"
+                    onclick="submitDeclineReason('{{ $user->user_id }}')">Decline</button>
             </div>
         </div>
     </div>
+</div>
 
     <script>
         function approveUser(userId) {
@@ -146,9 +161,40 @@
             $('#declineReasonModal').modal('hide');
         }
 
-        function submitDeclineReason(userId) {
-            const reason = $('#declineReason').val();
+        document.querySelectorAll('input[name="declineOption"]').forEach(radio => {
+            radio.addEventListener('change', function () {
+                const textarea = document.getElementById('declineReason');
+                if (this.id === 'reasonOther') {
+                    textarea.disabled = false;
+                    textarea.focus();
+                } else {
+                    textarea.disabled = true;
+                    textarea.value = ''; // Clear textarea
+                }
+            });
+        });
 
+        function submitDeclineReason(userId) {
+            const selectedOption = document.querySelector('input[name="declineOption"]:checked');
+            const reason = selectedOption ? selectedOption.value : null;
+
+            if (reason === 'Lainnya') {
+                const customReason = $('#declineReason').val().trim();
+                if (!customReason) {
+                    alert('Masukkan alasan jika memilih opsi "Lainnya".');
+                    return;
+                }
+                // Handle reason with custom text
+                submitDeclineRequest(userId, customReason);
+            } else if (reason) {
+                // Handle reason from radio
+                submitDeclineRequest(userId, reason);
+            } else {
+                alert('Pilih salah satu alasan terlebih dahulu.');
+            }
+        }
+
+        function submitDeclineRequest(userId, reason) {
             $.ajax({
                 url: 'validasi/decline/' + userId,
                 type: 'POST',
@@ -157,15 +203,13 @@
                     reason: reason
                 },
                 success: function(response) {
-                    $('#declineReasonModal').modal('hide'); // Tutup modal alasan
-                    $('#myModal').modal('hide'); // Tutup modal utama
-
+                    $('#declineReasonModal').modal('hide'); // Close modal
+                    $('#myModal').modal('hide'); // Close main modal
                     Swal.fire({
                         icon: 'success',
                         title: 'User Declined',
                         text: response.message
                     });
-
                     dataUser.ajax.reload();
                 },
                 error: function(response) {
@@ -177,7 +221,6 @@
                 }
             });
         }
-
 
         $(document).ready(function() {
             $("#form-delete").validate({
