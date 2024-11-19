@@ -37,6 +37,7 @@ Route::put('kompetensi/update/{id}', [KompetensiController::class, 'update']);
 Route::delete('kompetensi/delete/{id}', [KompetensiController::class, 'destroy']);
 Route::get('kompetensi/show/{id}', [KompetensiController::class, 'getKompetensiDetail']);
 Route::get('/dosen/pekerjaan/{user_id}', [DosenBuatPekerjaanController::class, 'index']);
+Route::post('/dosen/pekerjaan', [DosenBuatPekerjaanController::class, 'store']);
 
 
 Route::middleware(['auth:api'])->group(function () {
