@@ -31,4 +31,8 @@ class PekerjaanModel extends Model
         return $this->hasManyThrough(PersyaratanModel::class, detail_pekerjaanModel::class, 'pekerjaan_id', 'detail_pekerjaan_id', 'id', 'id');
     }
 
+    protected $casts = [
+        'akumulasi_deadline' => 'datetime:Y-m-d H:i:s', // Format datetime
+    ];
+
 }
