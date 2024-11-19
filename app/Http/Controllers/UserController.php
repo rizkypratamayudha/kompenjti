@@ -6,6 +6,8 @@ use App\Models\detail_dosenModel;
 use App\Models\detail_kaprodiModel;
 use App\Models\detail_mahasiswaModel;
 use App\Models\LevelModel;
+use App\Models\PeriodeModel;
+use App\Models\ProdiModel;
 use App\Models\UserModel;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
@@ -66,47 +68,91 @@ class UserController extends Controller
             ->make(true);
     }
 
-    public function create_ajax()
-    {
-        $level = LevelModel::select('level_id', 'level_nama')->get();
-        return view('user.create_ajax', ['level' => $level]);
-    }
-
-    public function store_ajax(Request $request)
-    {
-        if ($request->ajax() || $request->wantsJson()) {
-            $rules = [
-                'level_id' => 'required|integer',
-                'username' => 'required|string|min:3|unique:m_user,username',
-                'nama' => 'required|string|max:100',
-                'email' => 'required|email',
-                'no_hp' => 'required|string',
-                'password' => 'required|min:6'
-            ];
-
-            $validator = Validator::make($request->all(), $rules);
-            if ($validator->fails()) {
+  
+        public function create_ajax()
+        {
+            // Mengambil semua level, user, prodi, dan periode untuk ditampilkan pada form
+            $level = LevelModel::all();
+            $user = UserModel::all();
+            $prodi = ProdiModel::all();
+            $periode = PeriodeModel::all();
+            return view('user.create_ajax', ['level' => $level, 'user' => $user, 'prodi' => $prodi, 'periode' => $periode]);
+        }
+    
+        public function store_ajax(Request $request)
+        {
+            if ($request->ajax() || $request->wantsJson()) {
+                // Menetapkan aturan validasi
+                $rules = [
+                    'level_id' => 'required|integer',
+                    'username' => 'required|string|min:3|unique:m_user,username',
+                    'nama' => 'required|string|max:100',
+                    'password' => 'required|min:6|confirmed',
+                    'email' => 'required|email',
+                    'no_hp' => 'required|string',
+                    'prodi_id' => 'required_if:level_id,3,4',
+                    'angkatan' => 'required_if:level_id,3',
+                    'periode_id' => 'required|integer',
+                ];
+    
+                // Melakukan validasi
+                $validator = Validator::make($request->all(), $rules);
+                if ($validator->fails()) {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Validasi Gagal',
+                        'msgField' => $validator->errors(),
+                    ]);
+                }
+    
+                // Menyiapkan data untuk disimpan
+                $data = $request->all();
+                $data['password'] = Hash::make($request->password); // Enkripsi password
+    
+                // Simpan data ke tabel m_user
+                $user = UserModel::create($data);
+    
+                // Menambahkan detail sesuai level
+                if ($request->level_id == 3) { // Mahasiswa
+                    $detailMahasiswa = [
+                        'user_id' => $user->user_id,
+                        'email' => $request->email,
+                        'no_hp' => $request->no_hp,
+                        'angkatan' => $request->angkatan,
+                        'prodi_id' => $request->prodi_id,
+                        'periode_id' => $request->periode_id,
+                    ];
+                    detail_mahasiswaModel::create($detailMahasiswa); // Simpan detail mahasiswa
+                } elseif ($request->level_id == 2) { // Dosen
+                    $detailDosen = [
+                        'user_id' => $user->user_id,
+                        'email' => $request->email,
+                        'no_hp' => $request->no_hp,
+                    ];
+                    detail_dosenModel::create($detailDosen); // Simpan detail dosen
+                } elseif ($request->level_id == 4) { // Kaprodi
+                    $detailKaprodi = [
+                        'user_id' => $user->user_id,
+                        'email' => $request->email,
+                        'no_hp' => $request->no_hp,
+                        'prodi_id' => $request->prodi_id,
+                    ];
+                    detail_kaprodiModel::create($detailKaprodi); // Simpan detail kaprodi
+                }
+    
                 return response()->json([
-                    'status' => false,
-                    'message' => 'Validasi Gagal',
-                    'msgField' => $validator->errors(),
+                    'status' => true,
+                    'message' => 'Data user berhasil disimpan',
+                    'redirect' => url('user'), // Ganti dengan URL yang sesuai setelah data disimpan
                 ]);
             }
-
-            // Hash the password before saving the user
-            $data = $request->all();
-            $data['password'] = Hash::make($request->password); // Hash the password
-
-            UserModel::create($data);
-
-            return response()->json([
-                'status' => true,
-                'message' => 'Data user berhasil disimpan'
-            ]);
+    
+            // Jika bukan permintaan AJAX, arahkan ke halaman utama
+            return redirect('/');
         }
-        return redirect('/');
-    }
 
+    
+    
     public function show_ajax(string $id)
     {
         $user = UserModel::with(['detailMahasiswa', 'detailDosen', 'detailKaprodi'])->find($id);
@@ -127,96 +173,102 @@ class UserController extends Controller
             'contact' => $contact,
         ]);
     }
+    
+public function edit_ajax(string $id)
+{
+    $user = UserModel::with(['detailMahasiswa', 'detailDosen', 'detailKaprodi'])->find($id);
+    $level = LevelModel::select('level_id', 'level_nama')->get();
+    $prodi = ProdiModel::all(); // Ambil semua data prodi
 
-    public function edit_ajax(string $id)
-    {
-        $user = UserModel::with(['detailMahasiswa', 'detailDosen', 'detailKaprodi'])->find($id);
-        $level = LevelModel::select('level_id', 'level_nama')->get();
+    if (!$user) {
+        return response()->json(['status' => false, 'message' => 'Data tidak ditemukan']);
+    }
 
-        if ($user->role == 'mahasiswa' && $user->detailMahasiswa) {
-            $contact = $user->detailMahasiswa;
-        } elseif ($user->role == 'dosen' && $user->detailDosen) {
-            $contact = $user->detailDosen;
-        } elseif ($user->role == 'kaprodi' && $user->detailKaprodi) {
-            $contact = $user->detailKaprodi;
-        } else {
-            $contact = null;
+    $contact = null;
+    // Menentukan detail berdasarkan level pengguna
+    if ($user->level_id == 3) { // Mahasiswa
+        $contact = $user->detailMahasiswa;
+    } elseif ($user->level_id == 2) { // Dosen
+        $contact = $user->detailDosen;
+    } elseif ($user->level_id == 4) { // Kaprodi
+        $contact = $user->detailKaprodi;
+    }
+
+    // Kirim data prodi ke view
+    return view('user.edit_ajax', [
+        'user' => $user,
+        'level' => $level,
+        'contact' => $contact,
+        'prodi' => $prodi, // Pastikan data prodi dikirim ke tampilan
+    ]);
+}
+
+public function update_ajax(Request $request, $user_id)
+{
+    // Validation of inputs
+    $validated = $request->validate([
+        'username' => 'required|string|min:3|max:20',
+        'nama' => 'required|string|min:3|max:100',
+        'password' => 'nullable|string|min:6|max:20',
+        'email' => 'nullable|string|email|max:255',
+        'no_hp' => 'nullable|string|max:20',
+        'angkatan' => 'nullable|string|max:50', // For mahasiswa (student)
+        'prodi_id' => 'nullable|integer', // For mahasiswa (student) and kaprodi (head of program)
+    ]);
+
+    $user = UserModel::findOrFail($user_id); // Fetch user by user_id
+
+    // Check if admin is updating the user, they can't change the level_id
+    if (auth()->user()->level_id == 1) { // Only admin (level_id 1) can edit
+        $user->username = $request->username;
+        $user->nama = $request->nama;
+
+        if ($request->password) {
+            $user->password = bcrypt($request->password); // If password provided, hash it
         }
 
-        return view('user.edit_ajax', [
-            'user' => $user,
-            'level' => $level,
-            'contact' => $contact,
+        $user->save(); // Save user details
+
+        // Check if the user is a mahasiswa (student), dosen (lecturer), or kaprodi (head of program), and update the respective details
+        if ($user->level_id == 2) { // Dosen (Lecturer)
+            $detail = detail_dosenModel::where('user_id', $user_id)->first();
+            if ($detail) {
+                $detail->email = $request->email;
+                $detail->no_hp = $request->no_hp;
+                $detail->save(); // Update lecturer details
+            }
+        } elseif ($user->level_id == 3) { // Mahasiswa (Student)
+            $detail = detail_mahasiswaModel::where('user_id', $user_id)->first();
+            if ($detail) {
+                $detail->email = $request->email;
+                $detail->no_hp = $request->no_hp;
+                $detail->angkatan = $request->angkatan; // Update angkatan (year of entry) for mahasiswa
+                $detail->prodi_id = $request->prodi_id; // Update prodi_id (study program) for mahasiswa
+                $detail->save(); // Update student details
+            }
+        } elseif ($user->level_id == 4) { // Kaprodi (Head of Program)
+            $detail = detail_kaprodiModel::where('user_id', $user_id)->first();
+            if ($detail) {
+                $detail->email = $request->email;
+                $detail->no_hp = $request->no_hp;
+                $detail->prodi_id = $request->prodi_id; // Update prodi_id for kaprodi
+                $detail->save(); // Update head of program details
+            }
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'User data updated successfully!'
+        ]);
+    } else {
+        // If the user is not an admin, return a failure response
+        return response()->json([
+            'status' => false,
+            'message' => 'You are not authorized to edit user data!'
         ]);
     }
+}
 
-    public function update_ajax(Request $request, $id)
-    {
-        if ($request->ajax() || $request->wantsJson()) {
-            $rules = [
-                'level_id' => 'required|integer',
-                'username' => 'required|max:20|unique:m_user,username,' . $id . ',user_id',
-                'nama'     => 'required|max:100',
-                'email' => 'required|email',
-                'no_hp' => 'required|string',
-                'password' => 'nullable|min:6|max:20'
-            ];
-
-            // Validasi request
-            $validator = Validator::make($request->all(), $rules);
-
-            if ($validator->fails()) {
-                return response()->json([
-                    'status'   => false,
-                    'message'  => 'Validasi gagal.',
-                    'msgField' => $validator->errors()
-                ]);
-            }
-
-            $user = UserModel::find($id);
-            if ($user) {
-                // Jika password diisi, hash password sebelum menyimpan
-                if ($request->filled('password')) {
-                    $request->merge(['password' => Hash::make($request->password)]);
-                } else {
-                    // Jika tidak diisi, hapus password dari request
-                    $request->request->remove('password');
-                }
-
-                // Update data user
-                $user->update($request->all());
-
-                // Update no_hp dan email sesuai dengan peran menggunakan hasRole
-                if ($user->hasRole('mahasiswa') && $user->detailMahasiswa) {
-                    $user->detailMahasiswa->update([
-                        'no_hp' => $request->no_hp,
-                        'email' => $request->email,
-                    ]);
-                } elseif ($user->hasRole('dosen') && $user->detailDosen) {
-                    $user->detailDosen->update([
-                        'no_hp' => $request->no_hp,
-                        'email' => $request->email,
-                    ]);
-                } elseif ($user->hasRole('kaprodi') && $user->detailKaprodi) {
-                    $user->detailKaprodi->update([
-                        'no_hp' => $request->no_hp,
-                        'email' => $request->email,
-                    ]);
-                }
-
-                return response()->json([
-                    'status'  => true,
-                    'message' => 'Data berhasil diupdate'
-                ]);
-            } else {
-                return response()->json([
-                    'status'  => false,
-                    'message' => 'Data tidak ditemukan'
-                ]);
-            }
-        }
-        return redirect('/');
-    }
 
 
     public function confirm_ajax(string $id)
