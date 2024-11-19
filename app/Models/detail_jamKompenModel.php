@@ -14,7 +14,7 @@ class detail_jamKompenModel extends Model
 
     protected $primaryKey = 'detail_jam_kompen_id';
 
-    protected $fillable = ['jam_kompen_id, matkul_id','jam','jumlah_jam', 'created_at','updated_at'];
+    protected $fillable = ['jam_kompen_id, matkul_id','jumlah_jam', 'created_at','updated_at'];
 
     public function jamKompen(): BelongsTo
     {

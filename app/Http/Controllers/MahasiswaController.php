@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\detail_jamKompenModel;
 use App\Models\jamKompenModel;
+use App\Models\MatkulModel;
 use App\Models\PeriodeModel;
 use App\Models\UserModel;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\Facades\DataTables;
 
 class MahasiswaController extends Controller
@@ -46,4 +49,67 @@ class MahasiswaController extends Controller
             ->rawColumns(['aksi']) 
             ->make(true);
     }
+    public function create_ajax()
+    {
+        // Fetch data for periode and user dropdowns
+        $periode = PeriodeModel::select('periode_id', 'periode_nama')->get();
+        $user = UserModel::select('user_id', 'nama', 'username')->where('level_id', 3)->get();
+        $detailJamKompen = detail_jamKompenModel::all();
+        $matkul = MatkulModel::all(); 
+    
+        // Send data to the view for mahasiswa creation form
+        return view('mahasiswa.create_ajax')
+            ->with('periode', $periode)
+            ->with('user', $user)
+            ->with('detailJamKompen', $detailJamKompen)
+            ->with('matkul', $matkul)
+            ;
+    }
+    
+    public function store_ajax(Request $request)
+    {
+        if ($request->ajax() || $request->wantsJson()) {
+            $rules = [
+                'user_id' => 'required|integer',
+                'periode_id' => 'required|integer',
+                'jumlah_jam.*' => 'required|integer',
+                'matkul_id.*' => 'required|integer',
+            ];
+
+            $validator = Validator::make($request->all(), $rules);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Validasi Gagal',
+                    'msgField' => $validator->errors(),
+                ]);
+            }
+
+            // Hitung akumulasi jam dari jumlah_jam[]
+            $totalJam = array_sum($request->jumlah_jam);
+
+            $jamKompen = jamKompenModel::create([
+                'user_id' => $request->user_id,
+                'periode_id' => $request->periode_id,
+                'akumulasi_jam' => $totalJam,
+            ]);
+
+            foreach ($request->matkul_id as $index => $matkulId) {
+                detail_jamKompenModel::create([
+                    'jam_kompen_id' => $jamKompen->jam_kompen_id,
+                    'matkul_id' => $matkulId,
+                    'jumlah_jam' => $request->jumlah_jam[$index],
+                ]);
+            }
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Data Mahasiswa Kompensasi berhasil disimpan',
+            ]);
+        }
+
+        return redirect('/');
+    }
+
 }
