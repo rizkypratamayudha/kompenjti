@@ -1,103 +1,120 @@
-@empty($level)
+<form action="{{ url('/mahasiswa/' . $jamKompen->jam_kompen_id . '/delete_ajax') }}" method="POST"
+    id="form-delete-mahasiswa">
+    @csrf
+    @method('DELETE')
     <div id="modal-master" class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Kesalahan</h5>
-                <button type="button" class="close" data-dismiss="modal" arialabel="Close"><span
-                        aria-hidden="true">&times;</span></button>
+                <h5 class="modal-title" id="exampleModalLabel">Hapus Data Mahasiswa</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
             <div class="modal-body">
-                <div class="alert alert-danger">
-                    <h5><i class="icon fas fa-ban"></i> Kesalahan!!!</h5>
-                    Data yang anda cari tidak ditemukan
+                <div class="alert alert-warning">
+                    <h5><i class="icon fas fa-exclamation-triangle"></i> Konfirmasi !!!</h5>
+                    Apakah Anda ingin menghapus data berikut?
                 </div>
-                <a href="{{ url('/level') }}" class="btn btn-warning">Kembali</a>
+                <table class="table table-sm table-bordered table-striped">
+                    <tr>
+                        <th class="text-right col-3">NIM :</th>
+                        <td class="col-9">{{ $jamKompen->user->username }}</td>
+                    </tr>
+                    <tr>
+                        <th class="text-right col-3">Nama :</th>
+                        <td class="col-9">{{ $jamKompen->user->nama ?? '-' }}</td>
+                    </tr>
+                    <tr>
+                        <th class="text-right col-3">Periode :</th>
+                        <td class="col-9">{{ $jamKompen->periode->periode_nama }}</td>
+                    </tr>
+                    <tr>
+                        <th class="text-right col-3">Akumulasi Jam :</th>
+                        <td class="col-9">{{ $jamKompen->akumulasi_jam }}</td>
+                    </tr>
+                </table>
+
+                {{-- <div class="alert" style="background-color: #9BC4E2; color: #fff; border: 1px solid #7FAFC8;">
+                    <h5><i class="icon fas fa-list"></i> Detail Barang</h5>
+                </div> 
+                <table class="table table-sm table-bordered">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Nama Barang</th>
+                            <th>Harga Satuan</th>
+                            <th>Jumlah</th>
+                            <th>Total Harga</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @php $no = 1; @endphp
+                        @foreach ($penjualanDetail as $detail)
+                            <tr>
+                                <td>{{ $no++ }}</td>
+                                <td>{{ $detail->barang->barang_nama }}</td>
+                                <td>{{ $detail->harga }}</td>
+                                <td>{{ $detail->jumlah }}</td>
+                                <td>{{ number_format($detail->harga * $detail->jumlah) }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table> --}}
+            </div>
+            <div class="modal-footer">
+                <button type="button" data-dismiss="modal" class="btn btn-warning">Batal</button>
+                <button type="submit" class="btn btn-danger">Ya, Hapus</button>
             </div>
         </div>
     </div>
-@else
-    <form action="{{ url('/level/' . $level->level_id . '/delete_ajax') }}" method="POST" id="form-delete">
-        @csrf
-        @method('DELETE')
-        <div id="modal-master" class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Hapus Data level</h5>
-                    <button type="button" class="close" data-dismiss="modal" arialabel="Close"><span
-                            aria-hidden="true">&times;</span></button>
-                </div>
-                <div class="modal-body">
-                    <div class="alert alert-warning">
-                        <h5><i class="icon fas fa-ban"></i> Konfirmasi !!!</h5>
-                        Apakah Anda ingin menghapus data seperti di bawah ini?
-                    </div>
-                    <table class="table table-sm table-bordered table-striped">
-                        <tr>
-                            <th class="text-right col-3">ID Role :</th>
-                            <td class="col-9">{{ $level->level_id }}</td>
-                        </tr>
-                        <tr>
-                            <th class="text-right col-3">Kode Role :</th>
-                            <td class="col-9">{{ $level->kode_level }}</td>
-                        </tr>
-                        <tr>
-                            <th class="text-right col-3">Nama Role :</th>
-                            <td class="col-9">{{ $level->level_nama }}</td>
-                        </tr>
-                    </table>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" data-dismiss="modal" class="btn btn-warning">Batal</button>
-                    <button type="submit" class="btn btn-primary">Ya, Hapus</button>
-                </div>
-            </div>
-        </div>
-    </form>
-    <script>
-        $(document).ready(function() {
-            $("#form-delete").validate({
-                rules: {},
-                submitHandler: function(form) {
-                    $.ajax({
-                        url: form.action,
-                        type: form.method,
-                        data: $(form).serialize(),
-                        success: function(response) {
-                            if (response.status) {
-                                $('#myModal').modal('hide');
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'Berhasil',
-                                    text: response.message
-                                });
-                                dataLevel.ajax.reload();
-                            } else {
-                                $('.error-text').text('');
-                                $.each(response.msgField, function(prefix, val) {
-                                    $('#error-' + prefix).text(val[0]);
-                                });
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Terjadi Kesalahan',
-                                    text: response.message
-                                });
-                            }
+</form>
+
+<script>
+    $(document).ready(function() {
+        // Event submit form
+        $("#form-delete-mahasiswa").on('submit', function(event) {
+            event.preventDefault(); // Mencegah reload halaman
+            var form = $(this);
+
+            $.ajax({
+                url: form.attr('action'),
+                type: form.attr('method'),
+                data: form.serialize(),
+                success: function(response) {
+                    if (response.status) {
+                        // Tutup modal dan tampilkan pesan sukses
+                        $('#modal-master').modal('hide');
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil',
+                            text: response.message
+                        }).then(() => {
+                            // Refresh halaman setelah notifikasi sukses ditampilkan
+                            window.location.reload();
+                        });
+
+                        // Cek apakah instance DataTables sudah ada
+                        if ($.fn.DataTable.isDataTable('#dataMahasiswa')) {
+                            // Reload dan refresh tabel penjualan
+                            $('#dataMahasiswa').DataTable().ajax.reload(null, false).draw();
                         }
+                    } else {
+                        // Tampilkan pesan error
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Terjadi Kesalahan',
+                            text: response.message
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Terjadi Kesalahan',
+                        text: 'Gagal menghapus data. Silakan coba lagi.'
                     });
-                    return false;
-                },
-                errorElement: 'span',
-                errorPlacement: function(error, element) {
-                    error.addClass('invalid-feedback');
-                    element.closest('.form-group').append(error);
-                },
-                highlight: function(element, errorClass, validClass) {
-                    $(element).addClass('is-invalid');
-                },
-                unhighlight: function(element, errorClass, validClass) {
-                    $(element).removeClass('is-invalid');
                 }
             });
         });
-    </script>
-@endempty
+    });
+</script>

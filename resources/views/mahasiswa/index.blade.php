@@ -5,8 +5,8 @@
         <div class="card-header">
             <h3 class="card-title">{{ $page->title }}</h3>
             <div class="card-tools"> 
-                <a href="{{ url('/mahasiswa/export_excel') }}" class="btn btn-sm btn-primary mt-1"><i class="fa fa-file-excel"></i> Export Mahasiswa</a> 
-                <a href="{{ url('/mahasiswa/export_pdf') }}" class="btn btn-sm btn-warning mt-1"><i class="fa fa-file-pdf"></i> Export Mahasiswa</a>
+                {{-- <a href="{{ url('/mahasiswa/export_excel') }}" class="btn btn-sm btn-primary mt-1"><i class="fa fa-file-excel"></i> Export Mahasiswa</a> 
+                <a href="{{ url('/mahasiswa/export_pdf') }}" class="btn btn-sm btn-warning mt-1"><i class="fa fa-file-pdf"></i> Export Mahasiswa</a> --}}
                 <button onclick="modalAction('{{ url('/mahasiswa/import') }}')" class="btn btn-sm btn-info mt-1"><i class="fas fa-file-import"></i> Import Mahasiswa</button>  
                 <button onclick="modalAction('{{ url('/mahasiswa/create_ajax') }}')" class="btn btn-sm btn-success mt-1"><i class="fas fa-user-plus"></i> Tambah Mahasiswa</button>
             </div> 
