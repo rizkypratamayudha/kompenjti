@@ -61,9 +61,11 @@
 
                                     <a href="javascript:void(0)"
                                         onclick="checkIfAppliedAndOpenModal({{ $item->pekerjaan_id }})"
-                                        class="btn btn-outline-success btn-sm" id="apply-btn-{{ $item->pekerjaan_id }}">
+                                        class="btn btn-outline-success btn-sm" id="apply-btn-{{ $item->pekerjaan_id }}"
+                                        data-max-anggota="{{ $item->detail_pekerjaan->jumlah_anggota }}">
                                         Apply
                                     </a>
+
                                 </div>
                                 <div class="d-flex justify-content-between align-items-center">
                                     <small class="text-muted">Jumlah Nilai Jam Kompen :
@@ -111,9 +113,10 @@
         // Cek apakah user sudah melamar pekerjaan sebelum membuka modal
         function checkIfAppliedAndOpenModal(pekerjaanId) {
             checkIfApplied(pekerjaanId).done(function(response) {
+                const applyBtn = $('#apply-btn-' + pekerjaanId);
+
                 if (response.isApplied) {
-                    $('#apply-btn-' + pekerjaanId).prop('disabled',
-                        true); // Disable tombol Apply jika sudah melamar
+                    applyBtn.prop('disabled', true).text('Sudah Melamar');
                     Swal.fire({
                         icon: 'warning',
                         title: 'Sudah Melamar',
@@ -121,17 +124,30 @@
                         confirmButtonText: 'OK'
                     });
                 } else if (response.isApprove) {
-                    $('#apply-btn-' + pekerjaanId).prop('disabled',
-                        true); // Disable tombol Apply jika sudah melamar
+                    applyBtn.prop('disabled', true).text('Diterima');
                     Swal.fire({
                         icon: 'success',
                         title: 'Sudah Disetujui',
-                        text: 'Anda sudah diterima oleh dosen pada pekerjaan ini',
+                        text: 'Anda sudah diterima oleh dosen pada pekerjaan ini.',
                         confirmButtonText: 'OK'
                     });
                 } else {
-                    modalAction('{{ url('dosen/' . 'pekerjaan_id' . '/show_ajax') }}'.replace('pekerjaan_id',
-                        pekerjaanId));
+                    // Pastikan tombol hanya aktif jika anggota belum penuh
+                    const currentAnggota = parseInt($('#jumlah-anggota-' + pekerjaanId).text());
+                    const maxAnggota = parseInt(applyBtn.data('max-anggota'));
+
+                    if (currentAnggota >= maxAnggota) {
+                        applyBtn.prop('disabled', true).text('Penuh');
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Anggota Penuh',
+                            text: 'Tidak bisa melamar karena jumlah anggota sudah penuh.',
+                            confirmButtonText: 'OK'
+                        });
+                    } else {
+                        modalAction('{{ url('dosen/' . 'pekerjaan_id' . '/show_ajax') }}'.replace('pekerjaan_id',
+                            pekerjaanId));
+                    }
                 }
             }).fail(function() {
                 Swal.fire({
@@ -143,6 +159,7 @@
             });
         }
 
+
         // Fungsi untuk memuat jumlah anggota
         function loadAnggota(pekerjaanId) {
             $.ajax({
@@ -150,8 +167,17 @@
                 method: 'GET',
                 success: function(response) {
                     if (response.status) {
+                        const currentAnggota = response.anggotaJumlah;
+                        const maxAnggota = response.maxAnggota;
+
                         // Update jumlah anggota di elemen HTML
-                        $('#jumlah-anggota-' + pekerjaanId).text(response.anggotaJumlah);
+                        $('#jumlah-anggota-' + pekerjaanId).text(currentAnggota);
+
+                        // Cek jika jumlah anggota sudah mencapai batas maksimum
+                        if (currentAnggota >= maxAnggota) {
+                            // Nonaktifkan tombol Apply
+                            $('#apply-btn-' + pekerjaanId).prop('disabled', true).text('Penuh');
+                        }
                     } else {
                         console.error('Gagal memuat jumlah anggota untuk pekerjaan ID: ' + pekerjaanId);
                     }
@@ -161,6 +187,7 @@
                 }
             });
         }
+
 
 
         // Periksa status Apply dan jumlah anggota untuk setiap pekerjaan saat halaman dimuat

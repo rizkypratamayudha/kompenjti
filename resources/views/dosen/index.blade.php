@@ -100,6 +100,7 @@
                     $('#myModal').modal('show');
                 });
             }
+            
 
             // Fungsi untuk memuat jumlah anggota
         function loadAnggota(pekerjaanId) {

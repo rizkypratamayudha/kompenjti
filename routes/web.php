@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\KompetensiController;
 use App\Http\Controllers\LevelController;
 use App\Http\Controllers\ListPekerjaanMHSController;
 use App\Http\Controllers\MahasiswaController;
@@ -110,6 +111,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('approve-pekerjaan',[PekerjanController::class,'ApprovePekerjaan']);
         Route::post('decline-pekerjaan',[PekerjanController::class,'declinePekerjaan']);
         Route::post('kick-pekerjaan',[PekerjanController::class,'kickPekerjaan']);
+        Route::get('/{id}/lihat-pekerjaan',[PekerjanController::class,'lihatPekerjaan']);
     });
 
 
@@ -126,5 +128,13 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/apply',[ListPekerjaanMHSController::class,'apply']);
         Route::get('/check-if-applied', [ListPekerjaanMHSController::class, 'checkIfApplied'])->name('checkIfApplied');
         Route::get('/{id}/get-anggota',[ListPekerjaanMHSController::class,'get_anggota']);
+    });
+
+    Route::group(['prefix' => 'kompetensi'],function(){
+        Route::get('/',[KompetensiController::class,'index']);
+        Route::post('/list', [KompetensiController::class, 'list']);
+        Route::get('/create_ajax', [KompetensiController::class, 'create_ajax']);
+        Route::post('/ajax', [KompetensiController::class, 'store']);
+        Route::get('/{id}/show_ajax',[KompetensiController::class,'show_ajax']);
     });
 });

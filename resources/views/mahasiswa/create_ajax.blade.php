@@ -57,8 +57,8 @@
                         </tbody>
                     </table>
                 </div>
-                
-                
+
+
                 <div class="form-group">
                     <label>Akumulasi Jam Kompensasi</label>
                     <input type="number" name="akumulasi_jam" id="akumulasi_jam" class="form-control" readonly>
@@ -149,15 +149,17 @@ $(document).ready(function () {
                 data: $(form).serialize(),
                 success: function (response) {
                     if (response.status) {
+                        $('#myModal').modal('hide');
                         $('#modal-master').modal('hide');
                         Swal.fire({
                             icon: 'success',
                             title: 'Berhasil',
                             text: response.message
                         });
-                        form.reset(); // Reset form setelah berhasil
-                        $('#mata-kuliah-rows').empty(); // Kosongkan tabel
-                        updateAkumulasiJam(); // Reset akumulasi jam
+                        dataMahasiswa.ajax.reload();
+                        form.reset();
+                        $('#mata-kuliah-rows').empty();
+                        updateAkumulasiJam();
                     } else {
                         $('.error-text').text(''); // Hapus pesan error sebelumnya
                         $.each(response.errors, function (field, messages) {

@@ -4,6 +4,9 @@
     <div class="card card-outline card-primary">
         <div class="card-header">
             <h3 class="card-title">{{ $page->title }}</h3>
+            <div class="card-tools">
+                <button onclick="modalAction('{{url('kompetensi/create_ajax')}}')" class="btn btn-outline-primary"><i class="fa-solid fa-plus"></i>         Kompetensi</button>
+            </div>
         </div>
         <div class="card-body">
             @if (session('success'))
@@ -17,60 +20,36 @@
             <div class="row">
                 <div class="col-md-12">
                     <div class="form-group row">
-                        <label class="col-2 control-label col-form-label">Filter Periode:</label>
+                        <label class="col-1 control-label col-form-label">Filter:</label>
                         <div class="col-3">
-                            <select class="form-control" id="periode_filter" name="periode_filter" required>
-                                <option value="">- Semua Periode -</option>
-                                <option value="{{ $periodeNama }}" selected>{{ $periodeNama }}</option>
+                            <select class="form-control" id="periode_id" name="periode_id" required>
+                                <option value="">- Semua -</option>
+                                @foreach ($periodeNama as $item)
+                                    <option value="{{ $item->periode_id }}">{{ $item->periode_nama }}</option>
+                                @endforeach
                             </select>
-                            <small class="form-text text-muted">Pilih periode kompetensi</small>
+                            <small class="form-text text-muted">Periode</small>
                         </div>
                     </div>
                 </div>
             </div>
-
-            @if ($kompetensi->isEmpty())
-                <div class="text-center">
-                    <img src="{{ asset('kompetensi_kosong.png') }}" alt="No Competencies"
-                        style="max-width: 200px; margin-bottom: 15px;">
-                    <p class="mt-3">Belum ada data kompetensi yang tersedia!!!</p>
-                </div>
-            @endif
-
-            <div class="row">
-                @foreach ($kompetensi as $item)
-                    <div class="col-sm-6 mb-4">
-                        <div class="card shadow-sm border-0 rounded-lg">
-                            <div
-                                class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                                <h5 class="card-title mb-0">{{ $item->kompetensi_nama }}</h5>
-                            </div>
-                            <div class="card-body">
-                                <p class="card-text">
-                                    <small class="text-muted">Pengalaman:</small><br>
-                                    {{ $item->pengalaman }}
-                                </p>
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <small class="text-muted">Bukti Kompetensi: 
-                                        <a href="{{ $item->bukti }}" target="_blank" class="text-info">Lihat</a>
-                                    </small>
-                                </div>
-                            </div>
-                            <div class="card-footer bg-light">
-                                <i class="fas fa-clock text-muted"></i>
-                                Terakhir diperbarui: {{ $item->updated_at->locale('in_ID')->diffForHumans() }}
-                            </div>
-                        </div>
-                    </div>
-                @endforeach
-            </div>
+            <table class="table table-bordered table-striped table-hover table-sm" id="table_kompetensi">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Periode</th>
+                        <th>Kompetensi Nama</th>
+                        <th>Pengalaman</th>
+                        <th>Bukti</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+            </table>
         </div>
-        <div id="myModal" class="modal fade animate shake" tabindex="-1" role="dialog" data-backdrop="static"
-            data-keyboard="false" data-width="75%" aria-hidden="true"></div>
+    </div>
+    <div id="myModal" class="modal fade animate shake" tabindex="-1" role="dialog" data-backdrop="static"
+        data-keyboard="false" data-width="75%" aria-hidden="true"></div>
 @endsection
-
-@push('css')
-@endpush
 
 @push('js')
     <script>
@@ -80,11 +59,60 @@
             });
         }
 
-        // Event listener for periode filter
-        $('#periode_filter').change(function() {
-            let selectedPeriode = $(this).val();
-            // Handle filter logic here, like an AJAX request to fetch filtered data
-            alert('Filter berdasarkan periode: ' + selectedPeriode);
+        $(document).ready(function() {
+            dataUser = $('#table_kompetensi').DataTable({
+                serverSide: true,
+                ajax: {
+                    "url": "{{ url('kompetensi/list') }}",
+                    "dataType": "json",
+                    "type": "POST",
+                    "data": function(d) {
+                        d.periode_id = $('#periode_id').val();
+                    }
+                },
+                columns: [
+                    {
+                        data: "DT_RowIndex",
+                        className: "text-center",
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: "user.periode.periode_nama",
+                        className: "",
+                        orderable: true,
+                        searchable: true
+                    },
+                    {
+                        data: "kompetensi_nama",
+                        className: "",
+                        orderable: true,
+                        searchable: true
+                    },
+                    {
+                        data: "pengalaman",
+                        className: "",
+                        orderable: true,
+                        searchable: true
+                    },
+                    {
+                        data: "bukti",
+                        className: "",
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: "aksi",
+                        className: "text-center",
+                        orderable: false,
+                        searchable: false
+                    }
+                ]
+            });
+
+            $('#periode_id').on('change', function() {
+                dataUser.ajax.reload();
+            });
         });
     </script>
 @endpush

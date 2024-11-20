@@ -1,94 +1,85 @@
-@empty($level)
+
+@empty($jamKompen)
     <div id="modal-master" class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLabel">Kesalahan</h5>
-                <button type="button" class="close" data-dismiss="modal" arialabel="Close"><span
-                        aria-hidden="true">&times;</span></button>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
             <div class="modal-body">
                 <div class="alert alert-danger">
                     <h5><i class="icon fas fa-ban"></i> Kesalahan!!!</h5>
                     Data yang anda cari tidak ditemukan
                 </div>
-                <a href="{{ url('/level') }}" class="btn btn-warning">Kembali</a>
+                <a href="{{ url('/mahasiswa/') }}" class="btn btn-warning">Kembali</a>
             </div>
         </div>
     </div>
 @else
-        <div id="modal-master" class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Detail Data level</h5>
-                    <button type="button" class="close" data-dismiss="modal" arialabel="Close"><span
-                            aria-hidden="true">&times;</span></button>
+    <div id="modal-master" class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Detail Data Mahasiswa</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info">
+                    <h5><i class="icon fas fa-info-circle"></i> Informasi !!!</h5>
+                    Berikut adalah detail data Mahasiswa:
                 </div>
-                <div class="modal-body">
-                    <div class="alert alert-info">
-                        <h5><i class="icon fas fa-info"></i> Detail Informasi</h5>
-                    </div>
-                    <table class="table table-sm table-bordered table-striped">
+                <table class="table table-sm table-bordered table-striped">
+                    <tr>
+                        <th class="text-right col-3">NIM :</th>
+                        <td class="col-9">{{ $jamKompen->user->username }}</td>
+                    </tr>
+                    <tr>
+                        <th class="text-right col-3">Nama :</th>
+                        <td class="col-9">{{ $jamKompen->user->nama ?? '-' }}</td>
+                    </tr>
+                    <tr>
+                        <th class="text-right col-3">Periode :</th>
+                        <td class="col-9">{{ $jamKompen->periode->periode_nama }}</td>
+                    </tr>
+                    <tr>
+                        <th class="text-right col-3">Akumulasi Jam :</th>
+                        <td class="col-9">{{ $jamKompen->akumulasi_jam }}</td>
+                    </tr>
+
+
+                {{-- </table>
+                <div class="alert" style="background-color: #9BC4E2; color: #fff; border: 1px solid #7FAFC8;">
+                    <h5><i class="icon fas fa-list"></i> Detail Barang</h5>
+                </div>                
+                <table class="table table-sm table-bordered">
+                    <thead>
                         <tr>
-                            <th class="text-right col-3">Role ID :</th>
-                            <td class="col-9">{{ $level->level_id }}</td>
+                            <th>No</th>
+                            <th>Nama Barang</th>
+                            <th>Harga Satuan</th>
+                            <th>Jumlah</th>
+                            <th>Total Harga</th>
                         </tr>
-                        <tr>
-                            <th class="text-right col-3">Kode Role :</th>
-                            <td class="col-9">{{ $level->kode_level }}</td>
-                        </tr>
-                        <tr>
-                            <th class="text-right col-3">Nama Role :</th>
-                            <td class="col-9">{{ $level->level_nama }}</td>
-                        </tr>
-                    </table>
-                </div>
+                    </thead>
+                    <tbody>
+                        @php $no = 1; @endphp 
+                        @foreach ($penjualan->penjualan_detail as $detail)
+                            <tr>
+                                <td>{{ $no++ }}</td>
+                                <td>{{ $detail->barang->barang_nama }}</td>
+                                <td>{{ $detail->harga }}</td>
+                                <td>{{ $detail->jumlah }}</td>
+                                <td>{{ number_format($detail->harga * $detail->jumlah) }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                    
+
+                </table> --}}
             </div>
         </div>
-    <script>
-        $(document).ready(function() {
-            $("#form-delete").validate({
-                rules: {},
-                submitHandler: function(form) {
-                    $.ajax({
-                        url: form.action,
-                        type: form.method,
-                        data: $(form).serialize(),
-                        success: function(response) {
-                            if (response.status) {
-                                $('#myModal').modal('hide');
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'Berhasil',
-                                    text: response.message
-                                });
-                                dataLevel.ajax.reload();
-                            } else {
-                                $('.error-text').text('');
-                                $.each(response.msgField, function(prefix, val) {
-                                    $('#error-' + prefix).text(val[0]);
-                                });
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Terjadi Kesalahan',
-                                    text: response.message
-                                });
-                            }
-                        }
-                    });
-                    return false;
-                },
-                errorElement: 'span',
-                errorPlacement: function(error, element) {
-                    error.addClass('invalid-feedback');
-                    element.closest('.form-group').append(error);
-                },
-                highlight: function(element, errorClass, validClass) {
-                    $(element).addClass('is-invalid');
-                },
-                unhighlight: function(element, errorClass, validClass) {
-                    $(element).removeClass('is-invalid');
-                }
-            });
-        });
-    </script>
+    </div>
 @endempty
