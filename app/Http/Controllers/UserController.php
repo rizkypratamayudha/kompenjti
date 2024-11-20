@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -69,87 +70,78 @@ class UserController extends Controller
     }
 
   
-        public function create_ajax()
-        {
-            // Mengambil semua level, user, prodi, dan periode untuk ditampilkan pada form
-            $level = LevelModel::all();
-            $user = UserModel::all();
-            $prodi = ProdiModel::all();
-            $periode = PeriodeModel::all();
-            return view('user.create_ajax', ['level' => $level, 'user' => $user, 'prodi' => $prodi, 'periode' => $periode]);
+    public function create_ajax()
+{
+    // Mengambil semua level, prodi, dan periode untuk ditampilkan pada form
+    $level = LevelModel::all();
+    $prodi = ProdiModel::all();
+    $user = UserModel::all();
+    $periode = PeriodeModel::all();
+
+    return view('user.create_ajax',['level' => $level, 'user' => $user, 'prodi' => $prodi,'periode'=> $periode]);
+}
+
+public function store_ajax(Request $request)
+{
+    if ($request->ajax() || $request->wantsJson()) {
+        // Atur aturan validasi berdasarkan level_id
+        $rules = [
+            'level_id' => 'required|integer',
+            'username' => 'required|string|min:3|max:20|unique:m_user,username',
+            'nama' => 'required|string|max:100',
+            'password' => 'required|min:6|confirmed',
+        ];
+
+        if (in_array($request->level_id, [2, 3, 4])) { // Dosen, Mahasiswa, Kaprodi
+            $rules['email'] = 'required|email';
+            $rules['no_hp'] = 'required|string|max:15';
         }
-    
-        public function store_ajax(Request $request)
-        {
-            if ($request->ajax() || $request->wantsJson()) {
-                // Menetapkan aturan validasi
-                $rules = [
-                    'level_id' => 'required|integer',
-                    'username' => 'required|string|min:3|unique:m_user,username',
-                    'nama' => 'required|string|max:100',
-                    'password' => 'required|min:6|confirmed',
-                    'email' => 'required|email',
-                    'no_hp' => 'required|string',
-                    'prodi_id' => 'required_if:level_id,3,4',
-                    'angkatan' => 'required_if:level_id,3',
-                    'periode_id' => 'required|integer',
-                ];
-    
-                // Melakukan validasi
-                $validator = Validator::make($request->all(), $rules);
-                if ($validator->fails()) {
-                    return response()->json([
-                        'status' => false,
-                        'message' => 'Validasi Gagal',
-                        'msgField' => $validator->errors(),
-                    ]);
-                }
-    
-                // Menyiapkan data untuk disimpan
-                $data = $request->all();
-                $data['password'] = Hash::make($request->password); // Enkripsi password
-    
-                // Simpan data ke tabel m_user
-                $user = UserModel::create($data);
-    
-                // Menambahkan detail sesuai level
-                if ($request->level_id == 3) { // Mahasiswa
-                    $detailMahasiswa = [
-                        'user_id' => $user->user_id,
-                        'email' => $request->email,
-                        'no_hp' => $request->no_hp,
-                        'angkatan' => $request->angkatan,
-                        'prodi_id' => $request->prodi_id,
-                        'periode_id' => $request->periode_id,
-                    ];
-                    detail_mahasiswaModel::create($detailMahasiswa); // Simpan detail mahasiswa
-                } elseif ($request->level_id == 2) { // Dosen
-                    $detailDosen = [
-                        'user_id' => $user->user_id,
-                        'email' => $request->email,
-                        'no_hp' => $request->no_hp,
-                    ];
-                    detail_dosenModel::create($detailDosen); // Simpan detail dosen
-                } elseif ($request->level_id == 4) { // Kaprodi
-                    $detailKaprodi = [
-                        'user_id' => $user->user_id,
-                        'email' => $request->email,
-                        'no_hp' => $request->no_hp,
-                        'prodi_id' => $request->prodi_id,
-                    ];
-                    detail_kaprodiModel::create($detailKaprodi); // Simpan detail kaprodi
-                }
-    
-                return response()->json([
-                    'status' => true,
-                    'message' => 'Data user berhasil disimpan',
-                    'redirect' => url('user'), // Ganti dengan URL yang sesuai setelah data disimpan
-                ]);
-            }
-    
-            // Jika bukan permintaan AJAX, arahkan ke halaman utama
-            return redirect('/');
+
+        if ($request->level_id == 3) { // Mahasiswa
+            $rules['angkatan'] = 'required|integer|digits:4';
+            $rules['prodi_id'] = 'required|integer';
+            $rules['periode_id'] = 'required|integer';
         }
+
+        if ($request->level_id == 4) { // Kaprodi
+            $rules['prodi_id'] = 'required|integer';
+        }
+
+        // Validasi input
+        $validator = Validator::make($request->all(), $rules);
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Validasi Gagal',
+                'msgField' => $validator->errors(),
+            ]);
+        }
+
+        // Simpan data ke database
+        $data = $request->only([
+            'level_id', 'username', 'nama', 'email', 'no_hp', 'angkatan', 'prodi_id', 'periode_id'
+        ]);
+        $data['password'] = Hash::make($request->password);
+
+        try {
+            DB::table('m_user')->insert($data);
+            return response()->json([
+                'status' => true,
+                'message' => 'Data berhasil disimpan',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Terjadi kesalahan saat menyimpan data: ' . $e->getMessage(),
+            ]);
+        }
+    }
+
+    return response()->json([
+        'status' => false,
+        'message' => 'Permintaan tidak valid.',
+    ]);
+}
 
     
     
