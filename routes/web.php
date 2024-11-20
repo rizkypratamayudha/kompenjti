@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\KompetensiController;
 use App\Http\Controllers\LevelController;
 use App\Http\Controllers\ListPekerjaanMHSController;
 use App\Http\Controllers\MahasiswaController;
@@ -98,17 +99,19 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/', [PekerjanController::class, 'index']);
         Route::get('/create_ajax', [PekerjanController::class, 'create_ajax']);
         Route::post('/ajax', [PekerjanController::class, 'store_ajax']);
+        Route::get('/{id}/edit_ajax', [PekerjanController::class, 'edit_ajax']);
+        Route::put('/{id}/update_ajax', [PekerjanController::class, 'update_ajax']);
         Route::get('/{id}/pekerjaan', [PekerjanController::class, 'enter_pekerjaan']);
         Route::get('/{id}/get-progres', [PekerjanController::class, 'getProgres'])->name('dosen.get-progres');
         Route::get('/{id}/get-pelamaran', [PekerjanController::class, 'getPelamaran']);
         Route::get('/{id}/get-anggota',[PekerjanController::class,'getAnggota']);
         Route::get('{id}/show_ajax',[PekerjanController::class,'show_ajax']);
-        Route::put('/{id}/update_ajax', [PekerjanController::class, 'update_ajax']);
         Route::get('/{id}/delete_ajax', [PekerjanController::class, 'confirm_ajax']);
         Route::delete('/{id}/delete_ajax', [PekerjanController::class, 'delete_ajax']);
         Route::post('approve-pekerjaan',[PekerjanController::class,'ApprovePekerjaan']);
         Route::post('decline-pekerjaan',[PekerjanController::class,'declinePekerjaan']);
         Route::post('kick-pekerjaan',[PekerjanController::class,'kickPekerjaan']);
+        Route::get('/{id}/lihat-pekerjaan',[PekerjanController::class,'lihatPekerjaan']);
     });
 
 
@@ -123,5 +126,15 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/{id}/delete_ajax', [ListPekerjaanMHSController::class, 'delete_ajax']);
         Route::get('/{id}/show_ajax', [ListPekerjaanMHSController::class, 'show_ajax']);
         Route::post('/apply',[ListPekerjaanMHSController::class,'apply']);
+        Route::get('/check-if-applied', [ListPekerjaanMHSController::class, 'checkIfApplied'])->name('checkIfApplied');
+        Route::get('/{id}/get-anggota',[ListPekerjaanMHSController::class,'get_anggota']);
+    });
+
+    Route::group(['prefix' => 'kompetensi'],function(){
+        Route::get('/',[KompetensiController::class,'index']);
+        Route::post('/list', [KompetensiController::class, 'list']);
+        Route::get('/create_ajax', [KompetensiController::class, 'create_ajax']);
+        Route::post('/ajax', [KompetensiController::class, 'store']);
+        Route::get('/{id}/show_ajax',[KompetensiController::class,'show_ajax']);
     });
 });

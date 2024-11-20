@@ -26,8 +26,10 @@ class detail_mahasiswaModel extends Model
         return $this->belongsTo(ProdiModel::class, 'prodi_id');
     }
 
-    public function periode(): BelongsTo
-    {
-        return $this->belongsTo(PeriodeModel::class, 'periode_id');
-    }
+    public function periode()
+{
+    return $this->belongsTo(PeriodeModel::class, 'periode_id', 'periode_id');
+}
+
+
 }

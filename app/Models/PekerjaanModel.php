@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class PekerjaanModel extends Model
 {
@@ -21,8 +22,8 @@ class PekerjaanModel extends Model
     public function detail_pekerjaan():BelongsTo{
         return $this->belongsTo(detail_pekerjaanModel::class,'pekerjaan_id','pekerjaan_id');
     }
-    public function progres():BelongsTo{
-        return $this->belongsTo(ProgresModel::class,'pekerjaan_id','pekerjaan_id');
+    public function progres():HasMany{
+        return $this->hasMany(ProgresModel::class,'pekerjaan_id','pekerjaan_id');
     }
 
     public function persyaratan()
