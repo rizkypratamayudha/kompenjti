@@ -156,7 +156,7 @@ $(document).ready(function () {
                             title: 'Berhasil',
                             text: response.message
                         });
-
+                        dataMahasiswa.ajax.reload();
                         form.reset();
                         $('#mata-kuliah-rows').empty();
                         updateAkumulasiJam();

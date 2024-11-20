@@ -36,7 +36,7 @@
 
                 {{-- <div class="alert" style="background-color: #9BC4E2; color: #fff; border: 1px solid #7FAFC8;">
                     <h5><i class="icon fas fa-list"></i> Detail Barang</h5>
-                </div> 
+                </div>
                 <table class="table table-sm table-bordered">
                     <thead>
                         <tr>
@@ -89,8 +89,7 @@
                             title: 'Berhasil',
                             text: response.message
                         }).then(() => {
-                            // Refresh halaman setelah notifikasi sukses ditampilkan
-                            window.location.reload();
+                            dataMahasiswa.ajax.reload();
                         });
 
                         // Cek apakah instance DataTables sudah ada

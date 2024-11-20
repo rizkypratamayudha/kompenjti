@@ -4,12 +4,12 @@
     <div class="card card-outline card-primary">
         <div class="card-header">
             <h3 class="card-title">{{ $page->title }}</h3>
-            <div class="card-tools"> 
-                {{-- <a href="{{ url('/mahasiswa/export_excel') }}" class="btn btn-sm btn-primary mt-1"><i class="fa fa-file-excel"></i> Export Mahasiswa</a> 
+            <div class="card-tools">
+                {{-- <a href="{{ url('/mahasiswa/export_excel') }}" class="btn btn-sm btn-primary mt-1"><i class="fa fa-file-excel"></i> Export Mahasiswa</a>
                 <a href="{{ url('/mahasiswa/export_pdf') }}" class="btn btn-sm btn-warning mt-1"><i class="fa fa-file-pdf"></i> Export Mahasiswa</a> --}}
-                <button onclick="modalAction('{{ url('/mahasiswa/import') }}')" class="btn btn-sm btn-info mt-1"><i class="fas fa-file-import"></i> Import Mahasiswa</button>  
+                <button onclick="modalAction('{{ url('/mahasiswa/import') }}')" class="btn btn-sm btn-info mt-1"><i class="fas fa-file-import"></i> Import Mahasiswa</button>
                 <button onclick="modalAction('{{ url('/mahasiswa/create_ajax') }}')" class="btn btn-sm btn-success mt-1"><i class="fas fa-user-plus"></i> Tambah Mahasiswa</button>
-            </div> 
+            </div>
         </div>
         <div class="card-body">
             @if (session('success'))
@@ -49,7 +49,7 @@
                 </table>
         </div>
     </div>
-    <div id="myModal" class="modal fade animate shake" tabindex="-1" role="dialog" databackdrop="static" data-keyboard="false" data-width="75%" aria-hidden="true"></div> 
+    <div id="myModal" class="modal fade animate shake" tabindex="-1" role="dialog" databackdrop="static" data-keyboard="false" data-width="75%" aria-hidden="true"></div>
 @endsection
 
 @push('css')
@@ -62,7 +62,6 @@
                 $('#myModal').modal('show');
             });
         }
-        var dataMahasiswa;
         $(document).ready(function() {
             dataMahasiswa = $('#table_mahasiswa').DataTable({
                 serverSide: true,
