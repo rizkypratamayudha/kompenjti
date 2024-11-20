@@ -82,7 +82,7 @@
                 data: form.serialize(),
                 success: function(response) {
                     if (response.status) {
-                        // Tutup modal dan tampilkan pesan sukses
+                        $('#myModal').modal('hide');
                         $('#modal-master').modal('hide');
                         Swal.fire({
                             icon: 'success',
