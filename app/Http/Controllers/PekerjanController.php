@@ -5,11 +5,14 @@ namespace App\Http\Controllers;
 use App\Models\ApprovePekerjaanModel;
 use App\Models\detail_dosenModel;
 use App\Models\detail_pekerjaanModel;
+use App\Models\kompetensiModel;
 use App\Models\PekerjaanModel;
 use App\Models\PendingPekerjaanController;
 use App\Models\PendingPekerjaanModel;
+use App\Models\PeriodeModel;
 use App\Models\PersyaratanModel;
 use App\Models\ProgresModel;
+use App\Models\UserModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -360,5 +363,13 @@ class PekerjanController extends Controller
             'status' => true,
             'anggotaJumlah' => $anggotaJumlah
         ]);
+    }
+
+    public function lihatPekerjaan($id){
+        $user = UserModel::find( $id );
+        $kompetensi = kompetensiModel::where('user_id',$id)->get();
+
+        return view('dosen.lihat_pekerjaan',['user'=>$user,'kompetensi'=>$kompetensi]);
+
     }
 }

@@ -94,6 +94,8 @@
             </div>
         </div>
     </div>
+    <div id="myModal" class="modal fade animate shake" tabindex="-1" role="dialog" data-backdrop="static"
+        data-keyboard="false" data-width="75%" aria-hidden="true"></div>
 @endsection
 
 @push('js')
@@ -102,6 +104,12 @@
     <script src="https://cdn.jsdelivr.net/npm/dayjs@1.11.9/locale/id.js"></script>
 
     <script>
+        function modalAction(url = '') {
+            $('#myModal').load(url, function() {
+                $('#myModal').modal('show');
+            });
+        }
+
         function loadProgres(pekerjaanId) {
             document.getElementById('pelamaranContent').style.display = 'none';
             document.getElementById('anggotaContent').style.display = 'none';
@@ -182,7 +190,8 @@
                             </div>
                             <div class="col-3 ml-auto">
                                 <p class="card-text"><small class="text-muted">Melamar ${dayjs(pelamar.created_at).fromNow()}</small></p>
-                                <button class="btn btn-outline-info btn-lg">Lihat</button>
+                                <button class="btn btn-outline-info btn-lg" onclick="modalAction('{{ url('/dosen/') }}/${pelamar.user.user_id}/lihat-pekerjaan')"
+>Lihat</button>
                                 <button onclick="approvePekerjaan(${pelamar.user.user_id}, {{ $pekerjaan->pekerjaan_id }})" class="btn btn-outline-success btn-lg"><i class="fas fa-check-circle"></i></button>
                                 <button onclick="declinePekerjaan(${pelamar.user.user_id}, {{ $pekerjaan->pekerjaan_id }})" class="btn btn-outline-danger btn-lg"><i class="fas fa-circle-xmark"></i></button>
                             </div>
@@ -241,7 +250,7 @@
                                     </div>
                                     <div class="col-3 ml-auto">
                                         <p class="card-text"><small class="text-muted">Disetujui ${dayjs(anggota.created_at).fromNow()}</small></p>
-                                        <button class="btn btn-outline-info btn-lg">Lihat</button>
+                                        <button class="btn btn-outline-info btn-lg" onclick="modalAction('{{ url('/dosen/') }}/${anggota.user.user_id}/lihat-pekerjaan')">Lihat</button>
                                         <button onclick="kickPekerjaan(${anggota.user.user_id}, {{ $pekerjaan->pekerjaan_id }})" class="btn btn-outline-danger btn-lg"><i class="fas fa-circle-xmark"></i></button>
                                     </div>
                                 </div>
@@ -315,6 +324,7 @@
                 }
             });
         }
+
 
         function declinePekerjaan(userId, pekerjaanId) {
             Swal.fire({
