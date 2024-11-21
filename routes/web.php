@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\kompetensi_adminController;
 use App\Http\Controllers\KompetensiController;
 use App\Http\Controllers\LevelController;
 use App\Http\Controllers\ListPekerjaanMHSController;
@@ -10,6 +11,7 @@ use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ValidasiController;
 use App\Http\Controllers\welcomeController;
+use App\Models\kompetensi_adminModel;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -136,5 +138,17 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/create_ajax', [KompetensiController::class, 'create_ajax']);
         Route::post('/ajax', [KompetensiController::class, 'store']);
         Route::get('/{id}/show_ajax',[KompetensiController::class,'show_ajax']);
+    });
+
+    Route::group(['prefix' => 'kompetensi_admin'],function(){
+        Route::get('/',[kompetensi_adminController::class,'index']);
+        Route::post('/list', [kompetensi_adminController::class, 'list']);
+        Route::get('/create_ajax', [kompetensi_adminController::class, 'create_ajax']);
+        Route::post('/ajax', [kompetensi_adminController::class, 'store_ajax']);
+        Route::get('/{id}/edit_ajax', [kompetensi_adminController::class, 'edit_ajax']);
+        Route::put('{id}/update_ajax',[kompetensi_adminController::class,'update_ajax']);
+        Route::get('/{id}/confirm_ajax', [kompetensi_adminController::class, 'confirm_ajax']);
+        Route::delete('/{id}/delete_ajax', [kompetensi_adminController::class, 'delete_ajax']);
+        Route::get('/{id}/show_ajax', [kompetensi_adminController::class, 'show_ajax']);
     });
 });

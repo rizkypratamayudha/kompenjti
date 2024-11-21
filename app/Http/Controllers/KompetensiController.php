@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\kompetensiModel;
 use App\Models\detail_mahasiswaModel;
+use App\Models\kompetensi_adminModel;
 use App\Models\PeriodeModel;
 use App\Models\UserModel;
 use Illuminate\Support\Facades\Auth;
@@ -27,15 +28,13 @@ class KompetensiController extends Controller
         $activeMenu = 'kompetensi';
 
         $periodeNama = PeriodeModel::all();
-        $kompetensi = kompetensiModel::with('user.periode')->where('user_id', Auth::id())->get();
+        $kompetensi = kompetensiModel::with('user.periode','kompetensiAdmin')->where('user_id', Auth::id())->get();
         return view('kompetensi.index', ['breadcrumb' => $breadcrumb, 'page' => $page, 'kompetensi' => $kompetensi, 'periodeNama' => $periodeNama, 'activeMenu' => $activeMenu]);
     }
 
     public function list(Request $request)
     {
-        $kompetensi = kompetensiModel::where('user_id', Auth::id())
-            ->select('kompetensi_id', 'user_id', 'kompetensi_nama', 'pengalaman', 'bukti')
-            ->with('user.periode');
+        $kompetensi = kompetensiModel::with('user.periode','kompetensiAdmin')->where('user_id',Auth::id())->get();
 
             if ($request->periode_id) {
                 $kompetensi->whereHas('user.detailMahasiswa.periode', function ($query) use ($request) {
@@ -60,8 +59,9 @@ class KompetensiController extends Controller
     }
 
     public function create_ajax(){
-        $user = UserModel::with('detailMahasiswa')->where('user_id',Auth::id())->first();
-        return view('kompetensi.create_ajax',['user'=>$user]);
+        $user = UserModel::with('detailMahasiswa','detailMahasiswa.prodi')->where('user_id',Auth::id())->first();
+        $kompetensi = kompetensi_adminModel::all();
+        return view('kompetensi.create_ajax',['user'=>$user,'kompetensi' => $kompetensi]);
     }
 
     public function store(Request $request)

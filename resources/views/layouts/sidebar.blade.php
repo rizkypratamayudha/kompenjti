@@ -72,7 +72,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{{ url('/kompetensi') }}" class="nav-link {{ $activeMenu == 'kompetensi' ? 'active' : '' }} ">
+                    <a href="{{ url('/kompetensi_admin') }}" class="nav-link {{ $activeMenu == 'kompetensi_admin' ? 'active' : '' }} ">
                         <i class="nav-icon fas fa-id-card"></i>
                         <p>Kompetensi</p>
                     </a>

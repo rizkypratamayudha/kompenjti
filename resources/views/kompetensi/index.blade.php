@@ -84,7 +84,7 @@
                         searchable: true
                     },
                     {
-                        data: "kompetensi_nama",
+                        data: "kompetensiAdmin.kompetensi_nama",
                         className: "",
                         orderable: true,
                         searchable: true

@@ -22,4 +22,8 @@ class detail_pekerjaanModel extends Model
         return $this->hasMany(PersyaratanModel::class, 'detail_pekerjaan_id', 'detail_pekerjaan_id');
     }
 
+    public function kompetensiDosen(){
+        return $this->hasMany(kompetensi_dosenModel::class,'detail_pekerjaan_id','detail_pekerjaan_id');
+    }
+
 }

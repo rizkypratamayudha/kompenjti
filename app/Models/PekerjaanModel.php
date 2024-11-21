@@ -30,4 +30,9 @@ class PekerjaanModel extends Model
     {
         return $this->hasManyThrough(PersyaratanModel::class, detail_pekerjaanModel::class, 'pekerjaan_id', 'detail_pekerjaan_id', 'id', 'id');
     }
+
+    public function kompetensiDosen()
+{
+    return $this->hasManyThrough(kompetensi_dosenModel::class, detail_pekerjaanModel::class);
+}
 }

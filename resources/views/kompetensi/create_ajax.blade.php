@@ -94,8 +94,12 @@
                 $dynamicInputs.append(`
                     <tr id="row-${i}">
                         <td>
-                            <input type="text" name="kompetensi[${i}][nama]" class="form-control" placeholder="Nama Kompetensi" required>
-                            <small class="error-text text-danger" id="error-nama-${i}"></small>
+                            <select name="kompetensi[${i}][nama]" class="form-control"  required>
+                                <option>- Pilih Kompetensi -</option>
+                                @foreach ($kompetensi as $item)
+                                    <option value="{{$item->kompetensi_admin_id}}">{{$item->kompetensi_nama}}</option>
+                                @endforeach
+                            </select>
                         </td>
                         <td>
                             <input type="text" name="kompetensi[${i}][pengalaman]" class="form-control" placeholder="Pengalaman" required>
