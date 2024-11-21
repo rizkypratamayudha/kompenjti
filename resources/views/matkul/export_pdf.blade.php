@@ -11,11 +11,12 @@
             width: 100%;  
             border-collapse: collapse; 
         } 
-        td, th { 
-            padding: 4px 3px; 
+        td { 
+            padding: 6px 3px; 
         } 
         th { 
             text-align: left; 
+            padding: 10px 5px;
         } 
         .d-block { 
             display: block; 
@@ -71,21 +72,19 @@
         </tr> 
     </table> 
  
-    <h3 class="text-center">LAPORAN DATA LEVEL</h3> 
+    <h3 class="text-center">LAPORAN DATA MATA KULIAH</h3> 
     <table class="border-all"> 
         <thead> 
             <tr> 
                 <th class="text-center">No</th> 
-                <th>Kode Level</th> 
-                <th>Nama Level</th> 
+                <th>Nama Mata Kuliah</th> 
             </tr> 
         </thead>  
         <tbody> 
-            @foreach($level as $l) 
+            @foreach($matkul as $l) 
             <tr> 
                 <td class="text-center">{{ $loop->iteration }}</td> 
-                <td>{{ $l->kode_level }}</td> 
-                <td>{{ $l->level_nama }}</td> 
+                <td>{{ $l->matkul_nama }}</td> 
             </tr> 
             @endforeach 
         </tbody>
