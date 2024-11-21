@@ -5,7 +5,8 @@
         <div class="card-header">
             <h3 class="card-title">{{ $page->title }}</h3>
             <div class="card-tools">
-                <button onclick="modalAction('{{url('kompetensi/create_ajax')}}')" class="btn btn-outline-primary"><i class="fa-solid fa-plus"></i>         Kompetensi</button>
+                <button onclick="modalAction('{{ url('kompetensi/create_ajax') }}')" class="btn btn-outline-primary"><i
+                        class="fa-solid fa-plus"></i> Kompetensi</button>
             </div>
         </div>
         <div class="card-body">
@@ -37,7 +38,6 @@
                 <thead>
                     <tr>
                         <th>No</th>
-                        <th>Periode</th>
                         <th>Kompetensi Nama</th>
                         <th>Pengalaman</th>
                         <th>Bukti</th>
@@ -63,28 +63,20 @@
             dataUser = $('#table_kompetensi').DataTable({
                 serverSide: true,
                 ajax: {
-                    "url": "{{ url('kompetensi/list') }}",
-                    "dataType": "json",
-                    "type": "POST",
-                    "data": function(d) {
+                    url: "{{ url('kompetensi/list') }}",
+                    type: "POST",
+                    data: function(d) {
                         d.periode_id = $('#periode_id').val();
                     }
                 },
-                columns: [
-                    {
+                columns: [{
                         data: "DT_RowIndex",
                         className: "text-center",
                         orderable: false,
                         searchable: false
                     },
                     {
-                        data: "user.periode.periode_nama",
-                        className: "",
-                        orderable: true,
-                        searchable: true
-                    },
-                    {
-                        data: "kompetensiAdmin.kompetensi_nama",
+                        data: "kompetensi_nama",
                         className: "",
                         orderable: true,
                         searchable: true
@@ -109,6 +101,7 @@
                     }
                 ]
             });
+
 
             $('#periode_id').on('change', function() {
                 dataUser.ajax.reload();

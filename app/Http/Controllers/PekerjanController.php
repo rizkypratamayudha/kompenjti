@@ -396,7 +396,7 @@ class PekerjanController extends Controller
     public function lihatPekerjaan($id)
     {
         $user = UserModel::find($id);
-        $kompetensi = kompetensiModel::where('user_id', $id)->get();
+        $kompetensi = kompetensiModel::with('kompetensiAdmin')->where('user_id',$id)->get();
 
         return view('dosen.lihat_pekerjaan', ['user' => $user, 'kompetensi' => $kompetensi]);
     }

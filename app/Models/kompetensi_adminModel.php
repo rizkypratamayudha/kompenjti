@@ -12,5 +12,8 @@ class kompetensi_adminModel extends Model
     protected $primaryKey = 'kompetensi_admin_id';
     protected $fillable = ['kompetensi_admin_id','kompetensi_nama'];
 
-    
+    public function kompetensi()
+    {
+        return $this->belongsTo(kompetensiModel::class, 'kompetensi_admin_id');
+    }
 }

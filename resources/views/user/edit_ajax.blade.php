@@ -16,109 +16,116 @@
         </div>
     </div>
 @else
-<form action="{{ url('/user/' . $user->user_id . '/update_ajax') }}" method="POST" id="form-edit"
-    enctype="multipart/form-data">
-    @csrf
-    @method('PUT')
-    <div id="modal-master" class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Edit Data User</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
-                        aria-hidden="true">&times;</span></button>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label>Level Pengguna</label>
-                    <select name="level_id" id="level_id" class="form-control" required>
-                        <option value="">- Pilih Role -</option>
-                        @foreach ($level as $l)
-                            <option {{ $l->level_id == $user->level_id ? 'selected' : '' }} value="{{ $l->level_id }}">
-                                {{ $l->level_nama }}</option>
-                        @endforeach
-                    </select>
-                    <small id="error-level_id" class="error-text form-text text-danger"></small>
+    <form action="{{ url('/user/' . $user->user_id . '/update_ajax') }}" method="POST" id="form-edit"
+        enctype="multipart/form-data">
+        @csrf
+        @method('PUT')
+        <div id="modal-master" class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Edit Data User</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
                 </div>
-                <div class="form-group">
-                    <label>Username</label>
-                    <input value="{{ $user->username }}" type="text" name="username" id="username" class="form-control" required>
-                    <small id="error-username" class="error-text form-text text-danger"></small>
-                </div>
-                <div class="form-group">
-                    <label>Nama</label>
-                    <input value="{{ $user->nama }}" type="text" name="nama" id="nama" class="form-control" required>
-                    <small id="error-nama" class="error-text form-text text-danger"></small>
-                </div>
-                @if ($user->level_id != 1)
+                <div class="modal-body">
                     <div class="form-group">
-                        <label>Email</label>
-                        <input value="{{ isset($contact) ? $contact->email : '' }}" type="text" name="email" id="email" class="form-control" required>
-                        <small id="error-email" class="error-text form-text text-danger"></small>
+                        <label>Level Pengguna</label>
+                        <select name="level_id" id="level_id" class="form-control" required>
+                            <option value="">- Pilih Role -</option>
+                            @foreach ($level as $l)
+                                <option {{ $l->level_id == $user->level_id ? 'selected' : '' }} value="{{ $l->level_id }}">
+                                    {{ $l->level_nama }}</option>
+                            @endforeach
+                        </select>
+                        <small id="error-level_id" class="error-text form-text text-danger"></small>
                     </div>
                     <div class="form-group">
-                        <label>No HP</label>
-                        <input value="{{ isset($contact) ? $contact->no_hp : '' }}" type="text" name="no_hp" id="no_hp" class="form-control" required>
-                        <small id="error-no_hp" class="error-text form-text text-danger"></small>
+                        <label>Username</label>
+                        <input value="{{ $user->username }}" type="text" name="username" id="username"
+                            class="form-control" required>
+                        <small id="error-username" class="error-text form-text text-danger"></small>
                     </div>
-                @endif
+                    <div class="form-group">
+                        <label>Nama</label>
+                        <input value="{{ $user->nama }}" type="text" name="nama" id="nama" class="form-control"
+                            required>
+                        <small id="error-nama" class="error-text form-text text-danger"></small>
+                    </div>
+                    @if ($user->level_id != 1)
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input value="{{ isset($contact) ? $contact->email : '' }}" type="text" name="email"
+                                id="email" class="form-control" required>
+                            <small id="error-email" class="error-text form-text text-danger"></small>
+                        </div>
+                        <div class="form-group">
+                            <label>No HP</label>
+                            <input value="{{ isset($contact) ? $contact->no_hp : '' }}" type="text" name="no_hp"
+                                id="no_hp" class="form-control" required>
+                            <small id="error-no_hp" class="error-text form-text text-danger"></small>
+                        </div>
+                    @endif
 
-                <!-- Form untuk level Mahasiswa (3) -->
-                @if ($user->level_id == 3)
-                    <div class="form-group">
-                        <label>Angkatan</label>
-                        <input value="{{ isset($contact) ? $contact->angkatan : '' }}" type="text" name="angkatan" id="angkatan" class="form-control" required>
-                        <small id="error-angkatan" class="error-text form-text text-danger"></small>
-                    </div>
-                    <div class="form-group">
-                        <label>Prodi ID</label>
-                        <input value="{{ isset($contact) ? $contact->prodi_id : '' }}" type="text" name="prodi_id" id="prodi_id" class="form-control" required>
-                        <small id="error-prodi_id" class="error-text form-text text-danger"></small>
-                    </div>
-                @endif
+                    <!-- Form untuk level Mahasiswa (3) -->
+                    @if ($user->level_id == 3)
+                        <div class="form-group">
+                            <label>Angkatan</label>
+                            <input value="{{ isset($contact) ? $contact->angkatan : '' }}" type="text" name="angkatan"
+                                id="angkatan" class="form-control" required>
+                            <small id="error-angkatan" class="error-text form-text text-danger"></small>
+                        </div>
+                        <div class="form-group">
+                            <label>Prodi ID</label>
+                            <input value="{{ isset($contact) ? $contact->prodi_id : '' }}" type="text" name="prodi_id"
+                                id="prodi_id" class="form-control" required>
+                            <small id="error-prodi_id" class="error-text form-text text-danger"></small>
+                        </div>
+                    @endif
 
-                <!-- Form untuk level Dosen (2) -->
-                @if ($user->level_id == 2)
-                    {{-- <div class="form-group">
+                    <!-- Form untuk level Dosen (2) -->
+                    @if ($user->level_id == 2)
+                        {{-- <div class="form-group">
                         <label>Prodi ID</label>
                         <input value="{{ isset($contact) ? $contact->prodi_id : '' }}" type="text" name="prodi_id" id="prodi_id" class="form-control" required>
                         <small id="error-prodi_id" class="error-text form-text text-danger"></small>
                     </div> --}}
-                @endif
+                    @endif
 
-               <!-- Form untuk level Kaprodi (4) -->
-               @if ($user->level_id == 4)
-               <div class="form-group">
-                   <label>Prodi</label>
-                   <select name="prodi_id" id="prodi_id" class="form-control" required>
-                       <option value="">- Pilih Prodi -</option>
-                       @foreach ($prodi as $p)
-                           <option {{ $p->prodi_id == $contact->prodi_id ? 'selected' : '' }} value="{{ $p->prodi_id }}">
-                               {{ $p->prodi_nama }}</option>
-                       @endforeach
-                   </select>
-                   <small id="error-prodi_id" class="error-text form-text text-danger"></small>
-               </div>
-           @endif
+                    <!-- Form untuk level Kaprodi (4) -->
+                    @if ($user->level_id == 4)
+                        <div class="form-group">
+                            <label>Prodi</label>
+                            <select name="prodi_id" id="prodi_id" class="form-control" required>
+                                <option value="">- Pilih Prodi -</option>
+                                @foreach ($prodi as $p)
+                                    <option {{ $p->prodi_id == $contact->prodi_id ? 'selected' : '' }}
+                                        value="{{ $p->prodi_id }}">
+                                        {{ $p->prodi_nama }}</option>
+                                @endforeach
+                            </select>
+                            <small id="error-prodi_id" class="error-text form-text text-danger"></small>
+                        </div>
+                    @endif
 
-                <!-- Untuk Admin (Level ID = 1), hanya dapat mengubah username, nama, dan password -->
-                @if ($user->level_id == 1)
-                    <!-- Kolom-kolom di atas sudah cukup untuk Admin -->
-                @endif
+                    <!-- Untuk Admin (Level ID = 1), hanya dapat mengubah username, nama, dan password -->
+                    @if ($user->level_id == 1)
+                        <!-- Kolom-kolom di atas sudah cukup untuk Admin -->
+                    @endif
 
-                <div class="form-group">
-                    <label>Password</label>
-                    <input value="" type="password" name="password" id="password" class="form-control">
-                    <small class="form-text text-muted">Abaikan jika tidak ingin ubah password</small>
-                    <small id="error-password" class="error-text form-text text-danger"></small>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input value="" type="password" name="password" id="password" class="form-control">
+                        <small class="form-text text-muted">Abaikan jika tidak ingin ubah password</small>
+                        <small id="error-password" class="error-text form-text text-danger"></small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" data-dismiss="modal" class="btn btn-warning">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" data-dismiss="modal" class="btn btn-warning">Batal</button>
-                <button type="submit" class="btn btn-primary">Simpan</button>
-            </div>
         </div>
-    </div>
-</form>
+    </form>
 
     <script>
         $(document).ready(function() {
@@ -180,7 +187,7 @@
                         },
                         error: function(xhr, status, error) {
                             console.error(xhr
-                            .responseText); // Log error response from server
+                                .responseText); // Log error response from server
                         }
                     });
                     return false;
