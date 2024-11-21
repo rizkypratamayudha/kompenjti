@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\PeriodeController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\kompetensi_adminController;
 use App\Http\Controllers\KompetensiController;
@@ -141,7 +142,13 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/{id}/edit_ajax',[KompetensiController::class,'edit_ajax']);
         Route::put('/{id}/update_ajax',[KompetensiController::class,'update_ajax']);
     });
-
+    Route::group(['prefix' => 'periode'],function(){
+        Route::get('/',[PeriodeController::class,'index']);
+        Route::post('/list', [PeriodeController::class, 'list']);
+        Route::get('/create_ajax', [PeriodeController::class, 'create_ajax']);
+        Route::post('/ajax', [PeriodeController::class, 'store']);
+        Route::get('/{id}/show_ajax',[PeriodeController::class,'show_ajax']);
+    });
     Route::group(['prefix' => 'kompetensi_admin'],function(){
         Route::get('/',[kompetensi_adminController::class,'index']);
         Route::post('/list', [kompetensi_adminController::class, 'list']);
