@@ -64,7 +64,7 @@
                     @foreach ($kompetensi as $detail)
                         <tbody>
                             <tr>
-                                <td class="col-9">{{ $detail->kompetensi_nama }}</td>
+                                <td class="col-9">{{ $detail->kompetensiAdmin->kompetensi_nama }}</td>
                                 <td class="col-9">{{ $detail->pengalaman }}</td>
                                 <td class="col-9">{{ $detail->bukti }}</td>
                             </tr>

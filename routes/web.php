@@ -138,6 +138,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/create_ajax', [KompetensiController::class, 'create_ajax']);
         Route::post('/ajax', [KompetensiController::class, 'store']);
         Route::get('/{id}/show_ajax',[KompetensiController::class,'show_ajax']);
+        Route::get('/{id}/edit_ajax',[KompetensiController::class,'edit_ajax']);
+        Route::put('/{id}/update_ajax',[KompetensiController::class,'update_ajax']);
     });
 
     Route::group(['prefix' => 'kompetensi_admin'],function(){
