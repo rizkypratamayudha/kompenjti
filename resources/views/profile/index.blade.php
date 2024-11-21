@@ -277,13 +277,13 @@
 
                                 // Update avatar in header
                                 const avatarImage = document.querySelector('img[alt="User Avatar"]');
-                                avatarImage.src = '{{ asset('default.png') }}';
+                                avatarImage.src = '{{ asset('user.png') }}';
 
                                 // Update avatar in index view (profile page)
                                 const profileAvatar = document.getElementById('profile-avatar');
                                 if (profileAvatar) {
                                     profileAvatar.src =
-                                    '{{ asset('default.png') }}'; // Memperbarui src avatar di halaman profil
+                                    '{{ asset('user.png') }}'; // Memperbarui src avatar di halaman profil
                                 }
                             } else {
                                 Swal.fire('Error!', data.message, 'error');
