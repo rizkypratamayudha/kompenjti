@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\Api\PeriodeController;
+use App\Http\Controllers\PeriodeController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\kompetensi_adminController;
 use App\Http\Controllers\KompetensiController;
