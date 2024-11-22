@@ -1,22 +1,22 @@
-<form action="{{ url('/matkul/import_ajax') }}" method="POST" id="form-import" 
+<form action="{{ url('/prodi/import_ajax') }}" method="POST" id="form-import" 
 enctype="multipart/form-data"> 
     @csrf 
     <div id="modal-master" class="modal-dialog modal-lg" role="document"> 
         <div class="modal-content"> 
             <div class="modal-header"> 
-                <h5 class="modal-title" id="exampleModalLabel">Import Data Mata Kuliah</h5> 
+                <h5 class="modal-title" id="exampleModalLabel">Import Data Program Studi</h5> 
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button> 
             </div> 
             <div class="modal-body"> 
                 <div class="form-group"> 
                     <label>Download Template</label> 
-                    <a href="{{ asset('template_matkul.xlsx') }}" class="btn btn-info btn-sm" download><i class="fa fa-file-excel"></i> Download</a> 
-                    <small id="error-kode_matkul" class="error-text form-text text-danger"></small> 
+                    <a href="{{ asset('template_prodi.xlsx') }}" class="btn btn-info btn-sm" download><i class="fa fa-file-excel"></i> Download</a> 
+                    <small id="error-kode_prodi" class="error-text form-text text-danger"></small> 
                 </div> 
                 <div class="form-group"> 
                     <label>Pilih File</label> 
-                    <input type="file" name="file_matkul" id="file_matkul" class="form-control" required> 
-                    <small id="error-file_matkul" class="error-text form-text text-danger"></small> 
+                    <input type="file" name="file_prodi" id="file_prodi" class="form-control" required> 
+                    <small id="error-file_prodi" class="error-text form-text text-danger"></small> 
                 </div> 
             </div> 
             <div class="modal-footer">
@@ -49,7 +49,7 @@ enctype="multipart/form-data">
                                 title: 'Berhasil', 
                                 text: response.message 
                             }); 
-                            datamatkul.ajax.reload(); // reload datatable 
+                            dataprodi.ajax.reload(); // reload datatable 
                         }else{ // jika error 
                             $('.error-text').text(''); 
                             $.each(response.msgField, function(prefix, val) { 

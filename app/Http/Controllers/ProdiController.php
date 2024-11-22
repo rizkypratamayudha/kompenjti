@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\matkulModel;
+use App\Models\ProdiModel;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -11,36 +11,36 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Yajra\DataTables\DataTables as DataTablesDataTables;
 use Yajra\DataTables\Facades\DataTables;
 
-class MatkulController extends Controller
+class ProdiController extends Controller
 {
     public function index(){
         $breadcrumb = (object)[
-            'title'=>'Daftar Mata Kuliah',
-            'list'=>['Home','Mata Kuliah']
+            'title'=>'Daftar Program Studi',
+            'list'=>['Home','Program Studi']
         ];
 
         $page = (object)[
-            'title'=>'Daftar Mata Kuliah yang terdaftar dalam sistem'
+            'title'=>'Daftar Program Studi yang terdaftar dalam sistem'
         ];
 
-        $activeMenu = 'matkul';
-        $matkul = matkulModel::all();
-        return view('matkul.index',['breadcrumb'=>$breadcrumb,'page'=>$page,'activeMenu'=>$activeMenu,'matkul'=>$matkul]);
+        $activeMenu = 'prodi';
+        $prodi = ProdiModel::all();
+        return view('prodi.index',['breadcrumb'=>$breadcrumb,'page'=>$page,'activeMenu'=>$activeMenu,'prodi'=>$prodi]);
     }
 
     public function list(Request $request)
     {
-        $matkul = matkulModel::select('matkul_id', 'matkul_nama',);
+        $prodi = prodiModel::select('prodi_id', 'prodi_nama',);
 
-        if ($request->matkul_id){
-            $matkul->where('matkul_id',$request->matkul_id);
+        if ($request->prodi_id){
+            $prodi->where('prodi_id',$request->prodi_id);
         }
-        return DataTables::of($matkul)
+        return DataTables::of($prodi)
             ->addIndexColumn()
-            ->addColumn('aksi', function ($matkul) { 
-                $btn  = '<button onclick="modalAction(\'' . url('/matkul/' . $matkul->matkul_id . '/show_ajax') . '\')" class="btn btn-info btn-sm">Detail</button> ';
-                $btn .= '<button onclick="modalAction(\'' . url('/matkul/' . $matkul->matkul_id . '/edit_ajax') . '\')" class="btn btn-warning btn-sm">Edit</button> ';
-                $btn .= '<button onclick="modalAction(\'' . url('/matkul/' . $matkul->matkul_id . '/delete_ajax') . '\')"  class="btn btn-danger btn-sm">Hapus</button> ';
+            ->addColumn('aksi', function ($prodi) { 
+                $btn  = '<button onclick="modalAction(\'' . url('/prodi/' . $prodi->prodi_id . '/show_ajax') . '\')" class="btn btn-info btn-sm">Detail</button> ';
+                $btn .= '<button onclick="modalAction(\'' . url('/prodi/' . $prodi->prodi_id . '/edit_ajax') . '\')" class="btn btn-warning btn-sm">Edit</button> ';
+                $btn .= '<button onclick="modalAction(\'' . url('/prodi/' . $prodi->prodi_id . '/delete_ajax') . '\')"  class="btn btn-danger btn-sm">Hapus</button> ';
                 return $btn;
             })
             ->rawColumns(['aksi']) 
@@ -48,12 +48,12 @@ class MatkulController extends Controller
     }
 
     public function create_ajax(){
-        return view ('matkul.create_ajax');
+        return view ('prodi.create_ajax');
     }
     public function store_ajax(Request $request){
         if($request->ajax()||$request->wantsJson()){
             $rules = [
-                'matkul_nama'=>'required|string|max:100'
+                'prodi_nama'=>'required|string|max:100'
             ];
 
             $validator = Validator::make($request->all(),$rules);
@@ -65,25 +65,25 @@ class MatkulController extends Controller
                 ]);
             }
 
-            matkulmodel::create($request->all());
+            ProdiModel::create($request->all());
             return response()->json([
                 'status'=>true,
-                'message'=>'Data Mata Kuliah berhasil disimpan'
+                'message'=>'Data Program Studi berhasil disimpan'
             ]);
         }
         redirect('/');
     }
 
-    public function edit_ajax(Request $request, $matkul_id){
-        $matkul = matkulModel::find($matkul_id);
+    public function edit_ajax(Request $request, $prodi_id){
+        $prodi = prodiModel::find($prodi_id);
 
-        return view ('matkul.edit_ajax',['matkul'=>$matkul]);
+        return view ('prodi.edit_ajax',['prodi'=>$prodi]);
     }
 
-    public function update_ajax (Request $request, $matkul_id){
+    public function update_ajax (Request $request, $prodi_id){
         if ($request->ajax() || $request->wantsJson()) {
             $rules = [
-                'matkul_nama'=>'required|string|max:100'
+                'prodi_nama'=>'required|string|max:100'
             ];
 
             $validator = Validator::make($request->all(), $rules);
@@ -96,7 +96,7 @@ class MatkulController extends Controller
                 ]);
             }
 
-            $check = matkulmodel::find($matkul_id);
+            $check = prodimodel::find($prodi_id);
             if ($check) {
                 $check->update($request->all());
                 return response()->json([
@@ -113,20 +113,20 @@ class MatkulController extends Controller
         return redirect('/');
     }
 
-    public function confirm_ajax ($matkul_id){
-        $matkul = matkulModel::find($matkul_id);
+    public function confirm_ajax ($prodi_id){
+        $prodi = prodiModel::find($prodi_id);
 
-        return view('matkul.confirm_ajax',['matkul'=>$matkul]);
+        return view('prodi.confirm_ajax',['prodi'=>$prodi]);
     }
 
-    public function delete_ajax(Request $request, $matkul_id)
+    public function delete_ajax(Request $request, $prodi_id)
 {
     if ($request->ajax() || $request->wantsJson()) {
-        $matkul = matkulModel::find($matkul_id);
+        $prodi = prodiModel::find($prodi_id);
 
-        if ($matkul) {
+        if ($prodi) {
             try {
-                $matkul->delete();
+                $prodi->delete();
                 return response()->json([
                     'status' => true,
                     'message' => 'Data berhasil dihapus'
@@ -148,21 +148,21 @@ class MatkulController extends Controller
     return redirect('/');
 }
 
-    public function show_ajax ($matkul_id){
-        $matkul = matkulModel::find($matkul_id);
+    public function show_ajax ($prodi_id){
+        $prodi = prodiModel::find($prodi_id);
 
-        return view('matkul.show_ajax',['matkul'=>$matkul]);
+        return view('prodi.show_ajax',['prodi'=>$prodi]);
     }
     public function import() 
     { 
-        return view('matkul.import'); 
+        return view('prodi.import'); 
     }
     public function import_ajax(Request $request) 
     { 
         if($request->ajax() || $request->wantsJson()){ 
             $rules = [ 
 
-                'file_matkul' => ['required', 'mimes:xlsx', 'max:1024'] 
+                'file_prodi' => ['required', 'mimes:xlsx', 'max:1024'] 
             ]; 
  
             $validator = Validator::make($request->all(), $rules); 
@@ -174,7 +174,7 @@ class MatkulController extends Controller
                 ]); 
             } 
  
-            $file = $request->file('file_matkul');  // ambil file dari request 
+            $file = $request->file('file_prodi');  // ambil file dari request 
  
             $reader = IOFactory::createReader('Xlsx');  // load reader file excel 
             $reader->setReadDataOnly(true);             // hanya membaca data 
@@ -188,7 +188,7 @@ class MatkulController extends Controller
                 foreach ($data as $baris => $value) { 
                     if($baris > 1){ // baris ke 1 adalah header, maka lewati 
                         $insert[] = [ 
-                            'matkul_nama' => $value['A'], 
+                            'prodi_nama' => $value['A'], 
                             'created_at' => now(), 
                         ]; 
                     } 
@@ -196,7 +196,7 @@ class MatkulController extends Controller
  
                 if(count($insert) > 0){ 
                     // insert data ke database, jika data sudah ada, maka diabaikan 
-                    matkulModel::insertOrIgnore($insert);    
+                    prodiModel::insertOrIgnore($insert);    
                 } 
  
                 return response()->json([ 
@@ -214,8 +214,8 @@ class MatkulController extends Controller
     }
         public function export_excel()
     {
-        // Ambil data dari matkulmodel
-        $matkul = matkulmodel::select( 'matkul_nama')->get();
+        // Ambil data dari prodimodel
+        $prodi = prodimodel::select( 'prodi_nama')->get();
 
         // Inisialisasi Spreadsheet
         $spreadsheet = new Spreadsheet();
@@ -223,7 +223,7 @@ class MatkulController extends Controller
 
         // Set Header Kolom
         $sheet->setCellValue('A1', 'No');
-        $sheet->setCellValue('B1', 'Nama Mata Kuliah');
+        $sheet->setCellValue('B1', 'Nama Program Studi');
 
         // Buat header menjadi bold
         $sheet->getStyle('A1:B1')->getFont()->setBold(true);
@@ -231,9 +231,9 @@ class MatkulController extends Controller
         // Isi data
         $no = 1; // Nomor data dimulai dari 1
         $baris = 2; // Baris data dimulai dari baris ke-2
-        foreach ($matkul as $key => $value) {
+        foreach ($prodi as $key => $value) {
             $sheet->setCellValue('A' . $baris, $no);
-            $sheet->setCellValue('B' . $baris, $value->matkul_nama);
+            $sheet->setCellValue('B' . $baris, $value->prodi_nama);
 
             $baris++;
             $no++;
@@ -245,11 +245,11 @@ class MatkulController extends Controller
         }
 
         // Set judul sheet
-        $sheet->setTitle('Data matkul');
+        $sheet->setTitle('Data prodi');
 
         // Buat writer untuk menulis file excel
         $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
-        $filename = 'Data matkul_' . date('Y-m-d_His') . '.xlsx';
+        $filename = 'Data prodi_' . date('Y-m-d_His') . '.xlsx';
 
         // Atur Header untuk Download File Excel
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
@@ -267,11 +267,11 @@ class MatkulController extends Controller
     public function export_pdf()
     {
         // Ambil data barang dari database
-        $matkul = matkulModel::select( 'matkul_nama') 
+        $prodi = prodiModel::select( 'prodi_nama') 
         ->get();
 
         // Gunakan library Dompdf untuk membuat PDF
-        $pdf = Pdf::loadView('matkul.export_pdf', ['matkul' => $matkul]);
+        $pdf = Pdf::loadView('prodi.export_pdf', ['prodi' => $prodi]);
 
         // Atur ukuran kertas dan orientasi
         $pdf->setPaper('A4', 'portrait');
@@ -283,6 +283,6 @@ class MatkulController extends Controller
         $pdf->render();
 
         // Download PDF
-        return $pdf->stream('Data matkul ' . date('Y-m-d H:i:s') . '.pdf');
+        return $pdf->stream('Data prodi ' . date('Y-m-d H:i:s') . '.pdf');
     }
 }

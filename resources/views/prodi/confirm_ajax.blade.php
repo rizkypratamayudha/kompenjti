@@ -1,4 +1,4 @@
-@empty($matkul)
+@empty($prodi)
     <div id="modal-master" class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -11,18 +11,18 @@
                     <h5><i class="icon fas fa-ban"></i> Kesalahan!!!</h5>
                     Data yang anda cari tidak ditemukan
                 </div>
-                <a href="{{ url('/matkul') }}" class="btn btn-warning">Kembali</a>
+                <a href="{{ url('/prodi') }}" class="btn btn-warning">Kembali</a>
             </div>
         </div>
     </div>
 @else
-    <form action="{{ url('/matkul/' . $matkul->matkul_id . '/delete_ajax') }}" method="POST" id="form-delete">
+    <form action="{{ url('/prodi/' . $prodi->prodi_id . '/delete_ajax') }}" method="POST" id="form-delete">
         @csrf
         @method('DELETE')
         <div id="modal-master" class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Hapus Data matkul</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Hapus Data prodi</h5>
                     <button type="button" class="close" data-dismiss="modal" arialabel="Close"><span
                             aria-hidden="true">&times;</span></button>
                 </div>
@@ -33,8 +33,8 @@
                     </div>
                     <table class="table table-sm table-bordered table-striped">
                         <tr>
-                            <th class="text-right col-3">Nama Mata Kuliah :</th>
-                            <td class="col-9">{{ $matkul->matkul_nama }}</td>
+                            <th class="text-right col-3">Nama Program Studi :</th>
+                            <td class="col-9">{{ $prodi->prodi_nama }}</td>
                         </tr>
                     </table>
                 </div>
@@ -62,7 +62,7 @@
                                     title: 'Berhasil',
                                     text: response.message
                                 });
-                                datamatkul.ajax.reload();
+                                dataprodi.ajax.reload();
                             } else {
                                 $('.error-text').text('');
                                 $.each(response.msgField, function(prefix, val) {

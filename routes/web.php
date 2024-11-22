@@ -7,7 +7,9 @@ use App\Http\Controllers\KompetensiController;
 use App\Http\Controllers\LevelController;
 use App\Http\Controllers\ListPekerjaanMHSController;
 use App\Http\Controllers\MahasiswaController;
+use App\Http\Controllers\matkulController;
 use App\Http\Controllers\PekerjanController;
+use App\Http\Controllers\ProdiController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ValidasiController;
@@ -163,5 +165,36 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/{id}/confirm_ajax', [kompetensi_adminController::class, 'confirm_ajax']);
         Route::delete('/{id}/delete_ajax', [kompetensi_adminController::class, 'delete_ajax']);
         Route::get('/{id}/show_ajax', [kompetensi_adminController::class, 'show_ajax']);
+    });
+    Route::group(['prefix' => 'matkul'], function () {
+        Route::get('/', [MatkulController::class, 'index']);
+        Route::post('/list', [MatkulController::class, 'list']);
+        Route::get('/create_ajax', [MatkulController::class, 'create_ajax']);
+        Route::post('/ajax', [MatkulController::class, 'store_ajax']);
+        Route::get('/{id}/edit_ajax', [MatkulController::class, 'edit_ajax']);
+        Route::put('/{id}/update_ajax', [MatkulController::class, 'update_ajax']);
+        Route::get('/{id}/delete_ajax', [MatkulController::class, 'confirm_ajax']);
+        Route::delete('/{id}/delete_ajax', [MatkulController::class, 'delete_ajax']);
+        Route::get('/{id}/show_ajax', [MatkulController::class, 'show_ajax']);
+        Route::get('/import', [MatkulController::class, 'import']);
+        Route::post('/import_ajax', [MatkulController::class, 'import_ajax']); 
+        Route::get('/export_excel', [MatkulController::class, 'export_excel']); 
+        Route::get('/export_pdf', [MatkulController::class, 'export_pdf']);
+    });
+
+    Route::group(['prefix' => 'prodi'], function () {
+        Route::get('/', [ProdiController::class, 'index']);
+        Route::post('/list', [ProdiController::class, 'list']);
+        Route::get('/create_ajax', [ProdiController::class, 'create_ajax']);
+        Route::post('/ajax', [ProdiController::class, 'store_ajax']);
+        Route::get('/{id}/edit_ajax', [ProdiController::class, 'edit_ajax']);
+        Route::put('/{id}/update_ajax', [ProdiController::class, 'update_ajax']);
+        Route::get('/{id}/delete_ajax', [ProdiController::class, 'confirm_ajax']);
+        Route::delete('/{id}/delete_ajax', [ProdiController::class, 'delete_ajax']);
+        Route::get('/{id}/show_ajax', [ProdiController::class, 'show_ajax']);
+        Route::get('/import', [ProdiController::class, 'import']);
+        Route::post('/import_ajax', [ProdiController::class, 'import_ajax']); 
+        Route::get('/export_excel', [ProdiController::class, 'export_excel']); 
+        Route::get('/export_pdf', [ProdiController::class, 'export_pdf']);
     });
 });

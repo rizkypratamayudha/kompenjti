@@ -72,19 +72,19 @@
         </tr> 
     </table> 
  
-    <h3 class="text-center">LAPORAN DATA MATA KULIAH</h3> 
+    <h3 class="text-center">LAPORAN DATA Program Studi</h3> 
     <table class="border-all"> 
         <thead> 
             <tr> 
                 <th class="text-center">No</th> 
-                <th>Nama Mata Kuliah</th> 
+                <th>Nama Program Studi</th> 
             </tr> 
         </thead>  
         <tbody> 
-            @foreach($matkul as $l) 
+            @foreach($prodi as $l) 
             <tr> 
                 <td class="text-center">{{ $loop->iteration }}</td> 
-                <td>{{ $l->matkul_nama }}</td> 
+                <td>{{ $l->prodi_nama }}</td> 
             </tr> 
             @endforeach 
         </tbody>
