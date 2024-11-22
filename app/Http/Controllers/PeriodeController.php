@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\PeriodeModel;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -12,20 +13,25 @@ use Yajra\DataTables\Facades\DataTables;
 
 class PeriodeController extends Controller
 {
-     public function index(){
-          $breadcrumb = (object)[
-              'title'=>'Daftar Periode',
-              'list'=>['Home','Periode']
-          ];
-  
-          $page = (object)[
-              'title'=>'Daftar Periode yang terdaftar dalam sistem'
-          ];
-  
-          $activeMenu = 'periode';
-          $periode = PeriodeModel::all();
-          return view('periode.index',['breadcrumb'=>$breadcrumb,'page'=>$page,'activeMenu'=>$activeMenu,'periode'=>$periode]);
-      }
+    public function index()
+    {
+        $breadcrumb = (object)[
+            'title' => 'Daftar Periode',
+            'list' => ['Home', 'Periode']
+        ];
+
+        $page = (object)[
+            'title' => 'Daftar Periode yang Terdaftar dalam Sistem'
+        ];
+
+        $activeMenu = 'periode';
+
+        return view('periode.index', [
+            'breadcrumb' => $breadcrumb,
+            'page' => $page,
+            'activeMenu' => $activeMenu,
+        ]);
+    }
 
     public function list(Request $request)
     {
@@ -36,89 +42,105 @@ class PeriodeController extends Controller
         }
 
         return DataTables::of($periode)
-        ->addIndexColumn()
-        ->addColumn('aksi', function ($periode) {
-            $btn  = '<button onclick="modalAction(\'' . url('/periode/' . $periode->periode_id .
-                '/show_ajax') . '\')" class="btn btn-info btn-sm">Detail</button> ';
-            $btn .= '<button onclick="modalAction(\'' . url('/periode/' . $periode->periode_id .
-                '/edit_ajax') . '\')" class="btn btn-warning btn-sm">Edit</button> ';
-            $btn .= '<button onclick="modalAction(\'' . url('/periode/' . $periode->periode_id .
-                '/delete_ajax') . '\')" class="btn btn-danger btn-sm">Hapus</button> ';
-            return $btn;
-        })
-        ->rawColumns(['aksi'])
-        ->make(true);
-}
+            ->addIndexColumn()
+            ->addColumn('aksi', function ($periode) {
+                $btn  = '<button onclick="modalAction(\'' . url('/periode/' . $periode->periode_id . '/show_ajax') . '\')" class="btn btn-info btn-sm">Detail</button> ';
+                $btn .= '<button onclick="modalAction(\'' . url('/periode/' . $periode->periode_id . '/edit_ajax') . '\')" class="btn btn-warning btn-sm">Edit</button> ';
+                $btn .= '<button onclick="modalAction(\'' . url('/periode/' . $periode->periode_id . '/confirm_ajax') . '\')" class="btn btn-danger btn-sm">Hapus</button> ';
+                return $btn;
+            })
+            ->rawColumns(['aksi'])
+            ->make(true);
+    }
 
     public function create_ajax()
     {
         return view('periode.create_ajax');
     }
-
+    
     public function store_ajax(Request $request)
     {
-        if ($request->ajax() || $request->wantsJson()) {
-            $rules = [
-                'periode_nama' => 'required|string|max:100'
-            ];
-
-            $validator = Validator::make($request->all(), $rules);
-            if ($validator->fails()) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Validasi Gagal',
-                    'msgField' => $validator->errors()
-                ]);
-            }
-
-            PeriodeModel::create($request->all());
+        // Validasi input
+        $rules = [
+          'periode_id' => 'required|integer', // Validasi untuk periode_id
+          'periode_nama' => 'required|string|max:255' // Validasi untuk nama periode
+        ];
+    
+        $validator = Validator::make($request->all(), $rules);
+    
+        if ($validator->fails()) {
             return response()->json([
-                'status' => true,
-                'message' => 'Data periode berhasil disimpan'
+                'status' => false,
+                'message' => 'Validasi Gagal',
+                'msgField' => $validator->errors() // Error detail per field
             ]);
         }
-        redirect('/');
+        PeriodeModel::create($request->all());
+        return response()->json([
+            'status' => true,
+            'message' => 'Data periode berhasil disimpan'
+        ]);
     }
+    
 
-    public function edit_ajax(Request $request, $periode_id)
+    public function edit_ajax($periode_id)
     {
         $periode = PeriodeModel::find($periode_id);
+
+        if (!$periode) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Data tidak ditemukan'
+            ]);
+        }
 
         return view('periode.edit_ajax', ['periode' => $periode]);
     }
 
     public function update_ajax(Request $request, $periode_id)
-    {
-        if ($request->ajax() || $request->wantsJson()) {
-            $rules = [
-                'periode_nama' => 'required|string|max:100'
-            ];
+{
+    // Memastikan permintaan berasal dari AJAX atau JSON
+    if ($request->ajax() || $request->wantsJson()) {
+        $rules = [
+            'periode_id' => 'required|integer', // Validasi untuk periode_id
+            'periode_nama' => 'required|string|max:255' // Validasi untuk nama periode
+        ];
 
-            $validator = Validator::make($request->all(), $rules);
-            if ($validator->fails()) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Validasi Gagal',
-                    'msgField' => $validator->errors()
-                ]);
-            }
+        // Validasi input
+        $validator = Validator::make($request->all(), $rules);
 
-            $check = PeriodeModel::find($periode_id);
-            if ($check) {
-                $check->update($request->all());
-                return response()->json([
-                    'status' => true,
-                    'message' => 'Data berhasil diupdate'
-                ]);
-            } else {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Data tidak ditemukan'
-                ]);
-            }
+        if ($validator->fails()) {
+            return response()->json([
+                'status'   => false, // Respon JSON, true: berhasil, false: gagal
+                'message'  => 'Validasi gagal.',
+                'msgField' => $validator->errors() // Menunjukkan field mana yang error
+            ]);
         }
-        return redirect('/');
+
+        // Cari data berdasarkan periode_id
+        $periode = PeriodeModel::find($periode_id);
+
+        if ($periode) {
+            // Update data langsung
+            $periode->update($request->all());
+
+            return response()->json([
+                'status'  => true,
+                'message' => 'Data berhasil diupdate'
+            ]);
+        } else {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Data tidak ditemukan'
+            ]);
+        }
     }
+
+    // Jika bukan AJAX atau JSON, redirect ke halaman utama
+    return redirect('/');
+}
+
+
 
     public function confirm_ajax($periode_id)
     {
@@ -129,31 +151,27 @@ class PeriodeController extends Controller
 
     public function delete_ajax(Request $request, $periode_id)
     {
-        if ($request->ajax() || $request->wantsJson()) {
-            $periode = PeriodeModel::find($periode_id);
+        $periode = PeriodeModel::find($periode_id);
 
-            if ($periode) {
-                try {
-                    $periode->delete();
-                    return response()->json([
-                        'status' => true,
-                        'message' => 'Data berhasil dihapus'
-                    ]);
-                } catch (\Illuminate\Database\QueryException $e) {
-                    return response()->json([
-                        'status' => false,
-                        'message' => 'Data gagal dihapus karena masih terdapat tabel lain yang terkait dengan data ini'
-                    ]);
-                }
-            } else {
+        if ($periode) {
+            try {
+                $periode->delete();
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Data berhasil dihapus'
+                ]);
+            } catch (\Illuminate\Database\QueryException $e) {
                 return response()->json([
                     'status' => false,
-                    'message' => 'Data tidak ditemukan'
+                    'message' => 'Data gagal dihapus karena terkait dengan data lain'
                 ]);
             }
         }
 
-        return redirect('/');
+        return response()->json([
+            'status' => false,
+            'message' => 'Data tidak ditemukan'
+        ]);
     }
 
     public function show_ajax($periode_id)
@@ -169,39 +187,22 @@ class PeriodeController extends Controller
 
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
-
         $sheet->setCellValue('A1', 'No');
         $sheet->setCellValue('B1', 'Nama Periode');
-
         $sheet->getStyle('A1:B1')->getFont()->setBold(true);
 
-        $no = 1;
-        $baris = 2;
-        foreach ($periode as $value) {
-            $sheet->setCellValue('A' . $baris, $no);
-            $sheet->setCellValue('B' . $baris, $value->periode_nama);
-
-            $baris++;
-            $no++;
+        $row = 2;
+        foreach ($periode as $index => $data) {
+            $sheet->setCellValue('A' . $row, $index + 1);
+            $sheet->setCellValue('B' . $row, $data->periode_nama);
+            $row++;
         }
-
-        foreach (range('A', 'B') as $columnID) {
-            $sheet->getColumnDimension($columnID)->setAutoSize(true);
-        }
-
-        $sheet->setTitle('Data Periode');
 
         $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
-        $filename = 'Data_Periode_' . date('Y-m-d_His') . '.xlsx';
+        $filename = 'Data_Periode_' . date('Ymd_His') . '.xlsx';
 
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment;filename="' . $filename . '"');
-        header('Cache-Control: max-age=0');
-        header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
-        header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
-        header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-        header('Pragma: public');
-
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
         $writer->save('php://output');
         exit;
     }
@@ -211,9 +212,6 @@ class PeriodeController extends Controller
         $periode = PeriodeModel::select('periode_nama')->get();
 
         $pdf = Pdf::loadView('periode.export_pdf', ['periode' => $periode]);
-        $pdf->setPaper('A4', 'portrait');
-        $pdf->setOption('isRemoteEnabled', true);
-
-        return $pdf->stream('Data_Periode_' . date('Y-m-d_His') . '.pdf');
+        return $pdf->stream('Data_Periode_' . date('Ymd_His') . '.pdf');
     }
 }

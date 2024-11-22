@@ -46,8 +46,9 @@
                 $('#myModal').modal('show');
             });
         }
+        var dataPeriode;
         $(document).ready(function() {
-            dataperiode = $('#table_periode').DataTable({
+            dataPeriode = $('#table_periode').DataTable({
                 serverSide: true,
                 ajax: {
                     "url": "{{ url('periode/list') }}",

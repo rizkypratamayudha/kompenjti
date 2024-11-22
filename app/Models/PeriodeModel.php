@@ -13,8 +13,8 @@ class PeriodeModel extends Model
     protected $table = 'periode';
 
     protected $primaryKey = 'periode_id';
+    protected $fillable = ['periode_id', 'periode_nama', 'created_at', 'updated_at'];
 
-    protected $fillable = ['periode_nama'];
 
     public static function getPeriodeNama($periodeId)
     {

@@ -146,8 +146,12 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/',[PeriodeController::class,'index']);
         Route::post('/list', [PeriodeController::class, 'list']);
         Route::get('/create_ajax', [PeriodeController::class, 'create_ajax']);
-        Route::post('/ajax', [PeriodeController::class, 'store']);
+        Route::post('/ajax', [PeriodeController::class, 'store_ajax']);
         Route::get('/{id}/show_ajax',[PeriodeController::class,'show_ajax']);
+        Route::get('/{id}/edit_ajax',[PeriodeController::class,'edit_ajax']);
+        Route::put('/{id}/update_ajax',[PeriodeController::class,'update_ajax']);
+          Route::get('/{id}/confirm_ajax', [PeriodeController::class, 'confirm_ajax']);
+        Route::delete('/{id}/delete_ajax', [PeriodeController::class, 'delete_ajax']);
     });
     Route::group(['prefix' => 'kompetensi_admin'],function(){
         Route::get('/',[kompetensi_adminController::class,'index']);
