@@ -56,13 +56,16 @@ class DosenBuatPekerjaanController extends Controller
             DB::beginTransaction();
 
             // Insert data ke tabel pekerjaan
+            $jumlahJamKompen = array_sum(array_column($validated['progress'], 'jumlah_jam'));
+            $akumulasiDeadline = Carbon::now()->addDays(array_sum(array_column($validated['progress'], 'jumlah_hari')));
+
             $pekerjaan = PekerjaanModel::create([
                 'user_id' => $validated['user_id'],
                 'jenis_pekerjaan' => $validated['jenis_pekerjaan'],
                 'pekerjaan_nama' => $validated['pekerjaan_nama'],
-                'jumlah_jam_kompen' => array_sum(array_column($validated['progress'], 'jumlah_jam')),
+                'jumlah_jam_kompen' => $jumlahJamKompen,
                 'status' => 'open',
-                'akumulasi_deadline' => Carbon::now()->addDays(array_sum(array_column($validated['progress'], 'jumlah_hari'))),
+                'akumulasi_deadline' => $akumulasiDeadline,
             ]);
 
             // Insert data ke tabel detail_pekerjaan
@@ -75,7 +78,7 @@ class DosenBuatPekerjaanController extends Controller
             // Insert data ke tabel persyaratan
             foreach ($validated['persyaratan'] as $persyaratanNama) {
                 PersyaratanModel::create([
-                    'detail_pekerjaan_id' => $detailPekerjaan->detail_pekerjaan_id, // Ambil ID dari tabel detail_pekerjaan
+                    'detail_pekerjaan_id' => $detailPekerjaan->detail_pekerjaan_id,
                     'persyaratan_nama' => $persyaratanNama,
                 ]);
             }
@@ -97,7 +100,12 @@ class DosenBuatPekerjaanController extends Controller
             // Commit transaksi
             DB::commit();
 
-            return response()->json(['message' => 'Data berhasil disimpan'], 200);
+            // Kirim respons ke Flutter, termasuk jumlah_jam_kompen dan akumulasi_deadline
+            return response()->json([
+                'message' => 'Data berhasil disimpan',
+                'jumlah_jam_kompen' => $jumlahJamKompen,
+                'akumulasi_deadline' => $akumulasiDeadline->toDateTimeString(), // Format tanggal
+            ], 200);
         } catch (\Exception $e) {
             // Rollback jika terjadi error
             DB::rollBack();
