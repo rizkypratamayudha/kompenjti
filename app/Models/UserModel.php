@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -30,8 +31,13 @@ class UserModel extends Authenticatable implements JWTSubject
         'username',
         'nama',
         'password',
+        'avatar'
     ];
-
+    protected function avatar(){
+        return Attribute::make(
+            get: fn ($avatar) => url('images/avatars/'.$avatar)
+        );
+    }
     protected $hidden = ['password'];
 
     protected $casts = ['password' => 'hashed'];

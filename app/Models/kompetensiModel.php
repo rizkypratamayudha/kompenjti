@@ -16,7 +16,7 @@ class kompetensiModel extends Model
 
     protected $fillable = [
         'user_id',
-        'kompetensi_nama',
+        'kompetensi_admin_id',
         'pengalaman',
         'bukti',
         'created_at',
@@ -26,5 +26,9 @@ class kompetensiModel extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(UserModel::class, 'user_id','user_id');
+    }
+
+    public function kompetensiAdmin(){
+        return $this->belongsTo(kompetensi_adminModel::class,'kompetensi_admin_id','kompetensi_admin_id');
     }
 }

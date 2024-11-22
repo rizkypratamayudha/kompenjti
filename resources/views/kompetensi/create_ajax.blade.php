@@ -12,56 +12,46 @@
             <div class="modal-body">
                 <div class="form-group">
                     <label>Nama :</label>
-                    <input value="{{ $user->nama }}" type="text" name="nama" id="nama" class="form-control"
-                        disabled>
-                    <small id="error-nama" class="error-text form-text text-danger"></small>
+                    <input value="{{ $user->nama }}" type="text" name="nama" id="nama" class="form-control" disabled>
                 </div>
                 <div class="form-group">
                     <label>NIM :</label>
-                    <input value="{{ $user->username }}" type="text" name="username" id="username"
-                        class="form-control" disabled>
-                    <small id="error-username" class="error-text form-text text-danger"></small>
+                    <input value="{{ $user->username }}" type="text" name="username" id="username" class="form-control" disabled>
                 </div>
                 <div class="form-group">
                     <label>Prodi :</label>
-                    <input value="{{ $user->detailMahasiswa->prodi->prodi_nama }}" type="text" name="prodi"
-                        id="prodi" class="form-control" disabled>
-                    <small id="error-prodi" class="error-text form-text text-danger"></small>
+                    <input value="{{ $user->detailMahasiswa->prodi->prodi_nama }}" type="text" name="prodi" id="prodi" class="form-control" disabled>
                 </div>
                 <div class="form-group">
                     <label>Periode :</label>
-                    <input value="{{ $user->detailMahasiswa->periode->periode_nama }}" type="text" name="prodi"
-                        id="prodi" class="form-control" disabled>
-                    <small id="error-periode" class="error-text form-text text-danger"></small>
+                    <input value="{{ $user->detailMahasiswa->periode->periode_nama }}" type="text" name="periode" id="periode" class="form-control" disabled>
                 </div>
             </div>
 
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Tambah Detail Kompetensi</h5>
+                <h5 class="modal-title">Tambah Detail Kompetensi</h5>
             </div>
 
             <div class="modal-body">
                 <div class="form-group">
-                    <label>Jumlah Kompetensi</label>
-                    <input type="number" name="jumlah_kompetensi" id="jumlah_kompetensi" class="form-control"
-                        min="1" required>
-                    <small id="error-jumlah_kompetensi" class="error-text form-text text-danger"></small>
+                    <label>Kompetensi</label>
+                    <select name="kompetensi_id" id="kompetensi_id" class="form-control" required>
+                        <option value="">- Pilih Kompetensi -</option>
+                        @foreach ($kompetensi as $item)
+                            <option value="{{$item->kompetensi_admin_id}}">{{$item->kompetensi_nama}}</option>
+                        @endforeach
+                    </select>
                 </div>
-            </div>
-
-            <div class="modal-body">
-                <table class="table table-bordered table-responsive" id="table-kompetensi">
-                    <thead>
-                        <tr>
-                            <th>
-                                Nama Kompetensi
-                            </th>
-                            <th>Pengalaman</th>
-                            <th>Bukti</th>
-                        </tr>
-                    </thead>
-                    <tbody id="dynamic-inputs"></tbody>
-                </table>
+                <div class="form-group">
+                    <label>Pengalaman</label>
+                    <input type="text" name="pengalaman" id="pengalaman" class="form-control" required>
+                    <small id="error-pengalaman" class="error-text form-text text-danger"></small>
+                </div>
+                <div class="form-group">
+                    <label>Bukti</label>
+                    <input type="text" name="bukti" id="bukti" class="form-control" required>
+                    <small id="error-bukti" class="error-text form-text text-danger"></small>
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" data-dismiss="modal" class="btn btn-warning">Batal</button>
@@ -70,122 +60,72 @@
         </div>
     </div>
 </form>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
     $(document).ready(function () {
-        // Event untuk memproses perubahan jumlah kompetensi
-        $('#jumlah_kompetensi').on('change', function () {
-            const jumlahKompetensi = parseInt($(this).val());
-            const $dynamicInputs = $('#dynamic-inputs');
+        $("#form-tambah").validate({
+            rules: {
+                kompetensi_id: {required: true},
+                pengalaman: {required: true, minlength: 3, maxlength: 100},
+                bukti: {required: true, minlength: 3, maxlength: 100},
+            },
 
-            // Validasi input jumlah kompetensi
-            if (isNaN(jumlahKompetensi) || jumlahKompetensi <= 0) {
-                $('#error-jumlah_kompetensi').text('Jumlah kompetensi harus lebih dari 0');
-                return;
-            }
+            submitHandler: function(form) {
+                $.ajax({
+                    url: form.action, // URL untuk mengirim data
+                    type: form.method, // POST method
+                    data: $(form).serialize(), // data form yang disubmit
+                    success: function(response) {
+                        console.log(
+                        response); // Log response untuk memeriksa apakah data sudah diterima
 
-            // Bersihkan error
-            $('#error-jumlah_kompetensi').text('');
-            $dynamicInputs.empty();
-
-            // Tambahkan baris dinamis sesuai jumlah kompetensi
-            for (let i = 1; i <= jumlahKompetensi; i++) {
-                $dynamicInputs.append(`
-                    <tr id="row-${i}">
-                        <td>
-                            <input type="text" name="kompetensi[${i}][nama]" class="form-control" placeholder="Nama Kompetensi" required>
-                            <small class="error-text text-danger" id="error-nama-${i}"></small>
-                        </td>
-                        <td>
-                            <input type="text" name="kompetensi[${i}][pengalaman]" class="form-control" placeholder="Pengalaman" required>
-                            <small class="error-text text-danger" id="error-pengalaman-${i}"></small>
-                        </td>
-                        <td>
-                            <input type="text" name="kompetensi[${i}][bukti]" class="form-control" placeholder="Bukti" required>
-                            <small class="error-text text-danger" id="error-bukti-${i}"></small>
-                        </td>
-                    </tr>
-                `);
-            }
-        });
-
-        // Validasi sebelum submit form
-        $('#form-tambah').on('submit', function (e) {
-            e.preventDefault(); // Prevent form submission for AJAX processing
-            let isValid = true;
-
-            // Validasi setiap input kompetensi
-            $('#dynamic-inputs').find('tr').each(function () {
-                const nama = $(this).find('input[name*="[nama]"]').val();
-                const pengalaman = $(this).find('input[name*="[pengalaman]"]').val();
-                const bukti = $(this).find('input[name*="[bukti]"]').val();
-
-                if (!nama) {
-                    $(this).find('.error-text[id^="error-nama"]').text('Nama kompetensi wajib diisi');
-                    isValid = false;
-                } else {
-                    $(this).find('.error-text[id^="error-nama"]').text('');
-                }
-
-                if (!pengalaman) {
-                    $(this).find('.error-text[id^="error-pengalaman"]').text('Pengalaman wajib diisi');
-                    isValid = false;
-                } else {
-                    $(this).find('.error-text[id^="error-pengalaman"]').text('');
-                }
-
-                if (!bukti) {
-                    $(this).find('.error-text[id^="error-bukti"]').text('Bukti wajib diunggah');
-                    isValid = false;
-                } else {
-                    $(this).find('.error-text[id^="error-bukti"]').text('');
-                }
-            });
-
-            // Jika validasi gagal
-            if (!isValid) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Oops...',
-                    text: 'Harap periksa kembali semua input!'
-                });
-                return;
-            }
-
-            // Jika validasi berhasil, kirim data melalui AJAX
-            $.ajax({
-                url: $('#form-tambah').attr('action'),
-                method: 'POST',
-                data: new FormData(this),
-                contentType: false,
-                processData: false,
-                success: function (response) {
-                    if (response.success) {
-                        $('#myModal').modal('hide');
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Berhasil!',
-                            text: response.message,
-                        }).then(() => {
+                        if (response.status) {
+                            $('#myModal').modal('hide');
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Berhasil',
+                                text: response.message
+                            }).then(() => {
+                                dataUser.ajax
+                            .reload(); // Reload data setelah berhasil
+                            });
+                        } else {
+                            $('.error-text').text('');
+                            $.each(response.msgField, function(prefix, val) {
+                                $('#error-' + prefix).text(val[0]);
+                            });
+                            $('#myModal').modal('hide');
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'berhasil',
+                                text: response.message
+                            });
                             dataUser.ajax.reload();
-                        });
-                    } else {
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error(error); // Menampilkan error jika permintaan gagal
                         Swal.fire({
                             icon: 'error',
-                            title: 'Gagal!',
-                            text: response.message,
+                            title: 'Terjadi Kesalahan',
+                            text: 'Gagal mengirim data. Coba lagi nanti.'
                         });
                     }
-                },
-                error: function (xhr) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error!',
-                        text: 'Terjadi kesalahan pada server!',
-                    });
-                }
-            });
+
+                });
+                return false;
+            },
+            errorElement: 'span',
+            errorPlacement: function(error, element) {
+                error.addClass('invalid-feedback');
+                element.closest('.form-group').append(error);
+            },
+            highlight: function(element, errorClass, validClass) {
+                $(element).addClass('is-invalid');
+            },
+            unhighlight: function(element, errorClass, validClass) {
+                $(element).removeClass('is-invalid');
+            }
         });
     });
 </script>

@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\ApprovePekerjaanModel;
 use App\Models\detail_dosenModel;
 use App\Models\detail_pekerjaanModel;
+use App\Models\kompetensi_adminModel;
+use App\Models\kompetensi_dosenModel;
 use App\Models\kompetensiModel;
 use App\Models\PekerjaanModel;
 use App\Models\PendingPekerjaanController;
@@ -48,7 +50,8 @@ class PekerjanController extends Controller
 
     public function create_ajax()
     {
-        return view('dosen.create_ajax');
+        $kompetensi = kompetensi_adminModel::all();
+        return view('dosen.create_ajax', ['kompetensi' => $kompetensi]);
     }
 
     public function store_ajax(Request $request)
@@ -59,6 +62,8 @@ class PekerjanController extends Controller
             'jumlah_anggota' => 'required|integer|min:1',
             'persyaratan' => ['nullable', 'string', 'json'],
             'persyaratan.*' => 'string|max:50',
+            'kompetensi_id' => 'nullable|array',
+            'kompetensi_id.*' => 'required|integer',
             'deskripsi_tugas' => 'nullable|string|max:1000',
             'judul_progres' => 'required|array|min:1',
             'judul_progres.*' => 'required|string|max:255',
@@ -105,6 +110,15 @@ class PekerjanController extends Controller
                     ]);
                 }
             }
+            if (!empty($request->kompetensi_id)) {
+                foreach ($request->kompetensi_id as $kompetensiId) {
+                    DB::table('kompetensi_dosen')->insert([
+                        'detail_pekerjaan_id' => $detailPekerjaan->detail_pekerjaan_id,
+                        'kompetensi_admin_id' => $kompetensiId
+                    ]);
+                }
+            }
+
 
 
             foreach ($request->judul_progres as $index => $judul) {
@@ -186,13 +200,14 @@ class PekerjanController extends Controller
 
     public function show_ajax($id)
     {
-        $pekerjaan = PekerjaanModel::with('detail_pekerjaan.persyaratan')->where('pekerjaan_id', $id)->first();
+        $pekerjaan = PekerjaanModel::with('detail_pekerjaan.persyaratan','detail_pekerjaan.kompetensiDosen.kompetensiAdmin')->where('pekerjaan_id', $id)->first();
         $jumlahProgres = ProgresModel::where('pekerjaan_id', $id)->count();
 
         return view('pekerjaanMHS.show_ajax', [
             'pekerjaan' => $pekerjaan,
             'jumlahProgres' => $jumlahProgres,
             'persyaratan' => $pekerjaan->detail_pekerjaan->persyaratan ?? collect(),
+            'kompetensi' => $pekerjaan->detail_pekerjaan->kompetensiDosen ?? collect(),
         ]);
     }
 
@@ -268,8 +283,9 @@ class PekerjanController extends Controller
 
     public function edit_ajax($id)
     {
-        $pekerjaan = PekerjaanModel::with('detail_pekerjaan', 'progres', 'detail_pekerjaan.persyaratan')->find($id);
-        return view('dosen.setting', ['pekerjaan' => $pekerjaan]);
+        $kompetensi = kompetensi_adminModel::all();
+        $pekerjaan = PekerjaanModel::with('detail_pekerjaan', 'progres', 'detail_pekerjaan.persyaratan','detail_pekerjaan.kompetensiDosen')->find($id);
+        return view('dosen.setting', ['pekerjaan' => $pekerjaan,'kompetensi'=>$kompetensi]);
     }
 
     public function update_ajax(Request $request, $id)
@@ -280,6 +296,8 @@ class PekerjanController extends Controller
             'jumlah_anggota' => 'required|integer|min:1',
             'persyaratan' => ['nullable', 'string', 'json'],
             'persyaratan.*' => 'string|max:50',
+            'kompetensi_id' => 'nullable|array',
+            'kompetensi_id.*' => 'required|integer',
             'deskripsi_tugas' => 'nullable|string|max:1000',
             'judul_progres' => 'required|array|min:1',
             'judul_progres.*' => 'required|string|max:255',
@@ -332,6 +350,15 @@ class PekerjanController extends Controller
                 }
             }
 
+            if (!empty($request->kompetensi_id)) {
+                foreach ($request->kompetensi_id as $kompetensiId) {
+                    DB::table('kompetensi_dosen')->updateOrInsert([
+                        'detail_pekerjaan_id' => $pekerjaan->detail_pekerjaan->detail_pekerjaan_id,
+                        'kompetensi_admin_id' => $kompetensiId
+                    ]);
+                }
+            }
+
             foreach ($request->judul_progres as $index => $judul) {
                 ProgresModel::updateOrCreate(
                     ['pekerjaan_id' => $pekerjaan->pekerjaan_id, 'judul_progres' => $judul],
@@ -357,19 +384,20 @@ class PekerjanController extends Controller
         }
     }
 
-    public function get_anggota($id){
-        $anggotaJumlah = ApprovePekerjaanModel::where('pekerjaan_id',$id)->count();
+    public function get_anggota($id)
+    {
+        $anggotaJumlah = ApprovePekerjaanModel::where('pekerjaan_id', $id)->count();
         return response()->json([
             'status' => true,
             'anggotaJumlah' => $anggotaJumlah
         ]);
     }
 
-    public function lihatPekerjaan($id){
-        $user = UserModel::find( $id );
-        $kompetensi = kompetensiModel::where('user_id',$id)->get();
+    public function lihatPekerjaan($id)
+    {
+        $user = UserModel::find($id);
+        $kompetensi = kompetensiModel::with('kompetensiAdmin')->where('user_id',$id)->get();
 
-        return view('dosen.lihat_pekerjaan',['user'=>$user,'kompetensi'=>$kompetensi]);
-
+        return view('dosen.lihat_pekerjaan', ['user' => $user, 'kompetensi' => $kompetensi]);
     }
 }

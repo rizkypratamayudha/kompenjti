@@ -135,7 +135,7 @@
     <div class="register-box">
         <div class="card card-outline card-primary">
             <div class="card-header text-center">
-                <a href="../../index2.html" class="h1">Register</a>
+                <a href="/" class="h1">Register</a>
             </div>
             <div class="card-body">
 

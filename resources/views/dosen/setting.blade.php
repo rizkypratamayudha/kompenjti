@@ -52,8 +52,7 @@
                         name="jumlah_anggota" id="jumlah_anggota" class="form-control" required>
                 </div>
 
-                <!-- Persyaratan -->
-                <!-- Persyaratan -->
+
                 <div class="form-group">
                     <label>Persyaratan</label>
                     <div id="tag-container" class="form-control"
@@ -70,8 +69,15 @@
                         value="{{ json_encode($pekerjaan->detail_pekerjaan->persyaratan->pluck('persyaratan_nama')->toArray()) }}">
                 </div>
 
-
-
+                <div class="form-group">
+                    <label>Kompetensi</label>
+                    <select name="kompetensi_id[]" id="kompetensi_id" class="form-control select2" multiple required>
+                        @foreach ($kompetensi as $item)
+                            <option value="{{ $item->kompetensi_admin_id }}">{{ $item->kompetensi_nama }}</option>
+                        @endforeach
+                    </select>
+                    <small id="error-kompetensi_id" class="error-text form-text text-danger"></small>
+                </div>
                 <!-- Deskripsi Tugas -->
                 <div class="form-group">
                     <label>Deskripsi Pekerjaan</label>
@@ -137,9 +143,30 @@
         cursor: pointer;
         color: #ffffff;
     }
+
+    .select2-container .select2-selection--multiple {
+        min-height: 38px; /* Sama dengan tinggi elemen form-control */
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        padding: 6px;
+    }
+    .select2-container--default .select2-selection--multiple .select2-selection__choice {
+        background-color: #007bff;
+        border: 1px solid #0056b3;
+        color: #ffffff;
+        border-radius: 2px;
+        padding: 3px 10px;
+    }
 </style>
 <script>
     $(document).ready(function() {
+
+        $('#kompetensi_id').select2({
+            placeholder: "Pilih Kompetensi",
+            allowClear: true,
+            width: '100%'
+        });
+
         // Handle perubahan status pekerjaan
         $('#status_pekerjaan').on('change', function() {
             var status = $(this).prop('checked') ? 'open' : 'close';
@@ -243,12 +270,19 @@
                 tags.push(tag.innerText.replace("×", "").trim());
             });
             document.getElementById('persyaratan-hidden').value = JSON.stringify(
-            tags); // Menyimpan dalam format JSON
+                tags); // Menyimpan dalam format JSON
         }
 
         // Form validation dan pengiriman data
         $("#form-tambah").validate({
             submitHandler: function(form) {
+                const formData = $(form).serializeArray();
+                // Tangkap nilai dari select multiple
+                const kompetensiValues = $('#kompetensi_id').val();
+                formData.push({
+                    name: 'kompetensi_id',
+                    value: kompetensiValues
+                });
                 $.ajax({
                     url: form.action,
                     type: form.method,

@@ -9,46 +9,45 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use App\Models\ProfileModel;
 
+
 class ProfileController extends Controller
 {
-    // Fungsi untuk update foto profil
-public function updatePhoto(Request $request)
-{
-    $validator = Validator::make($request->all(), [
-        'avatar' => 'required|image|mimes:jpeg,png,jpg|max:2048',
-    ]);
-
-    if ($validator->fails()) {
-        return response()->json(['errors' => $validator->errors()], 422);
-    }
-
-    $user = $request->user();
-    $profile = $user->profile;
-
-    // Hapus foto lama jika ada
-    if ($profile && $profile->avatar) {
-        Storage::delete($profile->avatar);
-    }
-
-    // Simpan foto baru
-    $avatarPath = $request->file('avatar')->store('avatars');
-
-    if (!$profile) {
-        $profile = $user->profile()->create([
-            'avatar' => $avatarPath,
-            'kompetensi_id' => null,
+    public function updatePhoto(Request $request)
+    {
+        // Validasi file upload
+        $validator = Validator::make($request->all(), [
+            'avatar' => 'required|image|mimes:jpeg,png,jpg|max:2048',
         ]);
-    } else {
-        $profile->avatar = $avatarPath;
-        $profile->save();
+    
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+    
+        // Mendapatkan user yang sedang login
+        $user = $request->user();
+    
+        // Hapus avatar lama jika ada
+        if ($user->avatar) {
+            Storage::disk('public')->delete($user->avatar);
+        }
+    
+        // Simpan avatar baru di folder 'avatars' pada disk 'public'
+        $avatarPath = $request->file('avatar')->store('avatars', 'public');
+    
+        // Perbarui avatar di database
+        $user->update(['avatar' => $avatarPath]);
+    
+        // Buat URL publik untuk avatar
+        $avatarUrl = asset('storage/' . $avatarPath);
+    
+        return response()->json([
+            'status' => true,
+            'message' => 'Foto profil berhasil diupdate',
+            'avatar_url' => $avatarUrl,
+        ], 200);
     }
-
-    return response()->json([
-        'status' => true,
-        'message' => 'Foto profil berhasil diupdate',
-        'avatar_url' => url('storage/' . $avatarPath),
-    ], 200);
-}
+    
+    
 public function updatePassword(Request $request)
 {
     $input = $request->all();

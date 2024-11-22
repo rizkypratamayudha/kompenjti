@@ -71,6 +71,17 @@
                             </td>
                         </tr>
                         <tr>
+                            <th class="text-right col-3">Kompetensi :</th>
+                            <td class="col-9">
+                                <ul>
+                                    @foreach ($kompetensi as $kompetensiDosen)
+                                        <li>{{ $kompetensiDosen->kompetensiAdmin->kompetensi_nama }}</li>
+                                    @endforeach
+                                </ul>
+                            </td>
+                        </tr>
+
+                        <tr>
                             <th class="text-right col-3">Deskripsi Tugas :</th>
                             <td class="col-9">{{ $pekerjaan->detail_pekerjaan->deskripsi_tugas }}</td>
                         </tr>

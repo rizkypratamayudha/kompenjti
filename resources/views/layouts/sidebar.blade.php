@@ -1,4 +1,4 @@
-<aside class="main-sidebar sidebar-dark-primary elevation-4 position-fixed">
+<aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
     <a href="{{ url('/') }}" class="brand-link">
         <img src="{{ asset('logo.png') }}" alt="AdminLTE Logo"
@@ -64,6 +64,31 @@
                         <p>Data Mahasiswa</p>
                     </a>
                 </li>
+                <li class="nav-header">Manage Data</li>
+                <li class="nav-item">
+                    <a href="{{ url('/matkul') }}" class="nav-link {{ $activeMenu == 'matkul' ? 'active' : '' }} ">
+                        <i class="nav-icon fas fa-file-lines"></i>
+                        <p>Mata Kuliah</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url('/kompetensi_admin') }}" class="nav-link {{ $activeMenu == 'kompetensi_admin' ? 'active' : '' }} ">
+                        <i class="nav-icon fas fa-id-card"></i>
+                        <p>Kompetensi</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url('/periode') }}" class="nav-link {{ $activeMenu == 'periode' ? 'active' : '' }} ">
+                        <i class="nav-icon fas fa-clock"></i>
+                        <p>Periode</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url('/prodi') }}" class="nav-link {{ $activeMenu == 'prodi' ? 'active' : '' }} ">
+                        <i class="nav-icon fas fa-tags"></i>
+                        <p>Program Studi</p>
+                    </a>
+                </li>
 
                 </li>
                 <li class="nav-header">Dosen/Tendik</li>
@@ -74,9 +99,9 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{{ url('/penerimaan') }}" class="nav-link {{ $activeMenu == 'penerimaan' ? 'active' : '' }}">
-                        <i class="nav-icon fas fa-clipboard-check"></i>
-                        <p>Penerimaan</p>
+                    <a href="{{ url('/riwayatPekerjaan') }}" class="nav-link {{ $activeMenu == 'riwayatPek' ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-history"></i>
+                        <p>Riwayat</p>
                     </a>
                 </li>
                 <li class="nav-header">Kaprodi</li>
