@@ -11,6 +11,7 @@ use App\Http\Controllers\matkulController;
 use App\Http\Controllers\PekerjanController;
 use App\Http\Controllers\ProdiController;
 use App\Http\Controllers\RegisterController;
+use App\Http\Controllers\riwayatController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ValidasiController;
 use App\Http\Controllers\welcomeController;
@@ -173,8 +174,8 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/{id}/delete_ajax', [MatkulController::class, 'delete_ajax']);
         Route::get('/{id}/show_ajax', [MatkulController::class, 'show_ajax']);
         Route::get('/import', [MatkulController::class, 'import']);
-        Route::post('/import_ajax', [MatkulController::class, 'import_ajax']); 
-        Route::get('/export_excel', [MatkulController::class, 'export_excel']); 
+        Route::post('/import_ajax', [MatkulController::class, 'import_ajax']);
+        Route::get('/export_excel', [MatkulController::class, 'export_excel']);
         Route::get('/export_pdf', [MatkulController::class, 'export_pdf']);
     });
 
@@ -189,8 +190,14 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/{id}/delete_ajax', [ProdiController::class, 'delete_ajax']);
         Route::get('/{id}/show_ajax', [ProdiController::class, 'show_ajax']);
         Route::get('/import', [ProdiController::class, 'import']);
-        Route::post('/import_ajax', [ProdiController::class, 'import_ajax']); 
-        Route::get('/export_excel', [ProdiController::class, 'export_excel']); 
+        Route::post('/import_ajax', [ProdiController::class, 'import_ajax']);
+        Route::get('/export_excel', [ProdiController::class, 'export_excel']);
         Route::get('/export_pdf', [ProdiController::class, 'export_pdf']);
     });
+
+    Route::group(['prefix'=> 'riwayat'], function () {
+        Route::get('/',[riwayatController::class,'index']);
+    });
 });
+
+

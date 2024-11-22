@@ -12,20 +12,21 @@ use Yajra\DataTables\Facades\DataTables;
 
 class PeriodeController extends Controller
 {
-     public function index(){
-          $breadcrumb = (object)[
-              'title'=>'Daftar Periode',
-              'list'=>['Home','Periode']
-          ];
-  
-          $page = (object)[
-              'title'=>'Daftar Periode yang terdaftar dalam sistem'
-          ];
-  
-          $activeMenu = 'periode';
-          $periode = PeriodeModel::all();
-          return view('periode.index',['breadcrumb'=>$breadcrumb,'page'=>$page,'activeMenu'=>$activeMenu,'periode'=>$periode]);
-      }
+    public function index()
+    {
+        $breadcrumb = (object)[
+            'title' => 'Daftar Periode',
+            'list' => ['Home', 'Periode']
+        ];
+
+        $page = (object)[
+            'title' => 'Daftar Periode yang terdaftar dalam sistem'
+        ];
+
+        $activeMenu = 'periode';
+        $periode = PeriodeModel::all();
+        return view('periode.index', ['breadcrumb' => $breadcrumb, 'page' => $page, 'activeMenu' => $activeMenu, 'periode' => $periode]);
+    }
 
     public function list(Request $request)
     {
@@ -36,19 +37,19 @@ class PeriodeController extends Controller
         }
 
         return DataTables::of($periode)
-        ->addIndexColumn()
-        ->addColumn('aksi', function ($periode) {
-            $btn  = '<button onclick="modalAction(\'' . url('/periode/' . $periode->periode_id .
-                '/show_ajax') . '\')" class="btn btn-info btn-sm">Detail</button> ';
-            $btn .= '<button onclick="modalAction(\'' . url('/periode/' . $periode->periode_id .
-                '/edit_ajax') . '\')" class="btn btn-warning btn-sm">Edit</button> ';
-            $btn .= '<button onclick="modalAction(\'' . url('/periode/' . $periode->periode_id .
-                '/delete_ajax') . '\')" class="btn btn-danger btn-sm">Hapus</button> ';
-            return $btn;
-        })
-        ->rawColumns(['aksi'])
-        ->make(true);
-}
+            ->addIndexColumn()
+            ->addColumn('aksi', function ($periode) {
+                $btn  = '<button onclick="modalAction(\'' . url('/periode/' . $periode->periode_id .
+                    '/show_ajax') . '\')" class="btn btn-info btn-sm">Detail</button> ';
+                $btn .= '<button onclick="modalAction(\'' . url('/periode/' . $periode->periode_id .
+                    '/edit_ajax') . '\')" class="btn btn-warning btn-sm">Edit</button> ';
+                $btn .= '<button onclick="modalAction(\'' . url('/periode/' . $periode->periode_id .
+                    '/delete_ajax') . '\')" class="btn btn-danger btn-sm">Hapus</button> ';
+                return $btn;
+            })
+            ->rawColumns(['aksi'])
+            ->make(true);
+    }
 
     public function create_ajax()
     {
