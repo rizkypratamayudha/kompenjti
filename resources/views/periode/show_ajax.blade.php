@@ -36,10 +36,6 @@
                         <th class="text-right col-3">Nama Periode :</th>
                         <td class="col-9">{{ $periode->periode_nama }}</td>
                     </tr>
-                    <tr>
-                        <th class="text-right col-3">Deskripsi :</th>
-                        <td class="col-9">{{ $periode->deskripsi ?? 'Tidak Ada Deskripsi' }}</td>
-                    </tr>
                 </table>
             </div>
         </div>
