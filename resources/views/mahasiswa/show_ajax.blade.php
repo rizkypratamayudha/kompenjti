@@ -50,35 +50,31 @@
                     </tr>
 
 
-                {{-- </table>
+                </table>
                 <div class="alert" style="background-color: #9BC4E2; color: #fff; border: 1px solid #7FAFC8;">
-                    <h5><i class="icon fas fa-list"></i> Detail Barang</h5>
+                    <h5><i class="icon fas fa-list"></i> Detail</h5>
                 </div>                
                 <table class="table table-sm table-bordered">
                     <thead>
                         <tr>
                             <th>No</th>
-                            <th>Nama Barang</th>
-                            <th>Harga Satuan</th>
-                            <th>Jumlah</th>
-                            <th>Total Harga</th>
+                            <th>Mata Kuliah</th>
+                            <th>Jumlah Jam</th>
                         </tr>
                     </thead>
                     <tbody>
                         @php $no = 1; @endphp 
-                        @foreach ($penjualan->penjualan_detail as $detail)
+                        @foreach ($jamKompen->detail_jamKompen as $detail)
                             <tr>
                                 <td>{{ $no++ }}</td>
-                                <td>{{ $detail->barang->barang_nama }}</td>
-                                <td>{{ $detail->harga }}</td>
-                                <td>{{ $detail->jumlah }}</td>
-                                <td>{{ number_format($detail->harga * $detail->jumlah) }}</td>
+                                <td>{{ $detail->matkul->matkul_nama }}</td>
+                                <td>{{ $detail->jumlah_jam }}</td>
                             </tr>
                         @endforeach
                     </tbody>
                     
 
-                </table> --}}
+                </table>
             </div>
         </div>
     </div>
