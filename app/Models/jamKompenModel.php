@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class jamKompenModel extends Model
 {
@@ -24,5 +25,10 @@ class jamKompenModel extends Model
     public function periode(): BelongsTo
     {
         return $this->belongsTo(PeriodeModel::class, 'periode_id');
+    }
+
+    public function detail_jamKompen(): HasMany
+    {
+        return $this->hasMany(detail_jamKompenModel::class, 'detail_jam_kompen_id');
     }
 }

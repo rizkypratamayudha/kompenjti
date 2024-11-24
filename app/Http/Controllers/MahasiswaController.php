@@ -45,7 +45,7 @@ class MahasiswaController extends Controller
             ->addIndexColumn()
             ->addColumn('aksi', function ($jamKompen) {
                 $btn  = '<button onclick="modalAction(\'' . url('/mahasiswa/' . $jamKompen->jam_kompen_id . '/show_ajax') . '\')" class="btn btn-info btn-sm">Detail</button> ';
-                // $btn .= '<button onclick="modalAction(\'' . url('/mahasiswa/' . $jamKompen->jam_kompen_id . '/edit_ajax') . '\')" class="btn btn-warning btn-sm">Edit</button> ';
+                $btn .= '<button onclick="modalAction(\'' . url('/mahasiswa/' . $jamKompen->jam_kompen_id . '/edit_ajax') . '\')" class="btn btn-warning btn-sm">Edit</button> ';
                 $btn .= '<button onclick="modalAction(\'' . url('/mahasiswa/' . $jamKompen->jam_kompen_id . '/delete_ajax') . '\')"  class="btn btn-danger btn-sm">Hapus</button> ';
                 return $btn;
             })
@@ -123,11 +123,80 @@ class MahasiswaController extends Controller
             ], 500);
         }
     }
+    public function edit_ajax($id)
+    {
+        $jamKompen = jamKompenModel::with('detail_jamKompen', 'user', 'periode')->find($id);
+        $periode = PeriodeModel::select('periode_id', 'periode_nama')->get();
+        $user = UserModel::select('user_id', 'nama', 'username')->where('level_id', 3)->get();
+        $matkul = MatkulModel::all();
+
+
+        return view('mahasiswa.edit_ajax', compact('jamKompen', 'periode', 'user', 'matkul'));
+    }
+
+public function update_ajax(Request $request, $id)
+{
+    $validator = Validator::make($request->all(), [
+        'user_id' => 'required|integer',
+        'periode_id' => 'required|integer',
+        'matkul_id' => 'required|array|min:1',
+        'matkul_id.*' => 'required|integer',
+        'jumlah_jam' => 'required|array|min:1',
+        'jumlah_jam.*' => 'required|integer',
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json([
+            'status' => false,
+            'message' => 'Validasi gagal',
+            'errors' => $validator->errors(),
+        ], 422);
+    }
+
+    $jamKompen = jamKompenModel::find($id);
+    if (!$jamKompen) {
+        return response()->json([
+            'status' => false,
+            'message' => 'Data tidak ditemukan',
+        ], 404);
+    }
+
+    DB::beginTransaction();
+    try {
+        $jamKompen->update([
+            'user_id' => $request->user_id,
+            'periode_id' => $request->periode_id,
+        ]);
+
+        $jamKompen->details()->delete();
+        foreach ($request->matkul_id as $index => $matkul) {
+            detail_jamKompenModel::create([
+                'jam_kompen_id' => $jamKompen->jam_kompen_id,
+                'matkul_id' => $matkul,
+                'jumlah_jam' => $request->jumlah_jam[$index],
+            ]);
+        }
+
+        DB::commit();
+        return response()->json([
+            'status' => true,
+            'message' => 'Data berhasil diperbarui',
+        ]);
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return response()->json([
+            'status' => false,
+            'message' => 'Terjadi kesalahan saat memperbarui data',
+            'errors' => $e->getMessage(),
+        ], 500);
+    }
+}
+
 
     public function show_ajax(string $id)
     {
 
-        $jamKompen = jamKompenModel::with(['user', 'periode'])->find($id);
+        $jamKompen = jamKompenModel::with(['user', 'periode', 'detail_jamKompen.matkul'])->find($id);
 
 
         if ($jamKompen) {
@@ -197,94 +266,8 @@ class MahasiswaController extends Controller
             }
         }
 
-        return redirect('/');  // Jika bukan ajax request, redirect ke halaman utama
+        return redirect('/');  
     }
-    // public function import()
-    // {
-    //     return view('mahasiswa.import');
-    // }
-
-    // // Function untuk proses import data melalui AJAX
-    // public function import_ajax(Request $request)
-    // {
-    //     if ($request->ajax() || $request->wantsJson()) {
-    //         // Validasi file
-    //         $rules = [
-    //             'file_mahasiswa' => ['required', 'mimes:xlsx', 'max:1024']
-    //         ];
-
-    //         $validator = Validator::make($request->all(), $rules);
-
-    //         if ($validator->fails()) {
-    //             return response()->json([
-    //                 'status' => false,
-    //                 'message' => 'Validasi gagal',
-    //                 'msgField' => $validator->errors()
-    //             ]);
-    //         }
-
-    //         // Mengambil file dari request
-    //         $file = $request->file('file_mahasiswa');
-    //         $reader = IOFactory::createReader('Xlsx');
-    //         $reader->setReadDataOnly(true);
-    //         $spreadsheet = $reader->load($file->getRealPath());
-    //         $sheet = $spreadsheet->getActiveSheet();
-
-    //         // Mengubah data sheet menjadi array
-    //         $data = $sheet->toArray(null, false, true, true);
-
-    //         $insertJamKompen = [];
-    //         $insertJamKompenDetail = [];
-    //         $jamKompenKodeMap = [];
-
-    //         if (count($data) > 1) {
-    //             foreach ($data as $baris => $value) {
-    //                 if ($baris > 1) {
-    //                     // Cek apakah penjualan_kode sudah ada di array penjualan yang akan dimasukkan
-    //                     if (!isset($jamKompenKodeMap[$value['C']])) {
-    //                         // Jika belum ada, tambahkan ke dalam array dan siapkan untuk insert ke t_penjualan
-    //                         $penjualan_tanggal = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($value['D'])->format('Y-m-d H:i:s');
-
-    //                         // Masukkan data ke t_penjualan
-    //                         $jamKompen = jamKompenModel::create([
-    //                             'user_id' => $value['A'],
-    //                             'pembeli' => $value['B'],
-    //                             'penjualan_kode' => $value['C'],
-    //                             'penjualan_tanggal' => $penjualan_tanggal,
-    //                         ]);
-
-    //                         // Simpan penjualan_id yang di-generate oleh database
-    //                         $penjualanKodeMap[$value['C']] = $penjualan->penjualan_id;
-    //                     }
-
-    //                     // Masukkan data ke t_penjualan_detail dengan menghubungkan penjualan_id
-    //                     $insertPenjualanDetail[] = [
-    //                         'penjualan_id' => $penjualanKodeMap[$value['C']],
-    //                         'barang_id' => $value['E'],
-    //                         'harga' => $value['G'],
-    //                         'jumlah' => $value['F'],
-    //                         'created_at' => now(),
-    //                     ];
-    //                 }
-    //             }
-
-    //             // Insert ke t_penjualan_detail secara batch
-    //             if (count($insertPenjualanDetail) > 0) {
-    //                 PenjualanDetailModel::insert($insertPenjualanDetail);
-    //             }
-
-    //             return response()->json([
-    //                 'status' => true,
-    //                 'message' => 'Data penjualan berhasil diimport'
-    //             ]);
-    //         } else {
-    //             return response()->json([
-    //                 'status' => false,
-    //                 'message' => 'Tidak ada data yang diimport'
-    //             ]);
-    //         }
-    //     }
-    //     return redirect('/');
-    // }
+    
 
 }

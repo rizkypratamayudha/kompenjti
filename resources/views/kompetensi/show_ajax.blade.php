@@ -58,7 +58,7 @@
                         <tr>
                             <th>Nama Kompetensi</th>
                             <th>Pengalaman</th>
-                            <th>Bukti</th>\
+                            <th>Bukti</th>
                         </tr>
                     </thead>
                     @foreach ($kompetensi as $detail)
