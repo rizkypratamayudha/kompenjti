@@ -153,7 +153,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/{id}/show_ajax',[PeriodeController::class,'show_ajax']);
         Route::get('/{id}/edit_ajax',[PeriodeController::class,'edit_ajax']);
         Route::put('/{id}/update_ajax',[PeriodeController::class,'update_ajax']);
-          Route::get('/{id}/confirm_ajax', [PeriodeController::class, 'confirm_ajax']);
+        Route::get('/{id}/confirm_ajax', [PeriodeController::class, 'confirm_ajax']);
         Route::delete('/{id}/delete_ajax', [PeriodeController::class, 'delete_ajax']);
     });
     Route::group(['prefix' => 'kompetensi_admin'],function(){
@@ -201,6 +201,8 @@ Route::middleware(['auth'])->group(function () {
 
     Route::group(['prefix'=> 'riwayat'], function () {
         Route::get('/',[riwayatController::class,'index']);
+        Route::get('/{id}/riwayatmhs',[riwayatController::class,'enter_pekerjaan']);
+        Route::get('/{id}/show_ajax',[riwayatController::class,'show_ajax']);
     });
 });
 

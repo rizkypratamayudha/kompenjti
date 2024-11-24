@@ -5,7 +5,7 @@
         <div class="banner">
             <h1>{{ $pekerjaan->pekerjaan_nama }}</h1>
             <div class="image-container">
-                <!-- Add icons here, using placeholder for now -->
+                {{-- gambar disini --}}
             </div>
         </div>
         <style>
@@ -98,6 +98,34 @@
         data-keyboard="false" data-width="75%" aria-hidden="true"></div>
 @endsection
 
+@push('css')
+<style>
+    .icon-circle {
+        width: 40px;
+        height: 40px;
+        background-color: #007bff; /* Warna biru */
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        font-size: 20px;
+    }
+    .task-title {
+        font-weight: bold;
+        font-size: 1rem;
+    }
+    .progress-detail {
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+    .ellipsis {
+        cursor: pointer;
+    }
+</style>
+
+@endpush
+
 @push('js')
     <script src="https://cdn.jsdelivr.net/npm/dayjs@1.11.9/dayjs.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/dayjs@1.11.9/plugin/relativeTime.js"></script>
@@ -130,14 +158,18 @@
                         let progresHtml = '';
                         data.data.forEach((progres, index) => {
                             progresHtml += `
-                        <div class="card mb-3">
-                            <div class="card-body">
-                                <h5 class="card-title">${progres.judul_progres}</h5>
-                                <p class="card-text">Nilai jam per progres: ${progres.jam_kompen}</p>
-                                <p class="card-text"><small class="text-muted">Deadline: ${progres.hari} Hari</small></p>
-                                <button class="btn btn-sm btn-primary">Info</button>
-                            </div>
-                        </div>
+                        <div class="d-flex align-items-center border p-3 mb-3 rounded shadow-sm">
+                                    <div class="icon-circle me-3">
+                                        <i class="fa-regular fa-file"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <div class="task-title">${progres.judul_progres}</div>
+                                        <div class="progress-detail">Nilai jam: ${progres.jam_kompen} - Deadline: ${progres.hari} Hari</div>
+                                    </div>
+                                        <div class="ellipsis">
+                                            <button class="btn btn-outline-primary btn-sm" onclick="alert('Info detail untuk ${progres.judul_progres}')">Info</button>
+                                        </div>
+                                </div>
                     `;
                         });
                         progresContent.innerHTML = progresHtml;

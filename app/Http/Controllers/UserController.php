@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -525,14 +526,29 @@ class UserController extends Controller
         ]);
     }
     public function update_profile(Request $request)
-    {
-        $avatar = $request->file('avatar')->store('avatars');
-        $request->user()->update([
-            'avatar' => $avatar
-        ]);
+{
+    // Validasi file upload
+    $request->validate([
+        'avatar' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+    ]);
 
-        return redirect()->back();
+    // Mendapatkan user yang sedang login
+    $user = $request->user();
+
+    // Hapus avatar lama jika ada
+    if ($user->avatar) {
+        Storage::disk('public')->delete($user->avatar);
     }
+
+    // Simpan avatar baru di folder 'avatars' pada disk 'public'
+    $avatarPath = $request->file('avatar')->store('avatars', 'public');
+
+    // Perbarui avatar di database
+    $user->update(['avatar' => $avatarPath]);
+
+    return redirect()->back()->with('status', 'Foto profil berhasil diperbarui!');
+}
+
 
     public function updateinfo(Request $request)
     {

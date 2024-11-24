@@ -39,7 +39,7 @@
          <!-- Profile Icon -->
 <li class="nav-item">
     <a id="profile" class="nav-link" href="#" role="button">
-        <img src="{{ Auth::user()->avatar ? asset('app/' . Auth::user()->avatar) : asset('user.png') }}"
+        <img src="{{ Auth::user()->avatar ? asset('storage/' . Auth::user()->avatar) : asset('user.png') }}"
             alt="User Avatar" class="img-circle" width="25" height="25" style="object-fit: cover;">
     </a>
 </li>
@@ -63,7 +63,7 @@
             </div>
             <div class="modal-body text-center">
                 <!-- Avatar -->
-                <img src="{{ Auth::user()->avatar ? asset('app/' . Auth::user()->avatar) : asset('user.png') }}"
+                <img src="{{ Auth::user()->avatar ? asset('storage/' . Auth::user()->avatar) : asset('user.png') }}"
                     alt="User Avatar" class="img-circle mb-3" width="100" height="100"
                     tyle="object-fit: cover;">
 

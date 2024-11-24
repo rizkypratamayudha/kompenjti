@@ -31,7 +31,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{{ url('/riwayat') }}" class="nav-link {{ $activeMenu == 'riwayat' ? 'active' : '' }} ">
+                    <a href="{{ url('/riwayatkompensasi') }}" class="nav-link {{ $activeMenu == 'riwayatKom' ? 'active' : '' }} ">
                         <i class="nav-icon fas fa-history"></i>
                         <p>Riwayat Kompensasi</p>
                     </a>
@@ -112,7 +112,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{{ url('/riwayat') }}" class="nav-link {{ $activeMenu == 'riwayat' ? 'active' : '' }}">
+                    <a href="{{ url('/riwayatKaprodi') }}" class="nav-link {{ $activeMenu == 'riwayatKap' ? 'active' : '' }}">
                         <i class="nav-icon fas fa-history"></i>
                         <p>Riwayat Penerimaan</p>
                     </a>

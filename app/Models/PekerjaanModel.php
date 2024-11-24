@@ -13,17 +13,20 @@ class PekerjaanModel extends Model
 
     protected $table = 'pekerjaan';
     protected $primaryKey = 'pekerjaan_id';
-    protected $fillable = ['user_id','jenis_pekerjaan','pekerjaan_nama','jumlah_jam_kompen','status','akumulasi_deadline','created_at','updated_at'];
+    protected $fillable = ['user_id', 'jenis_pekerjaan', 'pekerjaan_nama', 'jumlah_jam_kompen', 'status', 'akumulasi_deadline', 'created_at', 'updated_at'];
 
-    public function user(): BelongsTo{
-        return $this->belongsTo(UserModel::class,'user_id','user_id');
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(UserModel::class, 'user_id', 'user_id');
     }
 
-    public function detail_pekerjaan():BelongsTo{
-        return $this->belongsTo(detail_pekerjaanModel::class,'pekerjaan_id','pekerjaan_id');
+    public function detail_pekerjaan(): BelongsTo
+    {
+        return $this->belongsTo(detail_pekerjaanModel::class, 'pekerjaan_id', 'pekerjaan_id');
     }
-    public function progres():HasMany{
-        return $this->hasMany(ProgresModel::class,'pekerjaan_id','pekerjaan_id');
+    public function progres(): HasMany
+    {
+        return $this->hasMany(ProgresModel::class, 'pekerjaan_id', 'pekerjaan_id');
     }
 
     public function persyaratan()
@@ -32,7 +35,11 @@ class PekerjaanModel extends Model
     }
 
     public function kompetensiDosen()
-{
-    return $this->hasManyThrough(kompetensi_dosenModel::class, detail_pekerjaanModel::class);
-}
+    {
+        return $this->hasManyThrough(kompetensi_dosenModel::class, detail_pekerjaanModel::class);
+    }
+
+    public function approve(){
+        return $this->belongsTo(ApprovePekerjaanModel::class,'pekerjaan_id', 'pekerjaan_id');
+    }
 }

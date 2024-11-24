@@ -11,7 +11,7 @@
                         <div class="profile-picture mb-3">
                             <!-- Avatar di halaman profil -->
                             <img id="profile-avatar"
-                                src="{{ auth()->user()->avatar ? asset('app/' . auth()->user()->avatar) : asset('user.png') }}"
+                                src="{{ auth()->user()->avatar ? asset('storage/' . auth()->user()->avatar) : asset('user.png') }}"
                                 alt="User Avatar" class="img-circle rounded-circle" width="100" height="100"
                                 style="object-fit: cover;">
                         </div>
