@@ -18,10 +18,10 @@ class detail_jamKompenModel extends Model
 
     public function jamKompen(): BelongsTo
     {
-        return $this->belongsTo(jamKompenModel::class, 'jam_kompen_id');
+        return $this->belongsTo(jamKompenModel::class, 'jam_kompen_id','jam_kompen_id');
     }
     public function matkul(): BelongsTo
     {
-        return $this->belongsTo(MatkulModel::class, 'matkul_id');
+        return $this->belongsTo(MatkulModel::class, 'matkul_id','matkul_id');
     }
 }

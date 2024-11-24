@@ -53,7 +53,7 @@
                 </table>
                 <div class="alert" style="background-color: #9BC4E2; color: #fff; border: 1px solid #7FAFC8;">
                     <h5><i class="icon fas fa-list"></i> Detail</h5>
-                </div>                
+                </div>
                 <table class="table table-sm table-bordered">
                     <thead>
                         <tr>
@@ -63,7 +63,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @php $no = 1; @endphp 
+                        @php $no = 1; @endphp
                         @foreach ($jamKompen->detail_jamKompen as $detail)
                             <tr>
                                 <td>{{ $no++ }}</td>
@@ -72,7 +72,7 @@
                             </tr>
                         @endforeach
                     </tbody>
-                    
+
 
                 </table>
             </div>

@@ -195,22 +195,8 @@ public function update_ajax(Request $request, $id)
 
     public function show_ajax(string $id)
     {
-
-        $jamKompen = jamKompenModel::with(['user', 'periode', 'detail_jamKompen.matkul'])->find($id);
-
-
-        if ($jamKompen) {
-
-            return view('mahasiswa.show_ajax', [
-                'jamKompen' => $jamKompen
-            ]);
-        } else {
-
-            return response()->json([
-                'status' => false,
-                'message' => 'Data tidak ditemukan'
-            ]);
-        }
+        $jamkompen = jamKompenModel::with('detail_jamKompen','user','periode','detail_jamKompen.matkul')->find($id);
+        return view('mahasiswa.show_ajax',['jamKompen'=>$jamkompen]);
     }
     public function confirm_ajax(string $jam_kompen_id)
     {
@@ -266,8 +252,8 @@ public function update_ajax(Request $request, $id)
             }
         }
 
-        return redirect('/');  
+        return redirect('/');
     }
-    
+
 
 }

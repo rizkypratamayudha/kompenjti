@@ -29,6 +29,6 @@ class jamKompenModel extends Model
 
     public function detail_jamKompen(): HasMany
     {
-        return $this->hasMany(detail_jamKompenModel::class, 'detail_jam_kompen_id');
+        return $this->hasMany(detail_jamKompenModel::class, 'jam_kompen_id','jam_kompen_id');
     }
 }

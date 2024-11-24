@@ -88,6 +88,7 @@ Route::middleware(['auth'])->group(function () {
     });
 
     Route::get('/hitung-notif', [ValidasiController::class, 'hitung_notif']);
+    Route::get('/hitung-notif-pelamar', [ValidasiController::class, 'hitung_notif_pelamar']);
 
     Route::group(['prefix' => 'mahasiswa'], function () {
         Route::get('/', [MahasiswaController::class, 'index']);
@@ -118,6 +119,8 @@ Route::middleware(['auth'])->group(function () {
         Route::post('decline-pekerjaan',[PekerjanController::class,'declinePekerjaan']);
         Route::post('kick-pekerjaan',[PekerjanController::class,'kickPekerjaan']);
         Route::get('/{id}/lihat-pekerjaan',[PekerjanController::class,'lihatPekerjaan']);
+        Route::get('/{id}/hitung-notif', [PekerjanController::class, 'hitung_notif_pelamar']);
+
     });
 
 
@@ -203,6 +206,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/',[riwayatController::class,'index']);
         Route::get('/{id}/riwayatmhs',[riwayatController::class,'enter_pekerjaan']);
         Route::get('/{id}/show_ajax',[riwayatController::class,'show_ajax']);
+        Route::get('/riwayatmhs/{id}/enter-progres', [riwayatController::class, 'enter_progres']);
+
     });
 });
 

@@ -19,7 +19,7 @@ class riwayatController extends Controller
             'title' => 'Page Pengerjaan dan Riwayat Pekerjaan',
         ];
 
-        $activeMenu = 'riwayat';
+        $activeMenu = 'riwayatMhs';
         $tugas = PekerjaanModel::with('detail_pekerjaan','progres')->whereHas('approve', function($query){
             $query->where('user_id',Auth::id());
         })->get();
@@ -43,9 +43,24 @@ class riwayatController extends Controller
             'title' => 'Pekerjaan'
         ];
 
-        $activeMenu = 'riwayat';
+        $activeMenu = 'riwayatMhs';
         $activeTab = 'progres';
         $pekerjaan = PekerjaanModel::with('detail_pekerjaan', 'progres')->where('pekerjaan_id', $id)->first();
         return view('riwayatMHS.pekerjaan',['breadcrumb'=>$breadcrumb,'page'=>$page,'activeMenu'=>$activeMenu,'activeTab'=>$activeTab,'pekerjaan'=>$pekerjaan]);
+    }
+
+    public function enter_progres($id){
+        $breadcrumb = (object) [
+            'title' => 'Progres',
+            'list' => ['Home','Pekerjaan','Progres']
+        ];
+
+        $page = (object) [
+            'title' => 'Page progres'
+        ];
+
+        $activeMenu = 'riwayatMhs';
+        $progres = ProgresModel::with('pekerjaan','pekerjaan.detail_pekerjaan','pekerjaan.user')->find( $id );  
+        return view('riwayatMHS.progres',['breadcrumb'=>$breadcrumb,'activeMenu'=>$activeMenu,'progres'=>$progres,'page'=>$page]);
     }
 }

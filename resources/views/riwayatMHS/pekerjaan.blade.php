@@ -65,31 +65,34 @@
 @endsection
 
 @push('css')
-<style>
-    .icon-circle {
-        width: 40px;
-        height: 40px;
-        background-color: #007bff; /* Warna biru */
-        border-radius: 50%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        color: white;
-        font-size: 20px;
-    }
-    .task-title {
-        font-weight: bold;
-        font-size: 1rem;
-    }
-    .progress-detail {
-        font-size: 0.9rem;
-        color: #6c757d;
-    }
-    .ellipsis {
-        cursor: pointer;
-    }
-</style>
+    <style>
+        .icon-circle {
+            width: 40px;
+            height: 40px;
+            background-color: #007bff;
+            /* Warna biru */
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 20px;
+        }
 
+        .task-title {
+            font-weight: bold;
+            font-size: 1rem;
+        }
+
+        .progress-detail {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .ellipsis {
+            cursor: pointer;
+        }
+    </style>
 @endpush
 
 @push('js')
@@ -129,14 +132,14 @@
                                         <i class="fa-regular fa-file"></i>
                                     </div>
                                     <div class="flex-grow-1">
-                                        <div class="task-title">${progres.judul_progres}</div>
+                                    <div class="task-title">${progres.judul_progres}</div>
                                         <div class="progress-detail">Nilai jam: ${progres.jam_kompen} - Deadline: ${progres.hari} Hari</div>
                                     </div>
                                         <div class="ellipsis">
-                                            <button class="btn btn-outline-primary btn-sm" onclick="alert('Info detail untuk ${progres.judul_progres}')">Info</button>
+                                            <a class="btn btn-outline-primary btn-sm" href="{{ url('/riwayat/riwayatmhs') }}/${progres.progres_id}/enter-progres">Info</a>
                                         </div>
-                                </div>
-                            `;
+                                    </div>
+                                    `;
                         });
                         progresContent.innerHTML = progresHtml;
                     } else {

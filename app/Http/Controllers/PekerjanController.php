@@ -200,7 +200,7 @@ class PekerjanController extends Controller
 
     public function show_ajax($id)
     {
-        $pekerjaan = PekerjaanModel::with('detail_pekerjaan.persyaratan','detail_pekerjaan.kompetensiDosen.kompetensiAdmin')->where('pekerjaan_id', $id)->first();
+        $pekerjaan = PekerjaanModel::with('detail_pekerjaan.persyaratan', 'detail_pekerjaan.kompetensiDosen.kompetensiAdmin')->where('pekerjaan_id', $id)->first();
         $jumlahProgres = ProgresModel::where('pekerjaan_id', $id)->count();
 
         return view('pekerjaanMHS.show_ajax', [
@@ -284,8 +284,8 @@ class PekerjanController extends Controller
     public function edit_ajax($id)
     {
         $kompetensi = kompetensi_adminModel::all();
-        $pekerjaan = PekerjaanModel::with('detail_pekerjaan', 'progres', 'detail_pekerjaan.persyaratan','detail_pekerjaan.kompetensiDosen')->find($id);
-        return view('dosen.setting', ['pekerjaan' => $pekerjaan,'kompetensi'=>$kompetensi]);
+        $pekerjaan = PekerjaanModel::with('detail_pekerjaan', 'progres', 'detail_pekerjaan.persyaratan', 'detail_pekerjaan.kompetensiDosen')->find($id);
+        return view('dosen.setting', ['pekerjaan' => $pekerjaan, 'kompetensi' => $kompetensi]);
     }
 
     public function update_ajax(Request $request, $id)
@@ -396,8 +396,14 @@ class PekerjanController extends Controller
     public function lihatPekerjaan($id)
     {
         $user = UserModel::find($id);
-        $kompetensi = kompetensiModel::with('kompetensiAdmin')->where('user_id',$id)->get();
+        $kompetensi = kompetensiModel::with('kompetensiAdmin')->where('user_id', $id)->get();
 
         return view('dosen.lihat_pekerjaan', ['user' => $user, 'kompetensi' => $kompetensi]);
+    }
+
+    public function hitung_notif_pelamar($id)
+    {
+        $jumlah = PendingPekerjaanModel::where('pekerjaan_id', $id)->count();
+        return response()->json(['jumlah' => $jumlah]);
     }
 }

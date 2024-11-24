@@ -56,15 +56,18 @@
                             <div class="card-body">
                                 <p class="card-text">
                                     <small class="text-muted">Status Pekerjaan :</small><br>
-                                    {{$item->status}}
+                                    {{ $item->status }}
                                 </p>
                                 <p class="card-text">
                                     <small class="text-muted">Deskripsi Tugas :</small><br>
                                     {{ $item->detail_pekerjaan->deskripsi_tugas }}
                                 </p>
                                 <div class="d-flex justify-content-between align-items-center">
-                                    <small
-                                        class="text-muted">Jumlah Anggota:
+                                    <small class="text-muted">
+                                        Jumlah Pelamar:
+                                        <span id="notif-pelamar-{{ $item->pekerjaan_id }}">0</span>
+                                    </small>
+                                    <small class="text-muted">Jumlah Anggota:
                                         <span id="jumlah-anggota-{{ $item->pekerjaan_id }}">0</span> /
                                         {{ $item->detail_pekerjaan->jumlah_anggota }}
                                     </small>
@@ -100,32 +103,57 @@
                     $('#myModal').modal('show');
                 });
             }
-            
+
+            function loadPelamarCount(pekerjaanId) {
+                $.ajax({
+                    url: '{{ url('/dosen') }}/' + pekerjaanId + '/hitung-notif',
+                    method: 'GET',
+                    success: function(response) {
+                        if (response.jumlah !== undefined) {
+                            $('#notif-pelamar-' + pekerjaanId).text(response.jumlah);
+                        } else {
+                            console.error('Gagal mendapatkan jumlah pelamar untuk ID: ' + pekerjaanId);
+                        }
+                    },
+                    error: function() {
+                        console.error('Error loading pelamar count for ID: ' + pekerjaanId);
+                    }
+                });
+            }
+
+            // Memuat data jumlah pelamar untuk setiap pekerjaan
+            $(document).ready(function() {
+                @foreach ($tugas as $item)
+                    loadPelamarCount({{ $item->pekerjaan_id }});
+                @endforeach
+            });
+
+
 
             // Fungsi untuk memuat jumlah anggota
-        function loadAnggota(pekerjaanId) {
-            $.ajax({
-                url: '{{ url('/pekerjaan') }}/' + pekerjaanId + '/get-anggota',
-                method: 'GET',
-                success: function(response) {
-                    if (response.status) {
-                        // Update jumlah anggota di elemen HTML
-                        $('#jumlah-anggota-' + pekerjaanId).text(response.anggotaJumlah);
-                    } else {
-                        console.error('Gagal memuat jumlah anggota untuk pekerjaan ID: ' + pekerjaanId);
+            function loadAnggota(pekerjaanId) {
+                $.ajax({
+                    url: '{{ url('/pekerjaan') }}/' + pekerjaanId + '/get-anggota',
+                    method: 'GET',
+                    success: function(response) {
+                        if (response.status) {
+                            // Update jumlah anggota di elemen HTML
+                            $('#jumlah-anggota-' + pekerjaanId).text(response.anggotaJumlah);
+                        } else {
+                            console.error('Gagal memuat jumlah anggota untuk pekerjaan ID: ' + pekerjaanId);
+                        }
+                    },
+                    error: function() {
+                        console.error('Error loading anggota count for pekerjaan ID: ' + pekerjaanId);
                     }
-                },
-                error: function() {
-                    console.error('Error loading anggota count for pekerjaan ID: ' + pekerjaanId);
-                }
-            });
-        }
+                });
+            }
 
-        // Periksa status Apply dan jumlah anggota untuk setiap pekerjaan saat halaman dimuat
-        $(document).ready(function() {
-            @foreach ($tugas as $item)
-                loadAnggota({{ $item->pekerjaan_id }}); // Memuat jumlah anggota untuk setiap pekerjaan
-            @endforeach
-        });
+            // Periksa status Apply dan jumlah anggota untuk setiap pekerjaan saat halaman dimuat
+            $(document).ready(function() {
+                @foreach ($tugas as $item)
+                    loadAnggota({{ $item->pekerjaan_id }}); // Memuat jumlah anggota untuk setiap pekerjaan
+                @endforeach
+            });
         </script>
     @endpush

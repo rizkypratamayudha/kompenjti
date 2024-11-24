@@ -8,6 +8,7 @@ use App\Models\detail_dosenModel;
 use App\Models\detail_kaprodiModel;
 use App\Models\detail_mahasiswaModel;
 use App\Models\LevelModel;
+use App\Models\PendingPekerjaanModel;
 use App\Models\PendingRegister;
 use App\Models\PeriodeModel;
 use App\Models\ProdiModel;
@@ -146,6 +147,11 @@ class ValidasiController extends Controller
 
     public function hitung_notif(){
         $jumlah = PendingRegister::count();
+        return ['jumlah' => $jumlah];
+    }
+
+    public function hitung_notif_pelamar(){
+        $jumlah = PendingPekerjaanModel::count();
         return ['jumlah' => $jumlah];
     }
 }
