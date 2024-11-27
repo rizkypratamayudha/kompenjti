@@ -47,7 +47,9 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/delete_avatar', [UserController::class, 'deleteAvatar']);
     });
 
-    Route::group(['prefix' => 'level'], function () {
+
+    // ADMINNN
+    Route::group(['prefix' => 'level', 'middleware' => 'authorize:ADM'], function () {
         Route::get('/', [LevelController::class, 'index']);
         Route::post('/list', [LevelController::class, 'list']);
         Route::get('/create_ajax', [LevelController::class, 'create_ajax']);
@@ -62,8 +64,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/export_excel', [LevelController::class, 'export_excel']); // ajax exsport excel
         Route::get('/export_pdf', [LevelController::class, 'export_pdf']);// export pdf
     });
-
-    Route::group(['prefix' => 'user'], function () {
+    Route::group(['prefix' => 'user', 'middleware' => 'authorize:ADM'], function () {
         Route::get('/', [UserController::class, 'index']);
         Route::post('/list', [UserController::class, 'list']);
         Route::get('/create_ajax', [UserController::class, 'create_ajax']);
@@ -78,19 +79,14 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/export_excel', [UserController::class, 'export_excel']); // ajax exsport excel
         Route::get('/export_pdf', [UserController::class, 'export_pdf']);// export pdf
     });
-
-    Route::group(['prefix' => 'validasi'], function () {
+    Route::group(['prefix' => 'validasi','middleware' => 'authorize:ADM'], function () {
         Route::get('/', [ValidasiController::class, 'index']);
         Route::post('/list', [ValidasiController::class, 'list']);
         Route::get('/{id}/show_ajax', [ValidasiController::class, 'show_ajax']);
         Route::post('/approve/{id}', [ValidasiController::class, 'approve']);
         Route::post('/decline/{id}', [ValidasiController::class, 'decline']);
     });
-
-    Route::get('/hitung-notif', [ValidasiController::class, 'hitung_notif']);
-    Route::get('/hitung-notif-pelamar', [ValidasiController::class, 'hitung_notif_pelamar']);
-
-    Route::group(['prefix' => 'mahasiswa'], function () {
+    Route::group(['prefix' => 'mahasiswa', 'middleware' => 'authorize:ADM'], function () {
         Route::get('/', [MahasiswaController::class, 'index']);
         Route::post('/list', [MahasiswaController::class, 'list']);
         Route::get('/create_ajax', [MahasiswaController::class, 'create_ajax']);
@@ -101,7 +97,60 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/{id}/delete_ajax', [MahasiswaController::class, 'delete_ajax']);
         Route::get('/{id}/show_ajax', [MahasiswaController::class, 'show_ajax']);
     });
+    Route::group(['prefix' => 'periode','middleware' => 'authorize:ADM'],function(){
+        Route::get('/',[PeriodeController::class,'index']);
+        Route::post('/list', [PeriodeController::class, 'list']);
+        Route::get('/create_ajax', [PeriodeController::class, 'create_ajax']);
+        Route::post('/ajax', [PeriodeController::class, 'store_ajax']);
+        Route::get('/{id}/show_ajax',[PeriodeController::class,'show_ajax']);
+        Route::get('/{id}/edit_ajax',[PeriodeController::class,'edit_ajax']);
+        Route::put('/{id}/update_ajax',[PeriodeController::class,'update_ajax']);
+        Route::get('/{id}/confirm_ajax', [PeriodeController::class, 'confirm_ajax']);
+        Route::delete('/{id}/delete_ajax', [PeriodeController::class, 'delete_ajax']);
+    });
+    Route::group(['prefix' => 'kompetensi_admin','middleware' => 'authorize:ADM'],function(){
+        Route::get('/',[kompetensi_adminController::class,'index']);
+        Route::post('/list', [kompetensi_adminController::class, 'list']);
+        Route::get('/create_ajax', [kompetensi_adminController::class, 'create_ajax']);
+        Route::post('/ajax', [kompetensi_adminController::class, 'store_ajax']);
+        Route::get('/{id}/edit_ajax', [kompetensi_adminController::class, 'edit_ajax']);
+        Route::put('{id}/update_ajax',[kompetensi_adminController::class,'update_ajax']);
+        Route::get('/{id}/confirm_ajax', [kompetensi_adminController::class, 'confirm_ajax']);
+        Route::delete('/{id}/delete_ajax', [kompetensi_adminController::class, 'delete_ajax']);
+        Route::get('/{id}/show_ajax', [kompetensi_adminController::class, 'show_ajax']);
+    });
+    Route::group(['prefix' => 'matkul','middleware' => 'authorize:ADM'], function () {
+        Route::get('/', [MatkulController::class, 'index']);
+        Route::post('/list', [MatkulController::class, 'list']);
+        Route::get('/create_ajax', [MatkulController::class, 'create_ajax']);
+        Route::post('/ajax', [MatkulController::class, 'store_ajax']);
+        Route::get('/{id}/edit_ajax', [MatkulController::class, 'edit_ajax']);
+        Route::put('/{id}/update_ajax', [MatkulController::class, 'update_ajax']);
+        Route::get('/{id}/delete_ajax', [MatkulController::class, 'confirm_ajax']);
+        Route::delete('/{id}/delete_ajax', [MatkulController::class, 'delete_ajax']);
+        Route::get('/{id}/show_ajax', [MatkulController::class, 'show_ajax']);
+        Route::get('/import', [MatkulController::class, 'import']);
+        Route::post('/import_ajax', [MatkulController::class, 'import_ajax']);
+        Route::get('/export_excel', [MatkulController::class, 'export_excel']);
+        Route::get('/export_pdf', [MatkulController::class, 'export_pdf']);
+    });
+    Route::group(['prefix' => 'prodi','middleware' => 'authorize:ADM'], function () {
+        Route::get('/', [ProdiController::class, 'index']);
+        Route::post('/list', [ProdiController::class, 'list']);
+        Route::get('/create_ajax', [ProdiController::class, 'create_ajax']);
+        Route::post('/ajax', [ProdiController::class, 'store_ajax']);
+        Route::get('/{id}/edit_ajax', [ProdiController::class, 'edit_ajax']);
+        Route::put('/{id}/update_ajax', [ProdiController::class, 'update_ajax']);
+        Route::get('/{id}/delete_ajax', [ProdiController::class, 'confirm_ajax']);
+        Route::delete('/{id}/delete_ajax', [ProdiController::class, 'delete_ajax']);
+        Route::get('/{id}/show_ajax', [ProdiController::class, 'show_ajax']);
+        Route::get('/import', [ProdiController::class, 'import']);
+        Route::post('/import_ajax', [ProdiController::class, 'import_ajax']);
+        Route::get('/export_excel', [ProdiController::class, 'export_excel']);
+        Route::get('/export_pdf', [ProdiController::class, 'export_pdf']);
+    });
 
+    // DOSENNN
     Route::group(['prefix'=> 'dosen'], function () {
         Route::get('/', [PekerjanController::class, 'index']);
         Route::get('/create_ajax', [PekerjanController::class, 'create_ajax']);
@@ -123,8 +172,8 @@ Route::middleware(['auth'])->group(function () {
 
     });
 
-
-    Route::group(['prefix'=> 'pekerjaan'], function () {
+    // MAHASISWAA
+    Route::group(['prefix'=> 'pekerjaan','middleware' => 'authorize:MHS'], function () {
         Route::get('/', [ListPekerjaanMHSController::class, 'index']);
         Route::post('/list', [ListPekerjaanMHSController::class, 'list']);
         Route::get('/create_ajax', [ListPekerjaanMHSController::class, 'create_ajax']);
@@ -138,8 +187,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/check-if-applied', [ListPekerjaanMHSController::class, 'checkIfApplied'])->name('checkIfApplied');
         Route::get('/{id}/get-anggota',[ListPekerjaanMHSController::class,'get_anggota']);
     });
-
-    Route::group(['prefix' => 'kompetensi'],function(){
+    Route::group(['prefix' => 'kompetensi','middleware' => 'authorize:MHS'],function(){
         Route::get('/',[KompetensiController::class,'index']);
         Route::post('/list', [KompetensiController::class, 'list']);
         Route::get('/create_ajax', [KompetensiController::class, 'create_ajax']);
@@ -148,67 +196,16 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/{id}/edit_ajax',[KompetensiController::class,'edit_ajax']);
         Route::put('/{id}/update_ajax',[KompetensiController::class,'update_ajax']);
     });
-    Route::group(['prefix' => 'periode'],function(){
-        Route::get('/',[PeriodeController::class,'index']);
-        Route::post('/list', [PeriodeController::class, 'list']);
-        Route::get('/create_ajax', [PeriodeController::class, 'create_ajax']);
-        Route::post('/ajax', [PeriodeController::class, 'store_ajax']);
-        Route::get('/{id}/show_ajax',[PeriodeController::class,'show_ajax']);
-        Route::get('/{id}/edit_ajax',[PeriodeController::class,'edit_ajax']);
-        Route::put('/{id}/update_ajax',[PeriodeController::class,'update_ajax']);
-        Route::get('/{id}/confirm_ajax', [PeriodeController::class, 'confirm_ajax']);
-        Route::delete('/{id}/delete_ajax', [PeriodeController::class, 'delete_ajax']);
-    });
-    Route::group(['prefix' => 'kompetensi_admin'],function(){
-        Route::get('/',[kompetensi_adminController::class,'index']);
-        Route::post('/list', [kompetensi_adminController::class, 'list']);
-        Route::get('/create_ajax', [kompetensi_adminController::class, 'create_ajax']);
-        Route::post('/ajax', [kompetensi_adminController::class, 'store_ajax']);
-        Route::get('/{id}/edit_ajax', [kompetensi_adminController::class, 'edit_ajax']);
-        Route::put('{id}/update_ajax',[kompetensi_adminController::class,'update_ajax']);
-        Route::get('/{id}/confirm_ajax', [kompetensi_adminController::class, 'confirm_ajax']);
-        Route::delete('/{id}/delete_ajax', [kompetensi_adminController::class, 'delete_ajax']);
-        Route::get('/{id}/show_ajax', [kompetensi_adminController::class, 'show_ajax']);
-    });
-    Route::group(['prefix' => 'matkul'], function () {
-        Route::get('/', [MatkulController::class, 'index']);
-        Route::post('/list', [MatkulController::class, 'list']);
-        Route::get('/create_ajax', [MatkulController::class, 'create_ajax']);
-        Route::post('/ajax', [MatkulController::class, 'store_ajax']);
-        Route::get('/{id}/edit_ajax', [MatkulController::class, 'edit_ajax']);
-        Route::put('/{id}/update_ajax', [MatkulController::class, 'update_ajax']);
-        Route::get('/{id}/delete_ajax', [MatkulController::class, 'confirm_ajax']);
-        Route::delete('/{id}/delete_ajax', [MatkulController::class, 'delete_ajax']);
-        Route::get('/{id}/show_ajax', [MatkulController::class, 'show_ajax']);
-        Route::get('/import', [MatkulController::class, 'import']);
-        Route::post('/import_ajax', [MatkulController::class, 'import_ajax']);
-        Route::get('/export_excel', [MatkulController::class, 'export_excel']);
-        Route::get('/export_pdf', [MatkulController::class, 'export_pdf']);
-    });
-
-    Route::group(['prefix' => 'prodi'], function () {
-        Route::get('/', [ProdiController::class, 'index']);
-        Route::post('/list', [ProdiController::class, 'list']);
-        Route::get('/create_ajax', [ProdiController::class, 'create_ajax']);
-        Route::post('/ajax', [ProdiController::class, 'store_ajax']);
-        Route::get('/{id}/edit_ajax', [ProdiController::class, 'edit_ajax']);
-        Route::put('/{id}/update_ajax', [ProdiController::class, 'update_ajax']);
-        Route::get('/{id}/delete_ajax', [ProdiController::class, 'confirm_ajax']);
-        Route::delete('/{id}/delete_ajax', [ProdiController::class, 'delete_ajax']);
-        Route::get('/{id}/show_ajax', [ProdiController::class, 'show_ajax']);
-        Route::get('/import', [ProdiController::class, 'import']);
-        Route::post('/import_ajax', [ProdiController::class, 'import_ajax']);
-        Route::get('/export_excel', [ProdiController::class, 'export_excel']);
-        Route::get('/export_pdf', [ProdiController::class, 'export_pdf']);
-    });
-
-    Route::group(['prefix'=> 'riwayat'], function () {
+    Route::group(['prefix'=> 'riwayat','middleware' => 'authorize:MHS'], function () {
         Route::get('/',[riwayatController::class,'index']);
         Route::get('/{id}/riwayatmhs',[riwayatController::class,'enter_pekerjaan']);
         Route::get('/{id}/show_ajax',[riwayatController::class,'show_ajax']);
         Route::get('/riwayatmhs/{id}/enter-progres', [riwayatController::class, 'enter_progres']);
-
     });
+
+    // NOTIFFF
+    Route::get('/hitung-notif', [ValidasiController::class, 'hitung_notif']);
+    Route::get('/hitung-notif-pelamar', [ValidasiController::class, 'hitung_notif_pelamar']);
 });
 
 
