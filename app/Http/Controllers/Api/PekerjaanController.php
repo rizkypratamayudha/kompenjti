@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\ApprovePekerjaanModel;
 use App\Models\detail_pekerjaanModel;
 use App\Models\PekerjaanModel;
+use App\Models\PendingPekerjaanModel;
 use App\Models\ProgresModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -13,9 +15,86 @@ use Illuminate\Support\Facades\Validator;
 
 class PekerjaanController extends Controller
 {
-    public function index(){
-        $pekerjaan = PekerjaanModel::with('detail_pekerjaan','progres')->get();
+    public function index()
+    {
+        $pekerjaan = PekerjaanModel::with('detail_pekerjaan.persyaratan', 'progres', 'user.detailDosen', 'detail_pekerjaan.kompetensiDosen.kompetensiAdmin')->where('status', 'open')->get();
+
         return response()->json($pekerjaan);
+    }
+
+    public function apply(Request $request)
+    {
+        // Validasi inputan
+        $validator = Validator::make($request->all(), [
+            'pekerjaan_id' => 'required|exists:pekerjaan,pekerjaan_id',
+            'user_id' => 'required|exists:m_user,user_id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Validasi gagal',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        // Cek apakah user sudah melamar pekerjaan ini sebelumnya di pending pekerjaan
+        $existingApply = PendingPekerjaanModel::where('pekerjaan_id', $request->pekerjaan_id)
+            ->where('user_id', $request->user_id)
+            ->exists();
+
+        if ($existingApply) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Anda sudah melamar pekerjaan ini sebelumnya.',
+            ], 409);
+        }
+
+        // Cek apakah user sudah melamar pekerjaan ini sebelumnya di approve pekerjaan
+        $existingApplyapprove = ApprovePekerjaanModel::where('pekerjaan_id', $request->pekerjaan_id)
+            ->where('user_id', $request->user_id)
+            ->exists();
+
+        if ($existingApplyapprove) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Anda sudah melamar pekerjaan ini sebelumnya dan sudah diterima.',
+            ], 409);
+        }
+
+        // Jika belum ada, simpan data apply ke PendingPekerjaanModel
+        PendingPekerjaanModel::create([
+            'pekerjaan_id' => $request->pekerjaan_id,
+            'user_id' => $request->user_id,
+        ]);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Lamaran pekerjaan berhasil diajukan.',
+        ], 200);
+    }
+
+    public function getPelamaran($id)
+    {
+        try {
+            // Ambil data pelamaran dengan relasi
+            $pelamaran = PendingPekerjaanModel::with('user.detailMahasiswa.prodi','pekerjaan')
+                ->where('pekerjaan_id', $id)
+                ->get();
+
+            // Berikan respons sukses
+            return response()->json([
+                'status' => true,
+                'data' => $pelamaran,
+            ], 200);
+        } catch (\Exception $e) {
+            // Berikan respons error jika terjadi masalah
+            return response()->json([
+                'status' => false,
+                'message' => 'Gagal mendapatkan data pelamaran.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
     public function store(Request $request)
     {
@@ -80,7 +159,6 @@ class PekerjaanController extends Controller
                 'status' => true,
                 'message' => 'Data pekerjaan berhasil disimpan'
             ]);
-
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
@@ -90,8 +168,4 @@ class PekerjaanController extends Controller
             ], 500);
         }
     }
-
-    
-
-
 }
