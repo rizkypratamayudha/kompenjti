@@ -302,6 +302,14 @@ public function update_ajax(Request $request, $id)
                         throw new \Exception("Data pada baris ke-" . ($index + 1) . " tidak lengkap");
                     }
     
+                    // Cari user_id berdasarkan username
+                    $user = DB::table('m_user')->where('username', $row['A'])->first();
+                    if (!$user) {
+                        throw new \Exception("Username '{$row['A']}' tidak ditemukan pada data user (baris ke-" . ($index + 1) . ")");
+                    }
+    
+                    $userId = $user->user_id; // Ambil user_id dari username yang ditemukan
+    
                     // Parsing data
                     $matkulIds = explode(',', $row['D']); // Pecah data matkul_id (bisa satu atau lebih)
                     $jumlahJams = explode(',', $row['E']); // Pecah data jumlah_jam (bisa satu atau lebih)
@@ -315,7 +323,7 @@ public function update_ajax(Request $request, $id)
     
                     // Simpan data jam_kompen
                     $jamKompen = jamKompenModel::create([
-                        'user_id' => $row['A'],
+                        'user_id' => $userId, // Gunakan user_id yang ditemukan
                         'periode_id' => $row['B'],
                         'akumulasi_jam' => $row['C'] ?: $akumulasiJam, // Gunakan nilai di kolom C atau hitung dari jumlah_jam
                     ]);
@@ -350,6 +358,7 @@ public function update_ajax(Request $request, $id)
     
         return redirect('/');
     }
+    
 
     public function export_excel()
     {
