@@ -77,18 +77,20 @@ class PekerjaanController extends Controller
     public function getPelamaran($id)
     {
         try {
-            // Ambil data pelamaran dengan relasi
-            $pelamaran = PendingPekerjaanModel::with('user.detailMahasiswa.prodi','pekerjaan')
+            $loggedInUserId = Auth::id();
+
+            $pelamaran = PendingPekerjaanModel::with('user.detailMahasiswa.prodi', 'pekerjaan.user', 'user.kompetensi.kompetensiAdmin')
                 ->where('pekerjaan_id', $id)
+                ->whereHas('pekerjaan', function ($query) use ($loggedInUserId) {
+                    $query->where('user_id', $loggedInUserId);
+                })
                 ->get();
 
-            // Berikan respons sukses
             return response()->json([
                 'status' => true,
                 'data' => $pelamaran,
             ], 200);
         } catch (\Exception $e) {
-            // Berikan respons error jika terjadi masalah
             return response()->json([
                 'status' => false,
                 'message' => 'Gagal mendapatkan data pelamaran.',
@@ -96,6 +98,7 @@ class PekerjaanController extends Controller
             ], 500);
         }
     }
+
     public function store(Request $request)
     {
         // Validasi input yang diterima melalui API

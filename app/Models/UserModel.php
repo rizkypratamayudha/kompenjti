@@ -55,7 +55,7 @@ class UserModel extends Authenticatable implements JWTSubject
         return $this->belongsTo(PekerjaanModel::class,'user_id');
     }
     public function kompetensi():HasMany{
-        return $this->hasMany(PekerjaanModel::class,'user_id');
+        return $this->hasMany(kompetensiModel::class,'user_id');
     }
 
     public function periode()

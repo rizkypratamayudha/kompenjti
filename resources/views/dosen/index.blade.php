@@ -63,9 +63,9 @@
                                     {{ $item->detail_pekerjaan->deskripsi_tugas }}
                                 </p>
                                 <div class="d-flex justify-content-between align-items-center">
-                                    <small class="text-muted">
+                                    <small class="text" style="color: #ff0000">
                                         Jumlah Pelamar:
-                                        <span id="notif-pelamar-{{ $item->pekerjaan_id }}">0</span>
+                                        <span id="notif-pelamar-{{ $item->pekerjaan_id }}" style="color: #ff0000">0</span>
                                     </small>
                                     <small class="text-muted">Jumlah Anggota:
                                         <span id="jumlah-anggota-{{ $item->pekerjaan_id }}">0</span> /
