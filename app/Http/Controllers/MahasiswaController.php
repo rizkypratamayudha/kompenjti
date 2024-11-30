@@ -305,7 +305,7 @@ public function update_ajax(Request $request, $id)
                     // Cari user_id berdasarkan username
                     $user = DB::table('m_user')->where('username', $row['A'])->first();
                     if (!$user) {
-                        throw new \Exception("Username '{$row['A']}' tidak ditemukan pada data user (baris ke-" . ($index + 1) . ")");
+                        throw new \Exception("Username '{$row['A']}' tidak ditemukan pada data user");
                     }
     
                     $userId = $user->user_id; // Ambil user_id dari username yang ditemukan
