@@ -96,6 +96,10 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/{id}/delete_ajax', [MahasiswaController::class, 'confirm_ajax']);
         Route::delete('/{id}/delete_ajax', [MahasiswaController::class, 'delete_ajax']);
         Route::get('/{id}/show_ajax', [MahasiswaController::class, 'show_ajax']);
+        Route::get('/import', [MahasiswaController::class, 'import']); // ajax form upload excel
+        Route::post('/import_ajax', [MahasiswaController::class, 'import_ajax']); // ajax import excel
+        Route::get('/export_excel', [MahasiswaController::class, 'export_excel']); // ajax exsport excel
+        Route::get('/export_pdf', [MahasiswaController::class, 'export_pdf']);// export pdf
     });
     Route::group(['prefix' => 'periode','middleware' => 'authorize:ADM'],function(){
         Route::get('/',[PeriodeController::class,'index']);

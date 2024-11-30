@@ -48,12 +48,9 @@
                         <th class="text-right col-3">Akumulasi Jam :</th>
                         <td class="col-9">{{ $jamKompen->akumulasi_jam }}</td>
                     </tr>
-
-
                 </table>
-                <div class="alert" style="background-color: #9BC4E2; color: #fff; border: 1px solid #7FAFC8;">
-                    <h5><i class="icon fas fa-list"></i> Detail</h5>
-                </div>
+
+                <div class="alert" style="background-color: #9BC4E2; color: #fff; border: 1px solid #7FAFC8;"><i class="icon fas fa-list"></i> Detail</div>
                 <table class="table table-sm table-bordered">
                     <thead>
                         <tr>
@@ -72,8 +69,6 @@
                             </tr>
                         @endforeach
                     </tbody>
-
-
                 </table>
             </div>
         </div>
