@@ -126,73 +126,89 @@ class MahasiswaController extends Controller
     }
     public function edit_ajax($id)
     {
+        // Fetch data related to the specific jamKompen
         $jamKompen = jamKompenModel::with('detail_jamKompen', 'user', 'periode')->find($id);
+        if (!$jamKompen) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Data tidak ditemukan',
+            ], 404);
+        }
+    
+        // Fetch dropdown data
         $periode = PeriodeModel::select('periode_id', 'periode_nama')->get();
         $user = UserModel::select('user_id', 'nama', 'username')->where('level_id', 3)->get();
         $matkul = MatkulModel::all();
-
-
+    
+        // Pass data to view
         return view('mahasiswa.edit_ajax', compact('jamKompen', 'periode', 'user', 'matkul'));
     }
-
-public function update_ajax(Request $request, $id)
-{
-    $validator = Validator::make($request->all(), [
-        'user_id' => 'required|integer',
-        'periode_id' => 'required|integer',
-        'matkul_id' => 'required|array|min:1',
-        'matkul_id.*' => 'required|integer',
-        'jumlah_jam' => 'required|array|min:1',
-        'jumlah_jam.*' => 'required|integer',
-    ]);
-
-    if ($validator->fails()) {
-        return response()->json([
-            'status' => false,
-            'message' => 'Validasi gagal',
-            'errors' => $validator->errors(),
-        ], 422);
-    }
-
-    $jamKompen = jamKompenModel::find($id);
-    if (!$jamKompen) {
-        return response()->json([
-            'status' => false,
-            'message' => 'Data tidak ditemukan',
-        ], 404);
-    }
-
-    DB::beginTransaction();
-    try {
-        $jamKompen->update([
-            'user_id' => $request->user_id,
-            'periode_id' => $request->periode_id,
+    
+    public function update_ajax(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'user_id' => 'required|integer',
+            'periode_id' => 'required|integer',
+            'matkul_id' => 'required|array|min:1',
+            'matkul_id.*' => 'required|integer|min:1',
+            'jumlah_jam' => 'required|array|min:1',
+            'jumlah_jam.*' => 'required|integer|min:1',
         ]);
-
-        $jamKompen->details()->delete();
-        foreach ($request->matkul_id as $index => $matkul) {
-            detail_jamKompenModel::create([
-                'jam_kompen_id' => $jamKompen->jam_kompen_id,
-                'matkul_id' => $matkul,
-                'jumlah_jam' => $request->jumlah_jam[$index],
-            ]);
+    
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Validasi gagal',
+                'errors' => $validator->errors(),
+            ], 422);
         }
-
-        DB::commit();
-        return response()->json([
-            'status' => true,
-            'message' => 'Data berhasil diperbarui',
-        ]);
-    } catch (\Exception $e) {
-        DB::rollBack();
-        return response()->json([
-            'status' => false,
-            'message' => 'Terjadi kesalahan saat memperbarui data',
-            'errors' => $e->getMessage(),
-        ], 500);
+    
+        $jamKompen = jamKompenModel::find($id);
+        if (!$jamKompen) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Data tidak ditemukan',
+            ], 404);
+        }
+    
+        DB::beginTransaction();
+        try {
+            // Update the main record
+            $jamKompen->update([
+                'user_id' => $request->user_id,
+                'periode_id' => $request->periode_id,
+            ]);
+    
+            // Recalculate akumulasi_jam
+            $akumulasi_jam = array_sum($request->jumlah_jam);
+            $jamKompen->update(['akumulasi_jam' => $akumulasi_jam]);
+    
+            // Delete existing details and recreate them
+            $jamKompen->detail_jamKompen()->delete();
+            foreach ($request->matkul_id as $index => $matkul) {
+                detail_jamKompenModel::create([
+                    'jam_kompen_id' => $jamKompen->jam_kompen_id,
+                    'matkul_id' => $matkul,
+                    'jumlah_jam' => $request->jumlah_jam[$index],
+                ]);
+            }
+    
+            DB::commit();
+            return response()->json([
+                'status' => true,
+                'message' => 'Data berhasil diperbarui',
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'status' => false,
+                'message' => 'Terjadi kesalahan saat memperbarui data',
+                'errors' => $e->getMessage(),
+            ], 500);
+        }
     }
-}
-
+    
+    
 
     public function show_ajax(string $id)
     {
@@ -363,50 +379,42 @@ public function update_ajax(Request $request, $id)
     public function export_excel()
     {
         // Ambil data jam kompen dan detailnya
-        $jamKompen = jamKompenModel::with('detail_jamKompen.matkul')->orderBy('periode_id')->get();
+        $jamKompen = jamKompenModel::select('jam_kompen_id', 'user_id', 'periode_id', 'akumulasi_jam')
+            ->with(['detail_jamKompen.matkul']) // Pastikan relasi sudah terdefinisi
+            ->orderBy('periode_id')
+            ->get();
 
-        // Load library Excel
+        // Load library excel
         $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet(); // Ambil sheet yang aktif
 
-        // Set header untuk file Excel
+        // Set header untuk penjualan
         $sheet->setCellValue('A1', 'No');
-        $sheet->setCellValue('B1', 'User ID');
-        $sheet->setCellValue('C1', 'Periode ID');
+        $sheet->setCellValue('B1', 'Username');
+        $sheet->setCellValue('C1', 'Periode');
         $sheet->setCellValue('D1', 'Akumulasi Jam');
-        $sheet->setCellValue('E1', 'Matkul ID');
+        $sheet->setCellValue('E1', 'Mata Kuliah');
         $sheet->setCellValue('F1', 'Jumlah Jam');
 
         $sheet->getStyle('A1:F1')->getFont()->setBold(true); // Bold header
 
-        $no = 1;
-        $baris = 2; // Baris data dimulai dari baris ke-2
+        $no = 1;  // Nomor data dimulai dari 1
+        $baris = 2; // Baris data dimulai dari baris ke 2
 
-        // Loop untuk setiap jam kompen
+        // Loop untuk setiap penjualan
         foreach ($jamKompen as $kompen) {
-            $matkulIds = [];
-            $jumlahJams = [];
-
-            // Ambil data matkul_id dan jumlah_jam dari detail
+            // Loop untuk setiap detail penjualan
             foreach ($kompen->detail_jamKompen as $detail) {
-                $matkulIds[] = $detail->matkul_id;
-                $jumlahJams[] = $detail->jumlah_jam;
+                $sheet->setCellValue('A' . $baris, $no);
+                $sheet->setCellValue('B' . $baris, $kompen->user->username ); 
+                $sheet->setCellValue('C' . $baris, $kompen->periode->periode_nama ) ; 
+                $sheet->setCellValue('D' . $baris, $kompen->akumulasi_jam ); 
+                $sheet->setCellValue('E' . $baris, $detail->matkul->matkul_nama ); 
+                $sheet->setCellValue('F' . $baris, $detail->jumlah_jam); 
+
+                $baris++;
+                $no++;
             }
-
-            // Gabungkan matkul_id dan jumlah_jam menjadi string (dipisahkan dengan koma)
-            $matkulIdsStr = implode(',', $matkulIds);
-            $jumlahJamsStr = implode(',', $jumlahJams);
-
-            // Isi data ke dalam Excel
-            $sheet->setCellValue('A' . $baris, $no);
-            $sheet->setCellValue('B' . $baris, $kompen->user_id); // User ID
-            $sheet->setCellValue('C' . $baris, $kompen->periode_id); // Periode ID
-            $sheet->setCellValue('D' . $baris, $kompen->akumulasi_jam); // Akumulasi Jam
-            $sheet->setCellValue('E' . $baris, $matkulIdsStr); // Matkul ID
-            $sheet->setCellValue('F' . $baris, $jumlahJamsStr); // Jumlah Jam
-
-            $baris++;
-            $no++;
         }
 
         // Set auto size untuk kolom
@@ -415,13 +423,12 @@ public function update_ajax(Request $request, $id)
         }
 
         // Set title sheet
-        $sheet->setTitle('Data Jam Kompen');
+        $sheet->setTitle('Data Mahasiswa Kompensasi');
 
-        // Generate file Excel
         $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
-        $filename = 'Data_Jam_Kompen_' . date('Y-m-d_H-i-s') . '.xlsx';
+        $filename = 'Data Mahasiswa Kompensasi ' . date('Y-m-d H:i:s') . '.xlsx';
 
-        // Pengaturan header untuk download file Excel
+        // Pengaturan header untuk download file excel
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment; filename="' . $filename . '"');
         header('Cache-Control: max-age=0');
@@ -433,6 +440,7 @@ public function update_ajax(Request $request, $id)
 
         $writer->save('php://output');
         exit;
+
     }
     public function export_pdf()
     {

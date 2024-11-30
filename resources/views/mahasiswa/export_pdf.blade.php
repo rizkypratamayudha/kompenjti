@@ -77,9 +77,9 @@
             <tr>
                 <th class="text-center">No</th>
                 <th>Username</th>
-                <th>Periode Nama</th>
+                <th>Periode</th>
                 <th>Akumulasi Jam</th>
-                <th>Matkul Nama</th>
+                <th>Mata Kuliah</th>
                 <th>Jumlah Jam</th>
             </tr>
         </thead>

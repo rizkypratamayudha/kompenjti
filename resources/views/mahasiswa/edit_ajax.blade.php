@@ -1,15 +1,16 @@
 @empty($jamKompen)
-    <div id="modal-master" class="modal-dialog modal-lg" role="document">
+    <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLabel">Kesalahan</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
-                        aria-hidden="true">&times;</span></button>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
             <div class="modal-body">
                 <div class="alert alert-danger">
                     <h5><i class="icon fas fa-ban"></i> Kesalahan!!!</h5>
-                    Data yang anda cari tidak ditemukan
+                    Data yang Anda cari tidak ditemukan.
                 </div>
                 <a href="{{ url('/mahasiswa') }}" class="btn btn-warning">Kembali</a>
             </div>
@@ -19,33 +20,40 @@
     <form action="{{ url('/mahasiswa/' . $jamKompen->jam_kompen_id . '/update_ajax') }}" method="POST" id="form-edit-mahasiswa">
         @csrf
         @method('PUT')
-        <div id="modal-master" class="modal-dialog modal-lg" role="document">
+        <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Edit Data Mahasiswa Kompensasi</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
-                            aria-hidden="true">&times;</span></button>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
                 <div class="modal-body">
+                    <!-- NIM -->
                     <div class="form-group">
-                        <label>NIM</label>
+                        <label for="user_id">NIM</label>
                         <select name="user_id" id="user_id" class="form-control" required>
                             <option value="">- Pilih Mahasiswa -</option>
                             @foreach($user as $u)
-                                <option value="{{ $u->user_id }}" data-nama="{{ $u->nama }}" 
-                                    {{ $jamKompen->user_id == $u->user_id ? 'selected' : '' }}>
+                                <option value="{{ $u->user_id }}" 
+                                    {{ $jamKompen->user_id == $u->user_id ? 'selected' : '' }}
+                                    data-nama="{{ $u->nama }}">
                                     {{ $u->username }}
                                 </option>
                             @endforeach
                         </select>
-                        <small id="error-user_id" class="error-text form-text text-danger"></small>
+                        <small id="error-user_id" class="form-text text-danger"></small>
                     </div>
+
+                    <!-- Nama -->
                     <div class="form-group">
-                        <label>Nama</label>
+                        <label for="nama">Nama</label>
                         <input type="text" name="nama" id="nama" class="form-control" value="{{ $jamKompen->user->nama }}" readonly>
                     </div>
+
+                    <!-- Periode -->
                     <div class="form-group">
-                        <label>Periode</label>
+                        <label for="periode_id">Periode</label>
                         <select name="periode_id" id="periode_id" class="form-control" required>
                             <option value="">- Pilih Periode -</option>
                             @foreach($periode as $p)
@@ -54,8 +62,10 @@
                                 </option>
                             @endforeach
                         </select>
-                        <small id="error-periode_id" class="error-text form-text text-danger"></small>
+                        <small id="error-periode_id" class="form-text text-danger"></small>
                     </div>
+
+                    <!-- Mata Kuliah -->
                     <div class="form-group">
                         <label>Mata Kuliah</label>
                         <div class="d-flex align-items-center mb-2">
@@ -73,7 +83,7 @@
                                 </tr>
                             </thead>
                             <tbody id="mata-kuliah-rows">
-                                @foreach($jamKompen->details as $index => $detail)
+                                @foreach($jamKompen->detail_jamKompen as $index => $detail)
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
                                         <td>
@@ -87,148 +97,152 @@
                                                 @endforeach
                                             </select>
                                         </td>
-                                        <td><input type="number" name="jumlah_jam[]" class="form-control jumlah-jam" value="{{ $detail->jumlah_jam }}" required></td>
-                                        <td><button type="button" class="btn btn-danger btn-sm remove-row">Hapus</button></td>
+                                        <td>
+                                            <input type="number" name="jumlah_jam[]" class="form-control jumlah-jam" 
+                                                value="{{ $detail->jumlah_jam }}" required>
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn btn-danger btn-sm remove-row">Hapus</button>
+                                        </td>
                                     </tr>
                                 @endforeach
                             </tbody>
                         </table>
                     </div>
+
+                    <!-- Akumulasi Jam -->
                     <div class="form-group">
-                        <label>Akumulasi Jam Kompensasi</label>
-                        <input type="number" name="akumulasi_jam" id="akumulasi_jam" class="form-control" value="{{ $jamKompen->akumulasi_jam }}" readonly>
+                        <label for="akumulasi_jam">Akumulasi Jam</label>
+                        <input type="number" name="akumulasi_jam" id="akumulasi_jam" class="form-control" 
+                            value="{{ $jamKompen->akumulasi_jam }}" readonly>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" data-dismiss="modal" class="btn btn-warning">Batal</button>
+                    <button type="button" class="btn btn-warning" data-dismiss="modal">Batal</button>
                     <button type="submit" class="btn btn-primary">Simpan</button>
                 </div>
             </div>
         </div>
     </form>
+
+    <!-- Javascript -->
     <script>
         $(document).ready(function () {
-            $(document).ready(function () {
-    // Menyimpan referensi elemen penting
-    const $mataKuliahRows = $("#mata-kuliah-rows");
-    const $akumulasiJam = $("#akumulasi_jam");
-
-    // Fungsi untuk menghitung total akumulasi jam
-    function hitungAkumulasiJam() {
-        let totalJam = 0;
-        $(".jumlah-jam").each(function () {
-            const jam = parseInt($(this).val());
-            if (!isNaN(jam)) {
-                totalJam += jam;
-            }
-        });
-        $akumulasiJam.val(totalJam);
-    }
-
-    // Tambah baris mata kuliah
-    $("#add-row").on("click", function () {
-        const rowCount = $mataKuliahRows.find("tr").length + 1;
-        const newRow = `
-            <tr>
-                <td>${rowCount}</td>
-                <td>
-                    <select name="matkul_id[]" class="form-control mata-kuliah-select" required>
-                        <option value="">- Pilih Mata Kuliah -</option>
-                        ${$("#matkul-template").html()}
-                    </select>
-                </td>
-                <td>
-                    <input type="number" name="jumlah_jam[]" class="form-control jumlah-jam" min="1" value="0" required>
-                </td>
-                <td>
-                    <button type="button" class="btn btn-danger btn-sm remove-row">Hapus</button>
-                </td>
-            </tr>`;
-        $mataKuliahRows.append(newRow);
-    });
-
-    // Hapus baris mata kuliah
-    $mataKuliahRows.on("click", ".remove-row", function () {
-        $(this).closest("tr").remove();
-        hitungAkumulasiJam(); // Hitung ulang akumulasi setelah baris dihapus
-    });
-
-    // Hitung ulang akumulasi saat jumlah jam diubah
-    $mataKuliahRows.on("input", ".jumlah-jam", function () {
-        hitungAkumulasiJam();
-    });
-
-    // Autofill nama mahasiswa berdasarkan NIM yang dipilih
-    $("#user_id").on("change", function () {
-        const nama = $(this).find("option:selected").data("nama");
-        $("#nama").val(nama);
-    });
-
-    // Validasi dan pengiriman form menggunakan AJAX
-    $("#form-edit-mahasiswa").validate({
-        rules: {
-            user_id: { required: true },
-            periode_id: { required: true },
-            "matkul_id[]": { required: true },
-            "jumlah_jam[]": { required: true, min: 1 },
-        },
-        submitHandler: function (form) {
-            const $form = $(form);
-            $.ajax({
-                url: $form.attr("action"),
-                type: $form.attr("method"),
-                data: $form.serialize(),
-                success: function (response) {
-                    if (response.status) {
-                        $("#myModal").modal("hide");
-                        Swal.fire({
-                            icon: "success",
-                            title: "Berhasil",
-                            text: response.message,
-                        });
-                        // Reload tabel atau data setelah sukses
-                        dataMahasiswa.ajax.reload();
-                    } else {
-                        $(".error-text").text("");
-                        if (response.errors) {
-                            $.each(response.errors, function (key, val) {
-                                $(`#error-${key}`).text(val[0]);
-                            });
-                        }
-                        Swal.fire({
-                            icon: "error",
-                            title: "Gagal",
-                            text: response.message,
-                        });
+            const $mataKuliahRows = $("#mata-kuliah-rows");
+            const $akumulasiJam = $("#akumulasi_jam");
+    
+            function hitungAkumulasiJam() {
+                let total = 0;
+                $(".jumlah-jam").each(function () {
+                    const val = parseInt($(this).val());
+                    if (!isNaN(val)) {
+                        total += val;
                     }
+                });
+                $akumulasiJam.val(total);
+            }
+    
+            // Add row functionality
+            $("#add-row").on("click", function () {
+                const index = $mataKuliahRows.children().length + 1;
+                const newRow = `
+                    <tr>
+                        <td>${index}</td>
+                        <td>
+                            <select name="matkul_id[]" class="form-control mata-kuliah-select" required>
+                                <option value="">- Pilih Mata Kuliah -</option>
+                                @foreach($matkul as $m)
+                                    <option value="{{ $m->matkul_id }}">{{ $m->matkul_nama }}</option>
+                                @endforeach
+                            </select>
+                        </td>
+                        <td>
+                            <input type="number" name="jumlah_jam[]" class="form-control jumlah-jam" min="1" value="0" required>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-danger btn-sm remove-row">Hapus</button>
+                        </td>
+                    </tr>`;
+                $mataKuliahRows.append(newRow);
+            });
+    
+            // Remove row functionality
+            $mataKuliahRows.on("click", ".remove-row", function () {
+                $(this).closest("tr").remove();
+                hitungAkumulasiJam();
+            });
+    
+            // Recalculate total hours on input change
+            $mataKuliahRows.on("input", ".jumlah-jam", hitungAkumulasiJam);
+    
+            // Submit form via AJAX
+            $("#form-edit-mahasiswa").validate({
+                rules: {
+                    user_id: { required: true },
+                    periode_id: { required: true },
+                    "matkul_id[]": { required: true },
+                    "jumlah_jam[]": { required: true, min: 1 },
                 },
-                error: function (xhr) {
-                    Swal.fire({
-                        icon: "error",
-                        title: "Kesalahan Server",
-                        text: "Terjadi kesalahan saat memproses permintaan.",
+                submitHandler: function (form) {
+                    const $form = $(form);
+                    $.ajax({
+                        url: $form.attr("action"),
+                        type: $form.attr("method"),
+                        data: $form.serialize(),
+                        success: function (response) {
+                            if (response.status) {
+                                // Close the modal on success
+                                $("#myModal").modal("hide");
+                                
+                                // Show success message using SweetAlert
+                                Swal.fire({
+                                    icon: "success",
+                                    title: "Berhasil",
+                                    text: response.message,
+                                });
+    
+                                // Reload the data table or reload the page
+                                dataMahasiswa.ajax.reload(); // Assuming you're using DataTables
+    
+                                // Or you can redirect or refresh the page like this:
+                                // window.location.reload(); // Reload page if needed
+                            } else {
+                                $(".error-text").text("");
+                                if (response.errors) {
+                                    $.each(response.errors, function (key, val) {
+                                        $(`#error-${key}`).text(val[0]);
+                                    });
+                                }
+                                Swal.fire({
+                                    icon: "error",
+                                    title: "Gagal",
+                                    text: response.message,
+                                });
+                            }
+                        },
+                        error: function (xhr) {
+                            Swal.fire({
+                                icon: "error",
+                                title: "Kesalahan Server",
+                                text: "Terjadi kesalahan saat memproses permintaan.",
+                            });
+                        },
                     });
+                    return false;
+                },
+                errorElement: "span",
+                errorPlacement: function (error, element) {
+                    error.addClass("invalid-feedback");
+                    element.closest(".form-group").append(error);
+                },
+                highlight: function (element) {
+                    $(element).addClass("is-invalid");
+                },
+                unhighlight: function (element) {
+                    $(element).removeClass("is-invalid");
                 },
             });
-            return false;
-        },
-        errorElement: "span",
-        errorPlacement: function (error, element) {
-            error.addClass("invalid-feedback");
-            element.closest(".form-group").append(error);
-        },
-        highlight: function (element) {
-            $(element).addClass("is-invalid");
-        },
-        unhighlight: function (element) {
-            $(element).removeClass("is-invalid");
-        },
-    });
-
-    // Hitung akumulasi jam saat halaman dimuat
-    hitungAkumulasiJam();
-});
-
         });
     </script>
+    
 @endempty
