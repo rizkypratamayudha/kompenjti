@@ -11,11 +11,25 @@
         </div>
         <div class="card-body">
             @if (session('success'))
-                <div class="alert alert-success">{{ session('success') }}</div>
+                <script>
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Sukses',
+                        text: '{{ session('success') }}',
+                        showConfirmButton: true
+                    });
+                </script>
             @endif
 
             @if (session('error'))
-                <div class="alert alert-danger">{{ session('error') }}</div>
+                <script>
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Terjadi Kesalahan',
+                        text: '{{ session('error') }}',
+                        showConfirmButton: true
+                    });
+                </script>
             @endif
 
             <div class="row">
@@ -52,6 +66,13 @@
                                     onclick="modalAction('{{ 'dosen/' . $item->pekerjaan_id . '/edit_ajax' }}')">
                                     <i class="fa-solid fa-gear" style="color: #ffffff;"></i>
                                 </button>
+
+                                @if ($item->akumulasi_deadline == null)
+                                <a href="{{ url('dosen/' . $item->pekerjaan_id . '/mulai') }}" class="btn btn-success btn-sm ml-2">
+                                    <i class="fas fa-play-circle"></i> Mulai
+                                </a>
+                                @endif
+
                             </div>
                             <div class="card-body">
                                 <p class="card-text">
@@ -63,9 +84,9 @@
                                     {{ $item->detail_pekerjaan->deskripsi_tugas }}
                                 </p>
                                 <div class="d-flex justify-content-between align-items-center">
-                                    <small class="text-muted">
+                                    <small class="text" style="color: #ff0000">
                                         Jumlah Pelamar:
-                                        <span id="notif-pelamar-{{ $item->pekerjaan_id }}">0</span>
+                                        <span id="notif-pelamar-{{ $item->pekerjaan_id }}" style="color: #ff0000">0</span>
                                     </small>
                                     <small class="text-muted">Jumlah Anggota:
                                         <span id="jumlah-anggota-{{ $item->pekerjaan_id }}">0</span> /
@@ -97,6 +118,8 @@
     @endpush
 
     @push('js')
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
         <script>
             function modalAction(url = '') {
                 $('#myModal').load(url, function() {
@@ -121,23 +144,18 @@
                 });
             }
 
-            // Memuat data jumlah pelamar untuk setiap pekerjaan
             $(document).ready(function() {
                 @foreach ($tugas as $item)
                     loadPelamarCount({{ $item->pekerjaan_id }});
                 @endforeach
             });
 
-
-
-            // Fungsi untuk memuat jumlah anggota
             function loadAnggota(pekerjaanId) {
                 $.ajax({
                     url: '{{ url('/pekerjaan') }}/' + pekerjaanId + '/get-anggota',
                     method: 'GET',
                     success: function(response) {
                         if (response.status) {
-                            // Update jumlah anggota di elemen HTML
                             $('#jumlah-anggota-' + pekerjaanId).text(response.anggotaJumlah);
                         } else {
                             console.error('Gagal memuat jumlah anggota untuk pekerjaan ID: ' + pekerjaanId);
@@ -149,10 +167,9 @@
                 });
             }
 
-            // Periksa status Apply dan jumlah anggota untuk setiap pekerjaan saat halaman dimuat
             $(document).ready(function() {
                 @foreach ($tugas as $item)
-                    loadAnggota({{ $item->pekerjaan_id }}); // Memuat jumlah anggota untuk setiap pekerjaan
+                    loadAnggota({{ $item->pekerjaan_id }});
                 @endforeach
             });
         </script>

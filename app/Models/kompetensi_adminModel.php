@@ -16,4 +16,6 @@ class kompetensi_adminModel extends Model
     {
         return $this->belongsTo(kompetensiModel::class, 'kompetensi_admin_id');
     }
+
+    
 }

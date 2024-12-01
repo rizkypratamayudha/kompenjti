@@ -37,7 +37,11 @@ Route::post('register', [RegisterController::class, 'store']);
 Route::post('logout', [AuthController::class, 'logout'])->middleware('auth');
 
 Route::middleware(['auth'])->group(function () {
-    Route::get('/', [welcomeController::class, 'index']);
+    Route::get('/', [welcomeController::class, 'index'])->middleware('authorize:ADM');
+    Route::get('/dashboardMhs', [welcomeController::class, 'mahasiswa'])->middleware('authorize:MHS');
+    Route::get('/dashboardDos', [welcomeController::class, 'dosen'])->middleware('authorize:DSN');
+    Route::get('/dashboardKap', [welcomeController::class, 'kaprodi'])->middleware('authorize:KPD');
+
 
     Route::group(['prefix'=>'profile'], function(){
         Route::get('/edit', [UserController::class, 'profile']);
@@ -96,6 +100,10 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/{id}/delete_ajax', [MahasiswaController::class, 'confirm_ajax']);
         Route::delete('/{id}/delete_ajax', [MahasiswaController::class, 'delete_ajax']);
         Route::get('/{id}/show_ajax', [MahasiswaController::class, 'show_ajax']);
+        Route::get('/import', [MahasiswaController::class, 'import']); // ajax form upload excel
+        Route::post('/import_ajax', [MahasiswaController::class, 'import_ajax']); // ajax import excel
+        Route::get('/export_excel', [MahasiswaController::class, 'export_excel']); // ajax exsport excel
+        Route::get('/export_pdf', [MahasiswaController::class, 'export_pdf']);// export pdf
     });
     Route::group(['prefix' => 'periode','middleware' => 'authorize:ADM'],function(){
         Route::get('/',[PeriodeController::class,'index']);
@@ -152,7 +160,7 @@ Route::middleware(['auth'])->group(function () {
 
     // DOSENNN
     Route::group(['prefix'=> 'dosen'], function () {
-        Route::get('/', [PekerjanController::class, 'index']);
+        Route::get('/', [PekerjanController::class, 'index'])->name('dosen.index');
         Route::get('/create_ajax', [PekerjanController::class, 'create_ajax']);
         Route::post('/ajax', [PekerjanController::class, 'store_ajax']);
         Route::get('/{id}/edit_ajax', [PekerjanController::class, 'edit_ajax']);
@@ -169,7 +177,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('kick-pekerjaan',[PekerjanController::class,'kickPekerjaan']);
         Route::get('/{id}/lihat-pekerjaan',[PekerjanController::class,'lihatPekerjaan']);
         Route::get('/{id}/hitung-notif', [PekerjanController::class, 'hitung_notif_pelamar']);
-
+        Route::get('/{id}/mulai',[PekerjanController::class,'mulai']);
     });
 
     // MAHASISWAA
@@ -185,7 +193,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/{id}/show_ajax', [ListPekerjaanMHSController::class, 'show_ajax']);
         Route::post('/apply',[ListPekerjaanMHSController::class,'apply']);
         Route::get('/check-if-applied', [ListPekerjaanMHSController::class, 'checkIfApplied'])->name('checkIfApplied');
-        Route::get('/{id}/get-anggota',[ListPekerjaanMHSController::class,'get_anggota']);
+
     });
     Route::group(['prefix' => 'kompetensi','middleware' => 'authorize:MHS'],function(){
         Route::get('/',[KompetensiController::class,'index']);
@@ -201,11 +209,15 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/{id}/riwayatmhs',[riwayatController::class,'enter_pekerjaan']);
         Route::get('/{id}/show_ajax',[riwayatController::class,'show_ajax']);
         Route::get('/riwayatmhs/{id}/enter-progres', [riwayatController::class, 'enter_progres']);
+        Route::get('/{id}/link_ajax', [riwayatController::class,'link_ajax']);
+        Route::get('{id}/gambar_ajax', [riwayatController::class,'gambar_ajax']);
+        Route::get('{id}/file_ajax', [riwayatController::class,'file_ajax']);
     });
 
     // NOTIFFF
     Route::get('/hitung-notif', [ValidasiController::class, 'hitung_notif']);
     Route::get('/hitung-notif-pelamar', [ValidasiController::class, 'hitung_notif_pelamar']);
+    Route::get('pekerjaan/{id}/get-anggota',[ListPekerjaanMHSController::class,'get_anggota']);
 });
 
 

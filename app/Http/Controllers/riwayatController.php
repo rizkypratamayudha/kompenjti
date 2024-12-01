@@ -60,7 +60,22 @@ class riwayatController extends Controller
         ];
 
         $activeMenu = 'riwayatMhs';
-        $progres = ProgresModel::with('pekerjaan','pekerjaan.detail_pekerjaan','pekerjaan.user')->find( $id );  
+        $progres = ProgresModel::with('pekerjaan','pekerjaan.detail_pekerjaan','pekerjaan.user')->find( $id );
         return view('riwayatMHS.progres',['breadcrumb'=>$breadcrumb,'activeMenu'=>$activeMenu,'progres'=>$progres,'page'=>$page]);
+    }
+
+    public function link_ajax($id){
+        $progres = ProgresModel::with('pekerjaan','pekerjaan.detail_pekerjaan','pekerjaan.user')->find( $id );
+        return view('riwayatMHS.link_ajax',['progres'=>$progres]);
+    }
+
+    public function gambar_ajax($id){
+        $progres = ProgresModel::with('pekerjaan','pekerjaan.detail_pekerjaan','pekerjaan.user')->find( $id );
+        return view('riwayatMHS.gambar_ajax',['progres'=>$progres]);
+    }
+
+    public function file_ajax($id){
+        $progres = ProgresModel::with('pekerjaan','pekerjaan.detail_pekerjaan','pekerjaan.user')->find( $id );
+        return view('riwayatMHS.file_ajax',['progres'=>$progres]);
     }
 }

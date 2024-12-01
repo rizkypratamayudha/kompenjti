@@ -15,6 +15,7 @@ use App\Models\PeriodeModel;
 use App\Models\PersyaratanModel;
 use App\Models\ProgresModel;
 use App\Models\UserModel;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -406,4 +407,51 @@ class PekerjanController extends Controller
         $jumlah = PendingPekerjaanModel::where('pekerjaan_id', $id)->count();
         return response()->json(['jumlah' => $jumlah]);
     }
+
+    public function mulai($id)
+{
+    // Ambil data pekerjaan berdasarkan ID
+    $pekerjaan = PekerjaanModel::find($id);
+
+    if (!$pekerjaan) {
+        return redirect()->route('dosen.index')->with('error', 'Pekerjaan tidak ditemukan.');
+    }
+
+    // Ambil data progres berdasarkan pekerjaan_id dan urutkan
+    $progresList = ProgresModel::where('pekerjaan_id', $id)->orderBy('progres_id')->get();
+
+    if ($progresList->isEmpty()) {
+        return redirect()->route('dosen.index')->with('error', 'Tidak ada progres untuk pekerjaan ini.');
+    }
+
+    // Inisialisasi deadline pertama dari progres pertama
+    $deadlinepertama = Carbon::parse($progresList->first()->updated_at);
+    $akumulasiDeadline = $deadlinepertama; // Untuk menyimpan total akumulasi deadline
+
+    // Iterasi setiap progres untuk memperbarui deadline dan menghitung akumulasi deadline
+    foreach ($progresList as $progres) {
+        // Mengambil jumlah hari dari setiap progres
+        $hari = $progres->hari;
+
+        // Menambahkan hari ke deadline
+        $deadlineBaru = $deadlinepertama->copy()->addDays($hari);
+
+        // Update deadline untuk progres ini
+        $progres->update([
+            'deadline' => $deadlineBaru,
+        ]);
+
+        // Set deadline pertama untuk progres berikutnya
+        $deadlinepertama = $deadlineBaru;
+    }
+
+    // Update akumulasi_deadline pada tabel pekerjaan (berisi deadline terakhir)
+    $pekerjaan->update([
+        'akumulasi_deadline' => $deadlinepertama,  // Menggunakan deadline terakhir
+    ]);
+
+    // Kirimkan pesan sukses melalui session
+    return redirect()->route('dosen.index')->with('success', 'Pekerjaan telah dimulai, semua progres sudah diperbarui!');
+}
+
 }

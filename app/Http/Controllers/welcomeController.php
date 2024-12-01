@@ -18,4 +18,35 @@ class welcomeController extends Controller
     return view('welcome', ['breadcrumb'=>$breadcrumb,'activeMenu'=>$activeMenu]);
     }
 
+    public function mahasiswa(){
+        $breadcrumb = (object)[
+            'title'=>'Selamat Datang',
+            'list'=>['Home','Dashboard Mahasiswa']
+        ];
+
+        $activeMenu = 'dashboardMhs';
+
+        return view('mahasiswa.dashboard',['breadcrumb'=>$breadcrumb,'activeMenu'=>$activeMenu]);
+    }
+    public function dosen(){
+        $breadcrumb = (object)[
+            'title'=>'Selamat Datang',
+            'list'=>['Home','Dashboard Dosen']
+        ];
+
+        $activeMenu = 'dashboardDos';
+
+        return view('dosen.dashboard',['breadcrumb'=>$breadcrumb,'activeMenu'=>$activeMenu]);
+    }
+    public function kaprodi(){
+        $breadcrumb = (object)[
+            'title'=>'Selamat Datang',
+            'list'=>['Home','Dashboard Kaprodi']
+        ];
+
+        $activeMenu = 'dashboardKap';
+
+        return view('kaprodi.dashboard',['breadcrumb'=>$breadcrumb,'activeMenu'=>$activeMenu]);
+    }
+
 }

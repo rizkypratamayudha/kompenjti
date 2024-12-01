@@ -64,6 +64,10 @@ Route::middleware(['auth:api'])->group(function () {
 
     Route::group(['prefix' => 'pekerjaan'], function(){
         Route::get('/',[PekerjaanController::class,'index']);
-        Route::post('/store',[PekerjaanController::class,'store']);
+        Route::post('/apply',[PekerjaanController::class,'apply']);
+    });
+
+    Route::group(['prefix' => 'dosen'], function(){
+        Route::get('/{id}/pelamaran',[PekerjaanController::class,'getPelamaran']);
     });
 });

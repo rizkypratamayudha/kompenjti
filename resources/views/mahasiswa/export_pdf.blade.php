@@ -71,24 +71,35 @@
         </tr> 
     </table> 
  
-    <h3 class="text-center">LAPORAN DATA LEVEL</h3> 
-    <table class="border-all"> 
-        <thead> 
-            <tr> 
-                <th class="text-center">No</th> 
-                <th>Kode Level</th> 
-                <th>Nama Level</th> 
-            </tr> 
-        </thead>  
-        <tbody> 
-            @foreach($level as $l) 
-            <tr> 
-                <td class="text-center">{{ $loop->iteration }}</td> 
-                <td>{{ $l->kode_level }}</td> 
-                <td>{{ $l->level_nama }}</td> 
-            </tr> 
-            @endforeach 
+    <h3 class="text-center">LAPORAN DATA MAHASISWA KOMPENSASI</h3> 
+    <table class="border-all">
+        <thead>
+            <tr>
+                <th class="text-center">No</th>
+                <th>Username</th>
+                <th>Periode</th>
+                <th>Akumulasi Jam</th>
+                <th>Mata Kuliah</th>
+                <th>Jumlah Jam</th>
+            </tr>
+        </thead>
+        <tbody>
+            @php $no = 1; @endphp
+            @foreach ($jamKompen as $kompen)
+                @foreach ($kompen->detail_jamKompen as $key => $detail)
+                <tr>
+                    @if ($key == 0)
+                        <td rowspan="{{ count($kompen->detail_jamKompen) }}" class="text-center">{{ $no++ }}</td>
+                        <td rowspan="{{ count($kompen->detail_jamKompen) }}" >{{ $kompen->user->username }}</td>
+                        <td rowspan="{{ count($kompen->detail_jamKompen) }}" >{{ $kompen->periode->periode_nama }}</td>
+                        <td rowspan="{{ count($kompen->detail_jamKompen) }}" >{{ $kompen->akumulasi_jam }}</td>
+                    @endif
+                    <td>{{ $detail->matkul->matkul_nama }}</td>
+                    <td>{{ $detail->jumlah_jam }}</td>
+                </tr>
+                @endforeach
+            @endforeach
         </tbody>
-    </table> 
+    </table>
 </body> 
 </html>

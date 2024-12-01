@@ -5,6 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Login Pengguna</title>
+    <img src="" alt="">
     <!-- Google Font: Source Sans Pro -->
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
@@ -19,107 +20,112 @@
 
     <style>
         body {
-          background: linear-gradient(#050C9C, #3572EF, #3ABEF9, #A7E6FF) !important; /* Gradasi biru */
-          font-family: 'Source Sans Pro', sans-serif;
-          position: relative;
-          overflow: hidden;
+            background: linear-gradient(#050C9C, #3572EF, #3ABEF9, #A7E6FF) !important;
+            /* Gradasi biru */
+            font-family: 'Source Sans Pro', sans-serif;
+            position: relative;
+            overflow: hidden;
         }
-      
+
         /* Adding background image with blur */
         body::before {
-          content: "";
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background: url('download.jpeg') no-repeat center center;
-          background-size: cover;
-          filter: blur(15px); /* Apply blur to the background image */
-          z-index: 1;
-          opacity: 0.5; /* Adjust opacity to blend with gradient */
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('download.jpeg') no-repeat center center;
+            background-size: cover;
+            filter: blur(15px);
+            /* Apply blur to the background image */
+            z-index: 1;
+            opacity: 0.5;
+            /* Adjust opacity to blend with gradient */
         }
-      
+
         .login-box {
-          position: relative;
-          z-index: 2; /* Ensures the form appears above the background */
-          width: 400px;
-          margin: 80px auto;
+            position: relative;
+            z-index: 2;
+            /* Ensures the form appears above the background */
+            width: 400px;
+            margin: 80px auto;
         }
-      
+
         .card {
-          border-radius: 15px;
-          box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.2);
         }
-      
+
         .card-header {
-          background: linear-gradient(135deg, #0077B6, #023E8A); /* Gradasi biru tua */
-          color: white;
-          font-weight: bold;
-          font-size: 20px;
-          border-radius: 15px 15px 0 0;
+            background: linear-gradient(135deg, #0077B6, #023E8A);
+            /* Gradasi biru tua */
+            color: white;
+            font-weight: bold;
+            font-size: 20px;
+            border-radius: 15px 15px 0 0;
         }
-      
+
         .btn-primary {
-          background: linear-gradient(135deg, #0077B6, #023E8A); /* Gradasi biru untuk tombol */
-          border-color: #00509D;
+            background: linear-gradient(135deg, #0077B6, #023E8A);
+            /* Gradasi biru untuk tombol */
+            border-color: #00509D;
         }
-      
+
         .btn-primary:hover {
-          background: linear-gradient(135deg, #00509D, #004080); /* Gradasi biru lebih gelap untuk hover */
-          border-color: #004080;
+            background: linear-gradient(135deg, #00509D, #004080);
+            /* Gradasi biru lebih gelap untuk hover */
+            border-color: #004080;
         }
-      
+
         .login-box-msg {
-          font-size: 16px;
-          font-weight: bold;
+            font-size: 16px;
+            font-weight: bold;
         }
-      
+
         .form-control {
-          border-radius: 10px;
+            border-radius: 10px;
         }
-      
+
         .input-group-text {
-          border-radius: 0 10px 10px 0;
-          background-color: #EAEAEA;
+            border-radius: 0 10px 10px 0;
+            background-color: #EAEAEA;
         }
-      
+
         .password-toggle {
-          cursor: pointer;
-          color: #495057;
-          background-color: white !important;
-          border-left: none !important;
+            cursor: pointer;
+            color: #495057;
+            background-color: white !important;
+            border-left: none !important;
         }
-      
+
         .password-toggle:hover {
-          color: #0077B6;
+            color: #0077B6;
         }
-      
+
         .input-group .form-control.is-invalid {
-          border-color: #e3342f;
+            border-color: #e3342f;
         }
-      
-        .input-group .form-control.is-invalid ~ .input-group-text {
-          border-color: #e3342f;
+
+        .input-group .form-control.is-invalid~.input-group-text {
+            border-color: #e3342f;
         }
-      
+
         .card-body {
-          padding: 30px;
+            padding: 30px;
         }
-      
+
         /* Additional style for footer link */
         .mb-0 a {
-          color: #0077B6;
-          font-weight: bold;
+            color: #0077B6;
+            font-weight: bold;
         }
-      
+
         .mb-0 a:hover {
-          text-decoration: underline;
-          color: #004080;
+            text-decoration: underline;
+            color: #004080;
         }
-      
-        
-       </style>
+    </style>
 </head>
 
 <body class="hold-transition login-page">
@@ -169,7 +175,7 @@
                 </form>
                 <p class="mb-0 text-center mt-3">
                     <a href="{{ url('/register') }}" class="text-center">Don't have an account? Register now!</a>
-                  </p>
+                </p>
             </div>
             <!-- /.card-body -->
         </div>
