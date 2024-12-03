@@ -104,6 +104,10 @@ class riwayatController extends Controller
             ]);
         }
 
+        if ($progres->deadline && \Carbon\Carbon::now()->greaterThan(\Carbon\Carbon::parse($progres->deadline))) {
+            return response()->json(['status' => false, 'message' => 'Aksi tidak diperbolehkan, deadline sudah terlewati'], 403);
+        }
+
         $pengumpulan = new PengumpulanModel();
         $pengumpulan->progres_id = $request->progres_id;
         $pengumpulan->user_id = Auth::id();
@@ -129,36 +133,63 @@ class riwayatController extends Controller
     }
 
     public function hapus(Request $request, $id)
-{
-    if ($request->ajax() || $request->wantsJson()) {
-        $progres = ProgresModel::with('pengumpulan')->find($id);
-        $pengumpulan = PengumpulanModel::with('progres')->where('progres_id', $id)->first();
+    {
+        if ($request->ajax() || $request->wantsJson()) {
+            $progres = ProgresModel::with('pengumpulan')->find($id);
+            $pengumpulan = PengumpulanModel::with('progres')->where('progres_id', $id)->first();
 
-        if ($progres && $pengumpulan) {
-            try {
-                // Update pengumpulan_id di tabel progres menjadi null
-                $progres->update(['pengumpulan_id' => null]);
+            if ($progres && $pengumpulan) {
+                try {
+                    // Update pengumpulan_id di tabel progres menjadi null
+                    $progres->update(['pengumpulan_id' => null]);
 
-                // Hapus data pengumpulan
-                $pengumpulan->delete();
+                    // Hapus data pengumpulan
+                    $pengumpulan->delete();
 
-                return response()->json([
-                    'status' => true,
-                    'message' => 'Data berhasil dihapus'
-                ]);
-            } catch (\Illuminate\Database\QueryException $e) {
+                    return response()->json([
+                        'status' => true,
+                        'message' => 'Data berhasil dihapus'
+                    ]);
+                } catch (\Illuminate\Database\QueryException $e) {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Data gagal dihapus karena masih terdapat tabel lain yang terkait dengan data ini'
+                    ]);
+                }
+            } else {
                 return response()->json([
                     'status' => false,
-                    'message' => 'Data gagal dihapus karena masih terdapat tabel lain yang terkait dengan data ini'
+                    'message' => 'Data tidak ditemukan'
                 ]);
             }
-        } else {
-            return response()->json([
-                'status' => false,
-                'message' => 'Data tidak ditemukan'
-            ]);
         }
     }
-}
 
+    public function store_gambar(Request $request){
+        $request->validate([
+            'progres_id' => 'required|exists:progres,progres_id',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048'
+        ]);
+
+        $progres = ProgresModel::findorfail($request->progres_id);
+        if ($progres->pengumpulan_id) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Pengumpulan sudah ada untuk progres ini.',
+            ]);
+        }
+
+        if ($progres->deadline && \Carbon\Carbon::now()->greaterThan(\Carbon\Carbon::parse($progres->deadline))) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Aksi tidak diperbolehkan, deadline sudah terlewati.',
+            ], 403);
+        }
+
+        $gambar = $request->file('image')->store('pengumpulan_gambar','public');
+        $pengumpulan = new PengumpulanModel();
+        $pengumpulan->progres_id = $request->progres_id;
+
+
+    }
 }

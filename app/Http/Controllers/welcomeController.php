@@ -49,4 +49,16 @@ class welcomeController extends Controller
         return view('kaprodi.dashboard',['breadcrumb'=>$breadcrumb,'activeMenu'=>$activeMenu]);
     }
 
+    public function contact(){
+        $breadcrumb = (object)[
+            'title'=> 'Contact',
+            'list'=> ['Home','Contact'],
+        ];
+
+        $page = (object)[
+            'title'=> 'Contact',
+        ];
+        $activeMenu = 'dashboard';
+        return view('contact',['activeMenu'=>$activeMenu,'breadcrumb'=>$breadcrumb,'page'=>$page]);
+    }
 }

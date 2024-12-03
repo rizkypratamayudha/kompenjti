@@ -216,14 +216,14 @@ class PekerjanController extends Controller
     {
         if ($request->ajax() || $request->wantsJson()) {
             $pekerjaan = PekerjaanModel::find($pekerjaan_id);
-    
+
             if (!$pekerjaan) {
                 return response()->json([
                     'status' => false,
                     'message' => 'Data Pekerjaan tidak ditemukan'
                 ]);
             }
-    
+
             try {
                 // Hapus semua data terkait secara bertahap
                 $pekerjaan->detail_pekerjaan->each(function ($detail) {
@@ -231,14 +231,14 @@ class PekerjanController extends Controller
                     $detail->persyaratan()->delete();
                     $detail->kompetensiDosen()->delete();
                 });
-    
+
                 // Hapus data detail pekerjaan
                 $pekerjaan->detail_pekerjaan()->delete();
-    
+
                 $pekerjaan->progres()->delete();
                 // Hapus data pekerjaan itu sendiri
                 $pekerjaan->delete();
-    
+
                 return response()->json([
                     'status' => true,
                     'message' => 'Data Pekerjaan berhasil dihapus'
@@ -251,7 +251,7 @@ class PekerjanController extends Controller
                 ]);
             }
         }
-    
+
         return redirect('/');
     }
 
@@ -326,11 +326,26 @@ class PekerjanController extends Controller
     }
 
     public function edit_ajax($id)
-    {
-        $kompetensi = kompetensi_adminModel::all();
-        $pekerjaan = PekerjaanModel::with('detail_pekerjaan', 'progres', 'detail_pekerjaan.persyaratan', 'detail_pekerjaan.kompetensiDosen')->find($id);
-        return view('dosen.setting', ['pekerjaan' => $pekerjaan, 'kompetensi' => $kompetensi]);
-    }
+{
+    $kompetensi = kompetensi_adminModel::all();
+    $pekerjaan = PekerjaanModel::with([
+        'detail_pekerjaan',
+        'progres',
+        'detail_pekerjaan.persyaratan',
+        'detail_pekerjaan.kompetensiDosen'
+    ])->find($id);
+
+    // Get kompetensi IDs directly from the kompetensiDosen relationship
+    $selectedKompetensiIds = $pekerjaan->detail_pekerjaan->kompetensiDosen
+        ->pluck('kompetensi_admin_id')
+        ->toArray();
+
+    return view('dosen.setting', [
+        'pekerjaan' => $pekerjaan,
+        'kompetensi' => $kompetensi,
+        'selectedKompetensiIds' => $selectedKompetensiIds
+    ]);
+}
 
     public function update_ajax(Request $request, $id)
     {
