@@ -72,39 +72,6 @@
             </div>
         </div>
 
-        <!-- Bagian Bawah: Informasi Jam Kompen -->
-        {{-- <div class="row">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header bg-warning text-white text-center">
-                        <h4>Informasi Jam Kompen</h4>
-                    </div>
-                    <div class="card-body">
-                        @if ($jamkompen)
-                            @foreach ($jamkompen as $item)
-                                <div class="mb-3">
-                                    <p><strong>Periode: </strong>{{ $item->periode->periode_nama }}</p>
-                                    <h5>Detail Kompen:</h5>
-                                    <ul class="list-group">
-                                        @foreach ($item->detail_jamKompen as $detail)
-                                            <li class="list-group-item">
-                                                <strong>Mata Kuliah:</strong>
-                                                {{ $detail->matkul->matkul_nama ?? 'Tidak Diketahui' }} <br>
-                                                <strong>Jam:</strong> {{ $detail->jumlah_jam }} Jam
-                                            </li>
-                                        @endforeach
-                                    </ul>
-                                </div>
-                                <hr>
-                            @endforeach
-                        @else
-                            <p class="text-danger">Data jam kompen tidak tersedia.</p>
-                        @endif
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div> --}}
     <!-- Bagian Bawah: Informasi Jam Kompen -->
 <div class="row mt-4">
     <div class="col-12">
