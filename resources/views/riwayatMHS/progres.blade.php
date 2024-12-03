@@ -31,8 +31,8 @@
                             </div>
                             <div class="ms-auto px-4">
                                 <p class="mb-0">Deadline : @if ($progres->deadline)
-                                    {{ \Carbon\Carbon::parse($progres->deadline)->format('d M Y, H:i') }}
-                                @endif
+                                        {{ \Carbon\Carbon::parse($progres->deadline)->format('d M Y, H:i') }}
+                                    @endif
                                 </p>
                             </div>
 
@@ -54,15 +54,34 @@
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-center mb-3">
                                     <h6 class="mb-0">Pekerjaan</h6>
-                                    <span class="text-secondary">Belum diserahkan</span>
+                                    @if ($progres->pengumpulan_id == null)
+                                        <span class="text-secondary">
+                                            Belum diserahkan
+                                        </span>
+                                    @else
+                                        <span class="text-secondary">
+                                            Nilai :
+                                            @if ($pengumpulan->status == 'pending')
+                                                -
+                                            @elseif ($pengumpulan->status == 'accept')
+                                                {{$progres->jam_kompen}}
+                                            @elseif ($pengumpulan->status == 'decline')
+                                                0
+                                            @endif
+                                        </span>
+                                    @endif
                                 </div>
                                 <div class="text-center">
+                                    @if ($progres->pengumpulan_id == null)
+
                                     <!-- Dropdown -->
                                     <div class="dropdown">
                                         <button class="btn btn-primary dropdown-toggle w-100" type="button"
-                                            id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                            id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false"
+                                            {{ $progres->deadline && \Carbon\Carbon::now()->greaterThan(\Carbon\Carbon::parse($progres->deadline)) ? 'disabled' : '' }}>
                                             <i class="fa-solid fa-plus me-2"></i> Tambah atau Buat
                                         </button>
+
                                         <ul class="dropdown-menu w-100" aria-labelledby="dropdownMenuButton">
                                             <li>
                                                 <a class="dropdown-item d-flex align-items-center gap-4"
@@ -74,24 +93,28 @@
                                             </li>
                                             <li>
                                                 <a class="dropdown-item d-flex align-items-center gap-4" href="#"
-                                                    onclick="modalAction('{{ url('/riwayat/'. $progres->progres_id . '/gambar_ajax') }}')">
+                                                    onclick="modalAction('{{ url('/riwayat/' . $progres->progres_id . '/gambar_ajax') }}')">
                                                     <i class="fa-regular fa-image"></i>
                                                     Gambar
                                                 </a>
                                             </li>
                                             <li>
-                                                <a class="dropdown-item d-flex align-items-center gap-4" href="#" onclick="modalAction('{{url('/riwayat/' . $progres->progres_id . '/file_ajax')}}')">
+                                                <a class="dropdown-item d-flex align-items-center gap-4" href="#"
+                                                    onclick="modalAction('{{ url('/riwayat/' . $progres->progres_id . '/file_ajax') }}')">
                                                     <i class="fa-solid fa-paperclip"></i>
                                                     File
                                                 </a>
                                             </li>
                                         </ul>
                                     </div>
+                                </div>
+                                    @endif
 
-                                </div>
-                                <div class="mt-3">
-                                    <button class="btn btn-link text-danger w-100">Batalkan pengiriman</button>
-                                </div>
+                                @if ($progres->pengumpulan_id != null)
+                                    <div class="mt-5 mb-2">
+                                        <button class="btn btn-danger w-100" onclick="modalAction('{{url('/riwayat/' . $progres->progres_id . '/hapus_ajax')}}')">Batalkan pengiriman</button>
+                                    </div>
+                                @endif
                             </div>
                         </div>
 
@@ -99,10 +122,10 @@
                             <div class="card-body">
                                 <div class="d-flex align-items-center gap-2">
                                     <i class="bi bi-person-circle"></i>
-                                    <span>Komentar pribadi</span>
+                                    <span>Pekerjaan yang dikumpulkan : </span>
                                 </div>
-                                <a href="#" class="text-decoration-none">Tambahkan komentar untuk
-                                    {{ $progres->pekerjaan->user->nama }}</a>
+                                <a class="text-decoration-none">
+                                    {{ $pengumpulan->bukti_pengumpulan ?? '-' }}</a>
                             </div>
                         </div>
                     </div>

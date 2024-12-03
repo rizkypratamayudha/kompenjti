@@ -212,6 +212,9 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/{id}/link_ajax', [riwayatController::class,'link_ajax']);
         Route::get('{id}/gambar_ajax', [riwayatController::class,'gambar_ajax']);
         Route::get('{id}/file_ajax', [riwayatController::class,'file_ajax']);
+        Route::post('/link',[riwayatController::class,'store_link']);
+        Route::get('/{id}/hapus_ajax',[riwayatController::class,'hapus_ajax']);
+        Route::delete('/{id}/hapus',[riwayatController::class,'hapus']);
     });
 
     // NOTIFFF

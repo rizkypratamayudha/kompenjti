@@ -134,16 +134,16 @@ class MahasiswaController extends Controller
                 'message' => 'Data tidak ditemukan',
             ], 404);
         }
-    
+
         // Fetch dropdown data
         $periode = PeriodeModel::select('periode_id', 'periode_nama')->get();
         $user = UserModel::select('user_id', 'nama', 'username')->where('level_id', 3)->get();
         $matkul = MatkulModel::all();
-    
+
         // Pass data to view
         return view('mahasiswa.edit_ajax', compact('jamKompen', 'periode', 'user', 'matkul'));
     }
-    
+
     public function update_ajax(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
@@ -154,7 +154,7 @@ class MahasiswaController extends Controller
             'jumlah_jam' => 'required|array|min:1',
             'jumlah_jam.*' => 'required|integer|min:1',
         ]);
-    
+
         if ($validator->fails()) {
             return response()->json([
                 'status' => false,
@@ -162,7 +162,7 @@ class MahasiswaController extends Controller
                 'errors' => $validator->errors(),
             ], 422);
         }
-    
+
         $jamKompen = jamKompenModel::find($id);
         if (!$jamKompen) {
             return response()->json([
@@ -170,7 +170,7 @@ class MahasiswaController extends Controller
                 'message' => 'Data tidak ditemukan',
             ], 404);
         }
-    
+
         DB::beginTransaction();
         try {
             // Update the main record
@@ -178,11 +178,11 @@ class MahasiswaController extends Controller
                 'user_id' => $request->user_id,
                 'periode_id' => $request->periode_id,
             ]);
-    
+
             // Recalculate akumulasi_jam
             $akumulasi_jam = array_sum($request->jumlah_jam);
             $jamKompen->update(['akumulasi_jam' => $akumulasi_jam]);
-    
+
             // Delete existing details and recreate them
             $jamKompen->detail_jamKompen()->delete();
             foreach ($request->matkul_id as $index => $matkul) {
@@ -192,7 +192,7 @@ class MahasiswaController extends Controller
                     'jumlah_jam' => $request->jumlah_jam[$index],
                 ]);
             }
-    
+
             DB::commit();
             return response()->json([
                 'status' => true,
@@ -207,8 +207,8 @@ class MahasiswaController extends Controller
             ], 500);
         }
     }
-    
-    
+
+
 
     public function show_ajax(string $id)
     {
@@ -284,7 +284,7 @@ class MahasiswaController extends Controller
             $validator = Validator::make($request->all(), [
                 'file_mahasiswa' => ['required', 'mimes:xlsx', 'max:1024']
             ]);
-    
+
             if ($validator->fails()) {
                 return response()->json([
                     'status' => false,
@@ -292,14 +292,14 @@ class MahasiswaController extends Controller
                     'errors' => $validator->errors()
                 ], 422);
             }
-    
+
             // Baca file Excel
             $file = $request->file('file_mahasiswa');
             $reader = IOFactory::createReader('Xlsx');
             $reader->setReadDataOnly(true);
             $spreadsheet = $reader->load($file->getRealPath());
             $data = $spreadsheet->getActiveSheet()->toArray(null, false, true, true);
-    
+
             // Pastikan file memiliki header (baris pertama)
             if (empty($data) || count($data) <= 1) {
                 return response()->json([
@@ -307,43 +307,43 @@ class MahasiswaController extends Controller
                     'message' => 'Tidak ada data yang dapat diimport atau format file salah'
                 ]);
             }
-    
+
             DB::beginTransaction();
             try {
                 foreach ($data as $index => $row) {
                     if ($index === 1) continue; // Lewati header (baris pertama)
-    
+
                     // Validasi baris
                     if (empty($row['A']) || empty($row['B']) || empty($row['D']) || empty($row['E'])) {
                         throw new \Exception("Data pada baris ke-" . ($index + 1) . " tidak lengkap");
                     }
-    
+
                     // Cari user_id berdasarkan username
                     $user = DB::table('m_user')->where('username', $row['A'])->first();
                     if (!$user) {
                         throw new \Exception("Username '{$row['A']}' tidak ditemukan pada data user");
                     }
-    
+
                     $userId = $user->user_id; // Ambil user_id dari username yang ditemukan
-    
+
                     // Parsing data
-                    $matkulIds = explode(',', $row['D']); // Pecah data matkul_id (bisa satu atau lebih)
-                    $jumlahJams = explode(',', $row['E']); // Pecah data jumlah_jam (bisa satu atau lebih)
-    
+                    $matkulIds = explode(';', $row['D']); // Pecah data matkul_id (bisa satu atau lebih)
+                    $jumlahJams = explode(';', $row['E']); // Pecah data jumlah_jam (bisa satu atau lebih)
+
                     if (count($matkulIds) !== count($jumlahJams)) {
                         throw new \Exception("Jumlah matkul_id dan jumlah jam tidak sesuai pada baris ke-" . ($index + 1));
                     }
-    
+
                     // Hitung akumulasi_jam jika kosong
                     $akumulasiJam = array_sum($jumlahJams);
-    
+
                     // Simpan data jam_kompen
                     $jamKompen = jamKompenModel::create([
                         'user_id' => $userId, // Gunakan user_id yang ditemukan
                         'periode_id' => $row['B'],
                         'akumulasi_jam' => $row['C'] ?: $akumulasiJam, // Gunakan nilai di kolom C atau hitung dari jumlah_jam
                     ]);
-    
+
                     // Simpan detail jam_kompen
                     $insertDetailJamKompen = [];
                     foreach ($matkulIds as $key => $matkulId) {
@@ -356,7 +356,7 @@ class MahasiswaController extends Controller
                     }
                     detail_jamKompenModel::insert($insertDetailJamKompen);
                 }
-    
+
                 DB::commit();
                 return response()->json([
                     'status' => true,
@@ -371,10 +371,10 @@ class MahasiswaController extends Controller
                 ], 500);
             }
         }
-    
+
         return redirect('/');
     }
-    
+
 
     public function export_excel()
     {
@@ -406,11 +406,11 @@ class MahasiswaController extends Controller
             // Loop untuk setiap detail penjualan
             foreach ($kompen->detail_jamKompen as $detail) {
                 $sheet->setCellValue('A' . $baris, $no);
-                $sheet->setCellValue('B' . $baris, $kompen->user->username ); 
-                $sheet->setCellValue('C' . $baris, $kompen->periode->periode_nama ) ; 
-                $sheet->setCellValue('D' . $baris, $kompen->akumulasi_jam ); 
-                $sheet->setCellValue('E' . $baris, $detail->matkul->matkul_nama ); 
-                $sheet->setCellValue('F' . $baris, $detail->jumlah_jam); 
+                $sheet->setCellValue('B' . $baris, $kompen->user->username );
+                $sheet->setCellValue('C' . $baris, $kompen->periode->periode_nama ) ;
+                $sheet->setCellValue('D' . $baris, $kompen->akumulasi_jam );
+                $sheet->setCellValue('E' . $baris, $detail->matkul->matkul_nama );
+                $sheet->setCellValue('F' . $baris, $detail->jumlah_jam);
 
                 $baris++;
                 $no++;
@@ -451,16 +451,16 @@ class MahasiswaController extends Controller
             ->orderBy('periode_id')
             ->get();
 
-    
+
         // Load view untuk PDF
         $pdf = Pdf::loadView('mahasiswa.export_pdf', ['jamKompen' => $jamKompen]);
-    
+
         $pdf->setPaper('a4', 'portrait'); // Set ukuran kertas dan orientasi
         $pdf->setOption("isRemoteEnabled", true); // Set true jika ada gambar dari URL
         $pdf->render();
-    
+
         // Stream file PDF
         return $pdf->stream('Data Mahasiswa Kompensasi' . date('Y-m-d_H-i-s') . '.pdf');
     }
-    
+
 }

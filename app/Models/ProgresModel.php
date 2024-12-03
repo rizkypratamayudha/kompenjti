@@ -17,4 +17,8 @@ class ProgresModel extends Model
     public function pekerjaan():BelongsTo{
         return $this->belongsTo(PekerjaanModel::class,'pekerjaan_id','pekerjaan_id');
     }
+
+    public function pengumpulan(){
+        return $this->hasMany(PengumpulanModel::class,'pengumpulan_id','pengumpulan_id');
+    }
 }

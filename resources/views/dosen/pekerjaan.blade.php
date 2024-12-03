@@ -170,7 +170,7 @@
                                     </div>
                                     <div class="flex-grow-1">
                                         <div class="task-title">${progres.judul_progres}</div>
-                                        <div class="progress-detail">Nilai jam: ${progres.jam_kompen} - Deadline: ${dayjs(progres.deadline).fromNow()}</div>
+                                        <div class="progress-detail">Nilai jam: ${progres.jam_kompen} - Deadline berakhir ${dayjs(progres.deadline).fromNow()}</div>
                                     </div>
                                         <div class="ellipsis">
                                             <button class="btn btn-outline-primary btn-sm" onclick="alert('Info detail untuk ${progres.judul_progres}')">Info</button>
