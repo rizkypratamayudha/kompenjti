@@ -212,6 +212,49 @@ class PekerjanController extends Controller
         ]);
     }
 
+    public function delete_ajax(Request $request, string $pekerjaan_id)
+    {
+        if ($request->ajax() || $request->wantsJson()) {
+            $pekerjaan = PekerjaanModel::find($pekerjaan_id);
+    
+            if (!$pekerjaan) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Data Pekerjaan tidak ditemukan'
+                ]);
+            }
+    
+            try {
+                // Hapus semua data terkait secara bertahap
+                $pekerjaan->detail_pekerjaan->each(function ($detail) {
+                    // Hapus persyaratan dan kompetensi dosen terkait
+                    $detail->persyaratan()->delete();
+                    $detail->kompetensiDosen()->delete();
+                });
+    
+                // Hapus data detail pekerjaan
+                $pekerjaan->detail_pekerjaan()->delete();
+    
+                $pekerjaan->progres()->delete();
+                // Hapus data pekerjaan itu sendiri
+                $pekerjaan->delete();
+    
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Data Pekerjaan berhasil dihapus'
+                ]);
+            } catch (\Exception $e) {
+                // Tangani error lainnya
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Data gagal dihapus: ' . $e->getMessage()
+                ]);
+            }
+        }
+    
+        return redirect('/');
+    }
+
     public function approvePekerjaan(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -360,6 +403,7 @@ class PekerjanController extends Controller
                 }
             }
 
+            $pekerjaan->progres()->delete();
             foreach ($request->judul_progres as $index => $judul) {
                 ProgresModel::updateOrCreate(
                     ['pekerjaan_id' => $pekerjaan->pekerjaan_id, 'judul_progres' => $judul],
