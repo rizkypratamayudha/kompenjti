@@ -348,137 +348,127 @@ class PekerjanController extends Controller
     }
 
     public function update_ajax(Request $request, $id)
-{
-    $validator = Validator::make($request->all(), [
-        'jenis_pekerjaan' => 'required|string|in:Teknis,Pengabdian,Penelitian',
-        'pekerjaan_nama' => 'required|string|max:255',
-        'jumlah_anggota' => 'required|integer|min:1',
-        'persyaratan' => ['nullable', 'string', 'json'],
-        'persyaratan.*' => 'string|max:50',
-        'kompetensi_id' => 'nullable|array',
-        'kompetensi_id.*' => 'required|integer',
-        'deskripsi_tugas' => 'nullable|string|max:1000',
-        'judul_progres' => 'required|array|min:1',
-        'judul_progres.*' => 'required|string|max:255',
-        'hari' => 'required|array|min:1',
-        'hari.*' => 'required|integer|min:1',
-        'jam_kompen' => 'required|array|min:1',
-        'jam_kompen.*' => 'required|integer|min:1',
-        'status' => 'sometimes|in:open,close,done'
-    ]);
-
-    if ($validator->fails()) {
-        return response()->json([
-            'status' => false,
-            'message' => 'Validasi gagal',
-            'errors' => $validator->errors()
-        ], 422);
-    }
-
-    $pekerjaan = PekerjaanModel::find($id);
-    if (!$pekerjaan) {
-        return response()->json([
-            'status' => false,
-            'message' => 'Pekerjaan tidak ditemukan'
-        ], 404);
-    }
-
-    $user_id = Auth::id();
-    $jumlah_jam_kompen = array_sum($request->jam_kompen);
-
-    DB::beginTransaction();
-    try {
-        // Update pekerjaan without changing pengumpulan_id
-        $pekerjaan->update([
-            'jenis_pekerjaan' => $request->jenis_pekerjaan,
-            'pekerjaan_nama' => $request->pekerjaan_nama,
-            'jumlah_jam_kompen' => $jumlah_jam_kompen,
-            'status' => $request->status,
+    {
+        $validator = Validator::make($request->all(), [
+            'jenis_pekerjaan' => 'required|string|in:Teknis,Pengabdian,Penelitian',
+            'pekerjaan_nama' => 'required|string|max:255',
+            'jumlah_anggota' => 'required|integer|min:1',
+            'persyaratan' => ['nullable', 'string', 'json'],
+            'persyaratan.*' => 'string|max:50',
+            'kompetensi_id' => 'nullable|array',
+            'kompetensi_id.*' => 'required|integer',
+            'deskripsi_tugas' => 'nullable|string|max:1000',
+            'judul_progres' => 'required|array|min:1',
+            'judul_progres.*' => 'required|string|max:255',
+            'hari' => 'required|array|min:1',
+            'hari.*' => 'required|integer|min:1',
+            'jam_kompen' => 'required|array|min:1',
+            'jam_kompen.*' => 'required|integer|min:1',
+            'status' => 'sometimes|in:open,close,done'
         ]);
 
-        if ($pekerjaan->detail_pekerjaan) {
-            $pekerjaan->detail_pekerjaan->update([
-                'jumlah_anggota' => $request->jumlah_anggota,
-                'deskripsi_tugas' => $request->deskripsi_tugas,
-            ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Validasi gagal',
+                'errors' => $validator->errors()
+            ], 422);
         }
 
-        // Fetch existing progres to get pengumpulan_id
-        $progres = ProgresModel::where('pekerjaan_id', $pekerjaan->pekerjaan_id)->get();
-
-        // Update persyaratan if available
-        if (!empty($request->persyaratan)) {
-            DB::table('persyaratan')
-                ->where('detail_pekerjaan_id', $pekerjaan->detail_pekerjaan->detail_pekerjaan_id)
-                ->delete();
-
-            $persyaratanArray = json_decode($request->persyaratan, true);
-            foreach ($persyaratanArray as $persyaratanNama) {
-                DB::table('persyaratan')->insert([
-                    'detail_pekerjaan_id' => $pekerjaan->detail_pekerjaan->detail_pekerjaan_id,
-                    'persyaratan_nama' => $persyaratanNama
-                ]);
-            }
+        $pekerjaan = PekerjaanModel::find($id);
+        if (!$pekerjaan) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Pekerjaan tidak ditemukan'
+            ], 404);
         }
 
-        // Update kompetensi if available
-        if (!empty($request->kompetensi_id)) {
-            foreach ($request->kompetensi_id as $kompetensiId) {
-                DB::table('kompetensi_dosen')->updateOrInsert([
-                    'detail_pekerjaan_id' => $pekerjaan->detail_pekerjaan->detail_pekerjaan_id,
-                    'kompetensi_admin_id' => $kompetensiId
-                ]);
-            }
-        }
+        $jumlah_jam_kompen = array_sum($request->jam_kompen);
 
-        // Delete existing progres
-        $pekerjaan->progres()->delete();
-
-        // Create new progres with unique pengumpulan_id for each progres
-        $deadlinePertama = Carbon::now(); // Start counting from now
-        foreach ($request->judul_progres as $index => $judul) {
-            $hari = $request->hari[$index];
-            $deadlineBaru = $deadlinePertama->copy()->addDays($hari);
-
-            // Generate new pengumpulan_id for each progres (if applicable)
-            $pengumpulan_id = null;
-            if ($existingPengumpulan = $progres->get($index)) {
-                $pengumpulan_id = $existingPengumpulan->pengumpulan_id; // Get unique pengumpulan_id for each progres
-            }
-
-            ProgresModel::create([
-                'pekerjaan_id' => $pekerjaan->pekerjaan_id,
-                'judul_progres' => $judul,
-                'hari' => $hari,
-                'jam_kompen' => $request->jam_kompen[$index],
-                'deadline' => $deadlineBaru,
-                'pengumpulan_id' => $pengumpulan_id, // Set unique pengumpulan_id
+        DB::beginTransaction();
+        try {
+            // Update data pekerjaan
+            $pekerjaan->update([
+                'jenis_pekerjaan' => $request->jenis_pekerjaan,
+                'pekerjaan_nama' => $request->pekerjaan_nama,
+                'jumlah_jam_kompen' => $jumlah_jam_kompen,
+                'status' => $request->status,
             ]);
 
-            $deadlinePertama = $deadlineBaru; // Update for next progres
+            if ($pekerjaan->detail_pekerjaan) {
+                $pekerjaan->detail_pekerjaan->update([
+                    'jumlah_anggota' => $request->jumlah_anggota,
+                    'deskripsi_tugas' => $request->deskripsi_tugas,
+                ]);
+            }
+
+            // Update persyaratan jika ada
+            if (!empty($request->persyaratan)) {
+                DB::table('persyaratan')
+                    ->where('detail_pekerjaan_id', $pekerjaan->detail_pekerjaan->detail_pekerjaan_id)
+                    ->delete();
+
+                $persyaratanArray = json_decode($request->persyaratan, true);
+                foreach ($persyaratanArray as $persyaratanNama) {
+                    DB::table('persyaratan')->insert([
+                        'detail_pekerjaan_id' => $pekerjaan->detail_pekerjaan->detail_pekerjaan_id,
+                        'persyaratan_nama' => $persyaratanNama
+                    ]);
+                }
+            }
+
+            // Update kompetensi jika ada
+            if (!empty($request->kompetensi_id)) {
+                foreach ($request->kompetensi_id as $kompetensiId) {
+                    DB::table('kompetensi_dosen')->updateOrInsert([
+                        'detail_pekerjaan_id' => $pekerjaan->detail_pekerjaan->detail_pekerjaan_id,
+                        'kompetensi_admin_id' => $kompetensiId
+                    ]);
+                }
+            }
+
+            // Delete existing progres and insert new ones
+            $pekerjaan->progres()->delete();
+            $deadlinePertama = $pekerjaan->akumulasi_deadline ? Carbon::parse($pekerjaan->akumulasi_deadline) : null;
+
+            foreach ($request->judul_progres as $index => $judul) {
+                $hari = $request->hari[$index];
+                $deadlineBaru = $deadlinePertama ? $deadlinePertama->copy()->addDays($hari) : null;
+
+                ProgresModel::create([
+                    'pekerjaan_id' => $pekerjaan->pekerjaan_id,
+                    'judul_progres' => $judul,
+                    'hari' => $hari,
+                    'jam_kompen' => $request->jam_kompen[$index],
+                    'deadline' => $deadlineBaru,
+                ]);
+
+                if ($deadlinePertama) {
+                    $deadlinePertama = $deadlineBaru;
+                }
+            }
+
+            // Update akumulasi_deadline hanya jika pekerjaan sudah dimulai
+            if ($pekerjaan->akumulasi_deadline) {
+                $pekerjaan->update([
+                    'akumulasi_deadline' => $deadlinePertama,
+                ]);
+            }
+
+            DB::commit();
+            return response()->json([
+                'status' => true,
+                'message' => 'Data pekerjaan berhasil diupdate'
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'status' => false,
+                'message' => 'Terjadi kesalahan saat mengupdate data',
+                'errors' => $e->getMessage()
+            ], 500);
         }
-
-        // Update akumulasi_deadline pada pekerjaan
-        $pekerjaan->update([
-            'akumulasi_deadline' => $deadlinePertama,
-        ]);
-
-        DB::commit();
-        return response()->json([
-            'status' => true,
-            'message' => 'Data pekerjaan berhasil diupdate'
-        ]);
-    } catch (\Exception $e) {
-        DB::rollBack();
-        return response()->json([
-            'status' => false,
-            'message' => 'Terjadi kesalahan saat mengupdate data',
-            'errors' => $e->getMessage()
-        ], 500);
     }
-}
-
-
 
     public function get_anggota($id)
     {
@@ -519,9 +509,8 @@ class PekerjanController extends Controller
             return redirect()->route('dosen.index')->with('error', 'Tidak ada progres untuk pekerjaan ini.');
         }
 
-        // Inisialisasi deadline pertama dari progres pertama
-        $deadlinepertama = Carbon::parse($progresList->first()->updated_at);
-        $akumulasiDeadline = $deadlinepertama; // Untuk menyimpan total akumulasi deadline
+        // Inisialisasi deadline pertama dari waktu saat ini
+        $deadlinepertama = Carbon::now();
 
         // Iterasi setiap progres untuk memperbarui deadline dan menghitung akumulasi deadline
         foreach ($progresList as $progres) {
