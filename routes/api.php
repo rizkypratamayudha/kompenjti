@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\KompetensiController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\DetailMahasiswaController;
 use App\Http\Controllers\Api\DosenBuatPekerjaanController;
+use App\Http\Controllers\Api\DashboardMhsController;
 
 
 use Illuminate\Http\Request;
@@ -38,6 +39,21 @@ Route::delete('kompetensi/delete/{id}', [KompetensiController::class, 'destroy']
 Route::get('kompetensi/show/{id}', [KompetensiController::class, 'getKompetensiDetail']);
 Route::get('/dosen/pekerjaan/{user_id}', [DosenBuatPekerjaanController::class, 'index']);
 Route::post('/dosen/pekerjaan/create', [DosenBuatPekerjaanController::class, 'store']);
+
+
+Route::get('/periode', [DashboardMhsController::class, 'getPeriode']);
+Route::get('/jam-kompen', [DashboardMhsController::class, 'getJamKompen']);
+Route::get('/detail-jam-kompen', [DashboardMhsController::class, 'getDetailJamKompenByUserAndPeriode']);
+Route::get('/matkul', [DashboardMhsController::class, 'getMatkul']);
+
+Route::prefix('mahasiswa')->group(function () {
+    Route::get('/periode', [DashboardMhsController::class, 'getPeriode']);
+    Route::post('/jam-kompen', [DashboardMhsController::class, 'getJamKompen']);
+});
+
+
+
+
 
 
 Route::middleware(['auth:api'])->group(function () {
