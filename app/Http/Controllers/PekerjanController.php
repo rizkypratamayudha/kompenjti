@@ -326,28 +326,28 @@ class PekerjanController extends Controller
     }
 
     public function edit_ajax($id)
-{
-    $kompetensi = kompetensi_adminModel::all();
-    $pekerjaan = PekerjaanModel::with([
-        'detail_pekerjaan',
-        'progres',
-        'detail_pekerjaan.persyaratan',
-        'detail_pekerjaan.kompetensiDosen'
-    ])->find($id);
+    {
+        $kompetensi = kompetensi_adminModel::all();
+        $pekerjaan = PekerjaanModel::with([
+            'detail_pekerjaan',
+            'progres',
+            'detail_pekerjaan.persyaratan',
+            'detail_pekerjaan.kompetensiDosen'
+        ])->find($id);
 
-    // Get kompetensi IDs directly from the kompetensiDosen relationship
-    $selectedKompetensiIds = $pekerjaan->detail_pekerjaan->kompetensiDosen
-        ->pluck('kompetensi_admin_id')
-        ->toArray();
+        // Get kompetensi IDs directly from the kompetensiDosen relationship
+        $selectedKompetensiIds = $pekerjaan->detail_pekerjaan->kompetensiDosen
+            ->pluck('kompetensi_admin_id')
+            ->toArray();
 
-    return view('dosen.setting', [
-        'pekerjaan' => $pekerjaan,
-        'kompetensi' => $kompetensi,
-        'selectedKompetensiIds' => $selectedKompetensiIds
-    ]);
-}
+        return view('dosen.setting', [
+            'pekerjaan' => $pekerjaan,
+            'kompetensi' => $kompetensi,
+            'selectedKompetensiIds' => $selectedKompetensiIds
+        ]);
+    }
 
-public function update_ajax(Request $request, $id)
+    public function update_ajax(Request $request, $id)
 {
     $validator = Validator::make($request->all(), [
         'jenis_pekerjaan' => 'required|string|in:Teknis,Pengabdian,Penelitian',
@@ -388,7 +388,7 @@ public function update_ajax(Request $request, $id)
 
     DB::beginTransaction();
     try {
-        // Update data pekerjaan
+        // Update pekerjaan without changing pengumpulan_id
         $pekerjaan->update([
             'jenis_pekerjaan' => $request->jenis_pekerjaan,
             'pekerjaan_nama' => $request->pekerjaan_nama,
@@ -403,7 +403,10 @@ public function update_ajax(Request $request, $id)
             ]);
         }
 
-        // Update persyaratan jika ada
+        // Fetch existing progres to get pengumpulan_id
+        $progres = ProgresModel::where('pekerjaan_id', $pekerjaan->pekerjaan_id)->get();
+
+        // Update persyaratan if available
         if (!empty($request->persyaratan)) {
             DB::table('persyaratan')
                 ->where('detail_pekerjaan_id', $pekerjaan->detail_pekerjaan->detail_pekerjaan_id)
@@ -418,7 +421,7 @@ public function update_ajax(Request $request, $id)
             }
         }
 
-        // Update kompetensi jika ada
+        // Update kompetensi if available
         if (!empty($request->kompetensi_id)) {
             foreach ($request->kompetensi_id as $kompetensiId) {
                 DB::table('kompetensi_dosen')->updateOrInsert([
@@ -428,12 +431,20 @@ public function update_ajax(Request $request, $id)
             }
         }
 
-        // Delete existing progres and insert new ones
+        // Delete existing progres
         $pekerjaan->progres()->delete();
-        $deadlinePertama = Carbon::now(); // Mulai hitungan dari sekarang
+
+        // Create new progres with unique pengumpulan_id for each progres
+        $deadlinePertama = Carbon::now(); // Start counting from now
         foreach ($request->judul_progres as $index => $judul) {
             $hari = $request->hari[$index];
             $deadlineBaru = $deadlinePertama->copy()->addDays($hari);
+
+            // Generate new pengumpulan_id for each progres (if applicable)
+            $pengumpulan_id = null;
+            if ($existingPengumpulan = $progres->get($index)) {
+                $pengumpulan_id = $existingPengumpulan->pengumpulan_id; // Get unique pengumpulan_id for each progres
+            }
 
             ProgresModel::create([
                 'pekerjaan_id' => $pekerjaan->pekerjaan_id,
@@ -441,9 +452,10 @@ public function update_ajax(Request $request, $id)
                 'hari' => $hari,
                 'jam_kompen' => $request->jam_kompen[$index],
                 'deadline' => $deadlineBaru,
+                'pengumpulan_id' => $pengumpulan_id, // Set unique pengumpulan_id
             ]);
 
-            $deadlinePertama = $deadlineBaru; // Set untuk progres berikutnya
+            $deadlinePertama = $deadlineBaru; // Update for next progres
         }
 
         // Update akumulasi_deadline pada pekerjaan
@@ -465,6 +477,8 @@ public function update_ajax(Request $request, $id)
         ], 500);
     }
 }
+
+
 
     public function get_anggota($id)
     {
@@ -534,5 +548,4 @@ public function update_ajax(Request $request, $id)
         // Kirimkan pesan sukses melalui session
         return redirect()->route('dosen.index')->with('success', 'Pekerjaan telah dimulai, semua progres sudah diperbarui!');
     }
-
 }
