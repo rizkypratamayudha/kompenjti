@@ -81,7 +81,7 @@
                                 </p>
                                 <p class="card-text">
                                     <small class="text-muted">Deskripsi Tugas :</small><br>
-                                    {{ $item->detail_pekerjaan->deskripsi_tugas }}
+                                    {{ $item->detail_pekerjaan->deskripsi_tugas ?? '-' }}
                                 </p>
                                 <div class="d-flex justify-content-between align-items-center">
                                     <small class="text" style="color: #ff0000">
