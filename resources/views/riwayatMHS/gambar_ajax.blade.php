@@ -9,6 +9,7 @@
                 </button>
             </div>
             <div class="modal-body">
+                <input type="hidden" name="progres_id" value="{{$progres->progres_id}}">
                 <div class="form-group">
                     <label>Progres : {{$progres->judul_progres}}</label>
                 </div>

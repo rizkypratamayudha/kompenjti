@@ -28,126 +28,141 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-rc.0/css/select2.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 
-<!-- Select2 JS -->
+    <!-- Select2 JS -->
 
     <style>
-      :root {
-        --primary-blue: #024CAA; /* Prioritized blue */
-        --light-blue: #82C4F3;   /* Light blue */
-        --medium-blue: #008DDA;  /* Medium blue */
-        --dark-blue: #0C356A;    /* Dark blue */
-        --highlight-yellow: #FFFFB3; /* Light yellow for highlighting */
-      }
+        :root {
+            --primary-blue: #024CAA;
+            /* Prioritized blue */
+            --light-blue: #82C4F3;
+            /* Light blue */
+            --medium-blue: #008DDA;
+            /* Medium blue */
+            --dark-blue: #0C356A;
+            /* Dark blue */
+            --highlight-yellow: #FFFFB3;
+            /* Light yellow for highlighting */
+        }
 
-      /* Navbar (Header) tetap putih */
-      .main-header.navbar {
-        background-color: white;
-        border-bottom: 1px solid #dee2e6;
-      }
-      .main-header.navbar .nav-link {
-        color: var(--primary-blue);
-      }
+        /* Navbar (Header) tetap putih */
+        .main-header.navbar {
+            background-color: white;
+            border-bottom: 1px solid #dee2e6;
+        }
 
-      /* Sidebar styling */
-      .main-sidebar {
-        background-color: var(--primary-blue);
-      }
+        .main-header.navbar .nav-link {
+            color: var(--primary-blue);
+        }
 
-      /* Sidebar brand section */
-      .brand-link {
-        background-color: var(--dark-blue);
-        border-bottom: 1px solid #EEEEEE;
-      }
-      .brand-link .brand-text {
-        color: white !important;
-      }
+        /* Sidebar styling */
+        .main-sidebar {
+            background-color: var(--primary-blue);
+        }
 
-      /* Sidebar menu items */
-      .nav-sidebar .nav-item p {
-        color: white !important;
-      }
-      .nav-sidebar .nav-item i {
-        color: white !important;
-      }
-      .nav-sidebar .nav-header {
-        color: rgba(255, 255, 255, 0.7) !important;
-        text-transform: uppercase;
-      }
+        /* Sidebar brand section */
+        .brand-link {
+            background-color: var(--dark-blue);
+            border-bottom: 1px solid #EEEEEE;
+        }
 
-      /* Hover effect pada menu */
-      .nav-sidebar .nav-link:hover {
-        background-color: rgba(255, 255, 255, 0.1);
-      }
+        .brand-link .brand-text {
+            color: white !important;
+        }
 
-      /* Active menu state */
-      .nav-sidebar .nav-link.active {
-        background-color: rgba(255, 255, 255, 0.2) !important;
-      }
-      .nav-sidebar .nav-link.active p,
-      .nav-sidebar .nav-link.active i {
-        color: white !important;
-      }
+        /* Sidebar menu items */
+        .nav-sidebar .nav-item p {
+            color: white !important;
+        }
 
-      /* Search box dalam sidebar */
-      .sidebar .form-control-sidebar {
-        background-color: rgba(255, 255, 255, 0.2);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        color: white;
-      }
-      .sidebar .form-control-sidebar::placeholder {
-        color: rgba(255, 255, 255, 0.6);
-      }
-      .sidebar .btn-sidebar {
-        background-color: rgba(255, 255, 255, 0.2);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        color: white;
-      }
+        .nav-sidebar .nav-item i {
+            color: white !important;
+        }
 
-      /* Scrollbar styling untuk sidebar */
-      .sidebar::-webkit-scrollbar {
-        width: 5px;
-      }
-      .sidebar::-webkit-scrollbar-track {
-        background: rgba(255, 255, 255, 0.1);
-      }
-      .sidebar::-webkit-scrollbar-thumb {
-        background: rgba(255, 255, 255, 0.2);
-      }
+        .nav-sidebar .nav-header {
+            color: rgba(255, 255, 255, 0.7) !important;
+            text-transform: uppercase;
+        }
 
-      /* Other components */
-      .btn-primary {
-        background-color: var(--primary-blue);
-        border-color: var(--primary-blue);
-      }
-      .btn-primary:hover {
-        background-color: var(--medium-blue);
-        border-color: var(--medium-blue);
-      }
+        /* Hover effect pada menu */
+        .nav-sidebar .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
 
-      .page-item.active .page-link {
-        background-color: var(--primary-blue);
-        border-color: var(--primary-blue);
-      }
+        /* Active menu state */
+        .nav-sidebar .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.2) !important;
+        }
 
-      .card-primary.card-outline {
-        border-top: 3px solid var(--primary-blue);
-      }
+        .nav-sidebar .nav-link.active p,
+        .nav-sidebar .nav-link.active i {
+            color: white !important;
+        }
 
-      /* Links */
-      a {
-        color: var(--primary-blue);
-      }
-      a:hover {
-        color: var(--medium-blue);
-      }
+        /* Search box dalam sidebar */
+        .sidebar .form-control-sidebar {
+            background-color: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+        }
 
-      /* Highlighting elements with yellow */
-      .highlight {
-        background-color: var(--highlight-yellow);
-        color: var(--primary-blue);
-      }
+        .sidebar .form-control-sidebar::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
 
-      </style>
+        .sidebar .btn-sidebar {
+            background-color: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        /* Scrollbar styling untuk sidebar */
+        .sidebar::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Other components */
+        .btn-primary {
+            background-color: var(--primary-blue);
+            border-color: var(--primary-blue);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--medium-blue);
+            border-color: var(--medium-blue);
+        }
+
+        .page-item.active .page-link {
+            background-color: var(--primary-blue);
+            border-color: var(--primary-blue);
+        }
+
+        .card-primary.card-outline {
+            border-top: 3px solid var(--primary-blue);
+        }
+
+        /* Links */
+        a {
+            color: var(--primary-blue);
+        }
+
+        a:hover {
+            color: var(--medium-blue);
+        }
+
+        /* Highlighting elements with yellow */
+        .highlight {
+            background-color: var(--highlight-yellow);
+            color: var(--primary-blue);
+        }
+    </style>
 
     @stack('css')
 </head>

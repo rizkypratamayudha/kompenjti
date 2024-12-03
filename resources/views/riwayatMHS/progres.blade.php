@@ -64,7 +64,7 @@
                                             @if ($pengumpulan->status == 'pending')
                                                 -
                                             @elseif ($pengumpulan->status == 'accept')
-                                                {{$progres->jam_kompen}}
+                                                {{ $progres->jam_kompen }}
                                             @elseif ($pengumpulan->status == 'decline')
                                                 0
                                             @endif
@@ -73,46 +73,56 @@
                                 </div>
                                 <div class="text-center">
                                     @if ($progres->pengumpulan_id == null)
+                                        <!-- Dropdown -->
+                                        <div class="dropdown">
+                                            {{-- @php
+                                                $isExpired =
+                                                    $progres->deadline &&
+                                                    \Carbon\Carbon::now()->greaterThan(
+                                                        \Carbon\Carbon::parse($progres->deadline),
+                                                    );
+                                            @endphp --}}
 
-                                    <!-- Dropdown -->
-                                    <div class="dropdown">
-                                        <button class="btn btn-primary dropdown-toggle w-100" type="button"
-                                            id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false"
-                                            {{ $progres->deadline && \Carbon\Carbon::now()->greaterThan(\Carbon\Carbon::parse($progres->deadline)) ? 'disabled' : '' }}>
-                                            <i class="fa-solid fa-plus me-2"></i> Tambah atau Buat
-                                        </button>
+                                            <button class="btn btn-primary dropdown-toggle w-100" type="button"
+                                                id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                                {{-- {{ $isExpired ? 'disabled' : '' }}> --}}
+                                                <i class="fa-solid fa-plus me-2"></i> Tambah atau Buat
+                                            </button>
 
-                                        <ul class="dropdown-menu w-100" aria-labelledby="dropdownMenuButton">
-                                            <li>
-                                                <a class="dropdown-item d-flex align-items-center gap-4"
-                                                    onclick="modalAction('{{ url('/riwayat/' . $progres->progres_id . '/link_ajax') }}')"
-                                                    href="#">
-                                                    <i class="fa-solid fa-link"></i>
-                                                    Link
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a class="dropdown-item d-flex align-items-center gap-4" href="#"
-                                                    onclick="modalAction('{{ url('/riwayat/' . $progres->progres_id . '/gambar_ajax') }}')">
-                                                    <i class="fa-regular fa-image"></i>
-                                                    Gambar
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a class="dropdown-item d-flex align-items-center gap-4" href="#"
-                                                    onclick="modalAction('{{ url('/riwayat/' . $progres->progres_id . '/file_ajax') }}')">
-                                                    <i class="fa-solid fa-paperclip"></i>
-                                                    File
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </div>
+
+                                            <ul class="dropdown-menu w-100" aria-labelledby="dropdownMenuButton">
+                                                <li>
+                                                    <a class="dropdown-item d-flex align-items-center gap-4"
+                                                        onclick="modalAction('{{ url('/riwayat/' . $progres->progres_id . '/link_ajax') }}')"
+                                                        href="#">
+                                                        <i class="fa-solid fa-link"></i>
+                                                        Link
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item d-flex align-items-center gap-4" href="#"
+                                                        onclick="modalAction('{{ url('/riwayat/' . $progres->progres_id . '/gambar_ajax') }}')">
+                                                        <i class="fa-regular fa-image"></i>
+                                                        Gambar
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item d-flex align-items-center gap-4" href="#"
+                                                        onclick="modalAction('{{ url('/riwayat/' . $progres->progres_id . '/file_ajax') }}')">
+                                                        <i class="fa-solid fa-paperclip"></i>
+                                                        File
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
                                 </div>
-                                    @endif
+                                @endif
 
                                 @if ($progres->pengumpulan_id != null)
                                     <div class="mt-5 mb-2">
-                                        <button class="btn btn-danger w-100" onclick="modalAction('{{url('/riwayat/' . $progres->progres_id . '/hapus_ajax')}}')">Batalkan pengiriman</button>
+                                        <button class="btn btn-danger w-100"
+                                            onclick="modalAction('{{ url('/riwayat/' . $progres->progres_id . '/hapus_ajax') }}')">Batalkan
+                                            pengiriman</button>
                                     </div>
                                 @endif
                             </div>
@@ -123,7 +133,7 @@
                                 <div class="d-flex align-items-center gap-2">
                                     <span>Pekerjaan yang dikumpulkan : </span>
                                 </div>
-                                <a class="text-decoration-none">
+                                <a class="text-decoration-none" href="{{$pengumpulan->bukti_pengumpulan ?? '-'}}">
                                     {{ $pengumpulan->bukti_pengumpulan ?? '-' }}</a>
                             </div>
                         </div>
@@ -183,5 +193,24 @@
                 $('#myModal').modal('show');
             });
         }
+
+        const serverTimeUrl = "{{ route('server-time') }}";
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const button = document.getElementById('dropdownMenuButton');
+            const deadline = new Date("{{ $progres->deadline }}"); // Ambil deadline dari backend
+
+            fetch(serverTimeUrl)
+                .then(response => response.json())
+                .then(data => {
+                    const serverTime = new Date(data.server_time); // Waktu server dari API
+                    if (serverTime > deadline) {
+                        button.disabled = true; // Nonaktifkan tombol jika waktu server melebihi deadline
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching server time:', error);
+                });
+        });
     </script>
 @endpush

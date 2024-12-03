@@ -97,7 +97,7 @@
                             <ul class="list-group">
                                 @foreach ($item->detail_jamKompen as $detail)
                                     <li class="list-group-item d-flex align-items-center">
-                                        <i class="bi bi-bookmark-fill text-info me-3" style="font-size: 1.5rem;"></i>
+                                        <i class="bi bi-bookmark-fill text-info me-3 mr-4" style="font-size: 1.5rem;"></i>
                                         <div>
                                             <p class="mb-1">
                                                 <strong>Mata Kuliah:</strong>

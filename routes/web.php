@@ -42,6 +42,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboardMhs', [DashboardMahasiswaController::class, 'index'])->middleware('authorize:MHS');
     Route::get('/dashboardDos', [welcomeController::class, 'dosen'])->middleware('authorize:DSN');
     Route::get('/dashboardKap', [welcomeController::class, 'kaprodi'])->middleware('authorize:KPD');
+    Route::get('/contact', [welcomeController::class,'contact']);
 
 
     Route::group(['prefix'=>'profile'], function(){
@@ -222,4 +223,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/hitung-notif', [ValidasiController::class, 'hitung_notif']);
     Route::get('/hitung-notif-pelamar', [ValidasiController::class, 'hitung_notif_pelamar']);
     Route::get('pekerjaan/{id}/get-anggota',[ListPekerjaanMHSController::class,'get_anggota']);
+    Route::get('/server-time', function () {
+        return response()->json(['server_time' => now()]);
+    })->name('server-time');
 });
