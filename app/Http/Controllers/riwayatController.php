@@ -128,13 +128,37 @@ class riwayatController extends Controller
         return view('riwayatMHS.hapus_ajax', ['progres' => $progres, 'pengumpulan' => $pengumpulan]);
     }
 
-    public function hapus(Request $request,$id){
-        if ($request->ajax() || $request->wantsJson()) {
-            $progres = ProgresModel::with('pengumpulan')->find( $id );
+    public function hapus(Request $request, $id)
+{
+    if ($request->ajax() || $request->wantsJson()) {
+        $progres = ProgresModel::with('pengumpulan')->find($id);
+        $pengumpulan = PengumpulanModel::with('progres')->where('progres_id', $id)->first();
 
-            if($progres){
+        if ($progres && $pengumpulan) {
+            try {
+                // Update pengumpulan_id di tabel progres menjadi null
+                $progres->update(['pengumpulan_id' => null]);
 
+                // Hapus data pengumpulan
+                $pengumpulan->delete();
+
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Data berhasil dihapus'
+                ]);
+            } catch (\Illuminate\Database\QueryException $e) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Data gagal dihapus karena masih terdapat tabel lain yang terkait dengan data ini'
+                ]);
             }
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => 'Data tidak ditemukan'
+            ]);
         }
     }
+}
+
 }

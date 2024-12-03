@@ -121,7 +121,6 @@
                         <div class="card">
                             <div class="card-body">
                                 <div class="d-flex align-items-center gap-2">
-                                    <i class="bi bi-person-circle"></i>
                                     <span>Pekerjaan yang dikumpulkan : </span>
                                 </div>
                                 <a class="text-decoration-none">
