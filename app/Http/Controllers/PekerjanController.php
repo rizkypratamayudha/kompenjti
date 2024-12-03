@@ -11,6 +11,7 @@ use App\Models\kompetensiModel;
 use App\Models\PekerjaanModel;
 use App\Models\PendingPekerjaanController;
 use App\Models\PendingPekerjaanModel;
+use App\Models\PengumpulanModel;
 use App\Models\PeriodeModel;
 use App\Models\PersyaratanModel;
 use App\Models\ProgresModel;
@@ -20,6 +21,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Yajra\DataTables\Facades\DataTables;
 
 class PekerjanController extends Controller
 {
@@ -427,31 +429,50 @@ class PekerjanController extends Controller
                 }
             }
 
-            // Delete existing progres and insert new ones
-            $pekerjaan->progres()->delete();
-            $deadlinePertama = $pekerjaan->akumulasi_deadline ? Carbon::parse($pekerjaan->akumulasi_deadline) : null;
+            // Update progres
+            $existingProgres = $pekerjaan->progres()->orderBy('deadline', 'asc')->get();
 
             foreach ($request->judul_progres as $index => $judul) {
                 $hari = $request->hari[$index];
-                $deadlineBaru = $deadlinePertama ? $deadlinePertama->copy()->addDays($hari) : null;
+                $jamKompen = $request->jam_kompen[$index];
 
-                ProgresModel::create([
-                    'pekerjaan_id' => $pekerjaan->pekerjaan_id,
-                    'judul_progres' => $judul,
-                    'hari' => $hari,
-                    'jam_kompen' => $request->jam_kompen[$index],
-                    'deadline' => $deadlineBaru,
-                ]);
+                if (isset($existingProgres[$index])) {
+                    $previousDeadline = $index > 0
+                        ? Carbon::parse($existingProgres[$index - 1]->deadline)
+                        : Carbon::now();
 
-                if ($deadlinePertama) {
-                    $deadlinePertama = $deadlineBaru;
+                    $newDeadline = $previousDeadline->copy()->addDays($hari);
+
+                    // Update progres yang relevan
+                    $existingProgres[$index]->update([
+                        'judul_progres' => $judul,
+                        'hari' => $hari,
+                        'jam_kompen' => $jamKompen,
+                        'deadline' => $newDeadline,
+                    ]);
+                } else {
+                    $lastDeadline = $index > 0
+                        ? Carbon::parse($existingProgres[$index - 1]->deadline)
+                        : Carbon::now();
+
+                    $newDeadline = $lastDeadline->copy()->addDays($hari);
+
+                    // Tambahkan progres baru
+                    ProgresModel::create([
+                        'pekerjaan_id' => $pekerjaan->pekerjaan_id,
+                        'judul_progres' => $judul,
+                        'hari' => $hari,
+                        'jam_kompen' => $jamKompen,
+                        'deadline' => $newDeadline,
+                    ]);
                 }
             }
 
-            // Update akumulasi_deadline hanya jika pekerjaan sudah dimulai
-            if ($pekerjaan->akumulasi_deadline) {
+            // Update akumulasi_deadline
+            $latestProgres = $pekerjaan->progres()->orderBy('deadline', 'desc')->first();
+            if ($latestProgres) {
                 $pekerjaan->update([
-                    'akumulasi_deadline' => $deadlinePertama,
+                    'akumulasi_deadline' => $latestProgres->deadline,
                 ]);
             }
 
@@ -469,7 +490,6 @@ class PekerjanController extends Controller
             ], 500);
         }
     }
-
     public function get_anggota($id)
     {
         $anggotaJumlah = ApprovePekerjaanModel::where('pekerjaan_id', $id)->count();
@@ -537,4 +557,104 @@ class PekerjanController extends Controller
         // Kirimkan pesan sukses melalui session
         return redirect()->route('dosen.index')->with('success', 'Pekerjaan telah dimulai, semua progres sudah diperbarui!');
     }
+
+    public function enter_progres($id)
+    {
+        $breadcrumg = (object) [
+            'title' => 'Progres',
+            'list' => ['Home', 'Tambah Pekerjaan', 'Progres']
+        ];
+
+        $page = (object)[
+            'title' => 'Page Progres',
+        ];
+
+        $activeMenu = 'dosen';
+        $pengumpulan = PengumpulanModel::with('user', 'progres')->where('progres_id', $id)->first();
+        $progres = ProgresModel::where('progres_id', $id)->first();
+        return view('dosen.progres', ['breadcrumb' => $breadcrumg, 'page' => $page, 'activeMenu' => $activeMenu, 'pengumpulan' => $pengumpulan, 'progres' => $progres]);
+    }
+
+    public function list(Request $request, $id)
+    {
+        $pengumpulan = PengumpulanModel::with('user', 'progres') // Ambil relasi user dan progres
+            ->where('progres_id', $id);
+
+        return DataTables::of($pengumpulan)
+            ->addIndexColumn()
+            ->addColumn('username', function ($pengumpulan) {
+                return $pengumpulan->user->username ?? '-';
+            })
+            ->addColumn('nama', function ($pengumpulan) {
+                return $pengumpulan->user->nama ?? '-';
+            })
+            ->addColumn('status', function ($pengumpulan) {
+                return $pengumpulan->status === 'pending' ? 'Sudah Diserahkan' : $pengumpulan->status = 'Sudah Dinilai';
+            })
+            ->addColumn('aksi', function ($pengumpulan) {
+                $btn  = '<button onclick="modalAction(\'' . url('/dosen/' . $pengumpulan->pengumpulan_id .
+                    '/detail-progres') . '\')" class="btn btn-info btn-sm">Detail</button> ';
+                return $btn;
+            })
+            ->rawColumns(['aksi'])
+            ->make(true);
+    }
+
+    public function detail_progres($id)
+    {
+        $pengumpulan = PengumpulanModel::with('user', 'progres')->where('pengumpulan_id', $id)->find($id);
+        return view('dosen.detail_progres', ['pengumpulan' => $pengumpulan]);
+    }
+
+    public function approve($id)
+{
+    DB::beginTransaction(); // Mulai transaksi
+    try {
+        // Ambil data pengumpulan yang terkait dengan progres dan user
+        $pengumpulan = PengumpulanModel::with('user', 'progres')->findOrFail($id);
+
+        if (!$pengumpulan->progres || !$pengumpulan->user) {
+            DB::rollBack(); // Rollback jika ada kesalahan
+            return response()->json(['error' => 'Data progres atau user tidak ditemukan.'], 404);
+        }
+
+        // Mengubah status pengumpulan menjadi 'accept'
+        $pengumpulan->status = 'accept';
+        $pengumpulan->save();
+
+        // Mengakses user yang terkait dengan pengumpulan
+        $user = $pengumpulan->user;
+
+        // Mengakses jam_kompen yang terkait dengan user
+        $jamKompen = $user->jamKompen;
+
+        if ($jamKompen) {
+            // Mengambil nilai akumulasi_jam
+            $currentAkumulasiJam = $jamKompen->akumulasi_jam;
+            $jamKompenProgres = $pengumpulan->progres->jam_kompen; // Jam kompen yang diambil dari progres
+
+            // Mengecek apakah cukup untuk mengurangi
+            if ($currentAkumulasiJam >= $jamKompenProgres) {
+                // Kurangi akumulasi_jam
+                $jamKompen->akumulasi_jam -= $jamKompenProgres;
+                $jamKompen->save(); // Simpan perubahan
+            } else {
+                // Set akumulasi_jam menjadi 0 jika tidak cukup
+                $jamKompen->akumulasi_jam = 0;
+                $jamKompen->save();
+            }
+
+            DB::commit(); // Commit jika berhasil
+            return response()->json(['message' => 'Tugas berhasil disetujui.']);
+        } else {
+            DB::rollBack(); // Rollback jika jamKompen tidak ditemukan
+            return response()->json(['error' => 'Jam Kompen tidak ditemukan untuk user tersebut.'], 404);
+        }
+    } catch (\Exception $e) {
+        DB::rollBack(); // Rollback transaksi jika terjadi error
+        return response()->json(['error' => 'Terjadi kesalahan saat menyetujui tugas: ' . $e->getMessage()], 500);
+    }
+}
+
+
 }

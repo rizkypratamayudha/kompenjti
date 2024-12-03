@@ -66,10 +66,19 @@ class riwayatController extends Controller
         ];
 
         $activeMenu = 'riwayatMhs';
-        $progres = ProgresModel::with('pekerjaan', 'pekerjaan.detail_pekerjaan', 'pekerjaan.user',)->find($id);
-        $pengumpulan = PengumpulanModel::with('progres')->where('user_id', Auth::id())->where('progres_id', $progres->progres_id)->first();
-        return view('riwayatMHS.progres', ['breadcrumb' => $breadcrumb, 'activeMenu' => $activeMenu, 'progres' => $progres, 'page' => $page, 'pengumpulan' => $pengumpulan]);
+        $progres = ProgresModel::with('pekerjaan', 'pekerjaan.detail_pekerjaan', 'pekerjaan.user', 'pengumpulan')->find($id);
+        $pengumpulan = PengumpulanModel::where('user_id', Auth::id())->where('progres_id', $id)->first();
+
+
+        return view('riwayatMHS.progres', [
+            'breadcrumb' => $breadcrumb,
+            'activeMenu' => $activeMenu,
+            'progres' => $progres,
+            'page' => $page,
+            'pengumpulan' => $pengumpulan
+        ]);
     }
+
 
     public function link_ajax($id)
     {
@@ -116,8 +125,6 @@ class riwayatController extends Controller
         $pengumpulan->status = 'pending';
         $pengumpulan->save();
 
-        $progres->pengumpulan_id = $pengumpulan->pengumpulan_id;
-        $progres->save();
 
         return response()->json([
             'status' => true,
@@ -147,7 +154,7 @@ class riwayatController extends Controller
                     }
 
                     // Update pengumpulan_id di tabel progres menjadi null
-                    $progres->update(['pengumpulan_id' => null]);
+                    // $progres->update(['pengumpulan_id' => null]);
 
                     // Hapus data pengumpulan
                     $pengumpulan->delete();
@@ -205,8 +212,6 @@ class riwayatController extends Controller
         $pengumpulan->status = 'pending';
         $pengumpulan->save();
 
-        $progres->pengumpulan_id = $pengumpulan->pengumpulan_id;
-        $progres->save();
 
         return response()->json([
             'status' => true,

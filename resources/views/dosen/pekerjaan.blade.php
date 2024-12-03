@@ -173,7 +173,7 @@
                                         <div class="progress-detail">Nilai jam: ${progres.jam_kompen} - Deadline berakhir ${dayjs(progres.deadline).fromNow()}</div>
                                     </div>
                                         <div class="ellipsis">
-                                            <button class="btn btn-outline-primary btn-sm" onclick="alert('Info detail untuk ${progres.judul_progres}')">Info</button>
+                                            <a class="btn btn-outline-primary btn-sm" href="{{url('/dosen/masukdosen') }}/${progres.progres_id}/enter-progres">Info</a>
                                         </div>
                                 </div>
                     `;

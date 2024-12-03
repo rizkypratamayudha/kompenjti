@@ -179,7 +179,11 @@ Route::middleware(['auth'])->group(function () {
         Route::post('kick-pekerjaan',[PekerjanController::class,'kickPekerjaan']);
         Route::get('/{id}/lihat-pekerjaan',[PekerjanController::class,'lihatPekerjaan']);
         Route::get('/{id}/hitung-notif', [PekerjanController::class, 'hitung_notif_pelamar']);
-        Route::get('/{id}/mulai',[PekerjanController::class,'mulai']);
+        Route::get('/{id}/mulai',action: [PekerjanController::class,'mulai']);
+        Route::get('/masukdosen/{id}/enter-progres',[PekerjanController::class,'enter_progres']);
+        Route::post('/{id}/list',[PekerjanController::class,'list']);
+        Route::get('{id}/detail-progres',[PekerjanController::class,'detail_progres']);
+        Route::post('/approve/{id}',[PekerjanController::class,'approve']);
     });
 
     // MAHASISWAA

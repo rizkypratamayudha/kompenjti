@@ -198,37 +198,44 @@
 @push('js')
     <script>
         $(document).ready(function() {
-            $.ajax({
-                url: '{{ url('/hitung-notif') }}',
-                method: 'GET',
-                success: function(response) {
-                    var jumlahNotif = response.jumlah;
-                    if (jumlahNotif > 99) {
-                        $('.badge').text('99+');
-                    } else if (jumlahNotif == 0) {
-                        $('.badge').remove(); // Menghapus elemen span badge
-                    } else {
-                        $('.badge').text(jumlahNotif);
-                    }
-                }
-            });
-        });
+    // Request untuk menghitung notifikasi pengguna yang belum diproses
+    $.ajax({
+        url: '{{ url('/hitung-notif') }}',  // URL untuk menghitung notifikasi
+        method: 'GET',
+        success: function(response) {
+            var jumlahNotif = response.jumlah;
+            if (jumlahNotif > 99) {
+                $('.badge').text('99+');
+            } else if (jumlahNotif == 0) {
+                $('.badge').remove(); // Menghapus elemen span badge
+            } else {
+                $('.badge').text(jumlahNotif);
+            }
+        },
+        error: function() {
+            console.error("Gagal memuat data notifikasi.");
+        }
+    });
 
-        $(document).ready(function() {
-            $.ajax({
-                url: '{{ url('/hitung-notif-pelamar') }}', // Sesuaikan URL di sini
-                method: 'GET',
-                success: function(response) {
-                    var jumlahNotif = response.jumlah;
-                    if (jumlahNotif > 99) {
-                        $('.badge').text('99+');
-                    } else if (jumlahNotif == 0) {
-                        $('.badge').remove(); // Menghapus elemen span badge
-                    } else {
-                        $('.badge').text(jumlahNotif);
-                    }
-                }
-            });
-        });
+    // Request untuk menghitung notifikasi pelamar pekerjaan
+    $.ajax({
+        url: '{{ url('/hitung-notif-pelamar') }}',  // URL untuk menghitung notifikasi pelamar pekerjaan
+        method: 'GET',
+        success: function(response) {
+            var jumlahNotif = response.jumlah;
+            if (jumlahNotif > 99) {
+                $('.badge-pelamar').text('99+'); // pastikan elemen badge-pelamar ada di HTML
+            } else if (jumlahNotif == 0) {
+                $('.badge-pelamar').remove(); // Menghapus elemen span badge-pelamar
+            } else {
+                $('.badge-pelamar').text(jumlahNotif);
+            }
+        },
+        error: function() {
+            console.error("Gagal memuat data notifikasi pelamar.");
+        }
+    });
+});
+
     </script>
 @endpush
