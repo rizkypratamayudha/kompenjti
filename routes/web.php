@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\PeriodeController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DashboardMahasiswaController;
 use App\Http\Controllers\kompetensi_adminController;
 use App\Http\Controllers\KompetensiController;
 use App\Http\Controllers\LevelController;
@@ -38,7 +39,7 @@ Route::post('logout', [AuthController::class, 'logout'])->middleware('auth');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/', [welcomeController::class, 'index'])->middleware('authorize:ADM');
-    Route::get('/dashboardMhs', [welcomeController::class, 'mahasiswa'])->middleware('authorize:MHS');
+    Route::get('/dashboardMhs', [DashboardMahasiswaController::class, 'index'])->middleware('authorize:MHS');
     Route::get('/dashboardDos', [welcomeController::class, 'dosen'])->middleware('authorize:DSN');
     Route::get('/dashboardKap', [welcomeController::class, 'kaprodi'])->middleware('authorize:KPD');
 
@@ -219,5 +220,3 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/hitung-notif-pelamar', [ValidasiController::class, 'hitung_notif_pelamar']);
     Route::get('pekerjaan/{id}/get-anggota',[ListPekerjaanMHSController::class,'get_anggota']);
 });
-
-
