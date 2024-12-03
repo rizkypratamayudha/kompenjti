@@ -133,17 +133,17 @@
                                 <span>Pekerjaan yang dikumpulkan : </span>
                             </div>
 
-                            @if($pengumpulan && $pengumpulan->bukti_pengumpulan)
-                                @if(str_starts_with($pengumpulan->bukti_pengumpulan, 'https://'))
+                            @if ($pengumpulan && $pengumpulan->bukti_pengumpulan)
+                                @if (str_starts_with($pengumpulan->bukti_pengumpulan, 'https://'))
                                     <!-- Jika bukti_pengumpulan adalah URL yang dimulai dengan 'https://' -->
                                     <a class="text-decoration-none" href="{{ $pengumpulan->bukti_pengumpulan }}">
                                         {{ $pengumpulan->bukti_pengumpulan }}
                                     </a>
                                 @elseif(str_starts_with($pengumpulan->bukti_pengumpulan, 'pengumpulan_gambar/'))
                                     <!-- Jika bukti_pengumpulan adalah file yang disimpan di folder 'pengumpulan_gambar/' -->
-                                    <a class="text-decoration-none" href="{{ asset('storage/' . $pengumpulan->bukti_pengumpulan) }}">
-                                        {{ $pengumpulan->bukti_pengumpulan }}
-                                    </a>
+                                    <img class="text-decoration-none mt-3"
+                                        src="{{ asset('storage/' . $pengumpulan->bukti_pengumpulan) }}"
+                                        style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; ">
                                 @else
                                     <!-- Jika bukti_pengumpulan tidak memenuhi kedua kondisi di atas, tampilkan '-'' -->
                                     <span>-</span>
