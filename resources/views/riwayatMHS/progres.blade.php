@@ -128,15 +128,32 @@
                             </div>
                         </div>
 
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="d-flex align-items-center gap-2">
-                                    <span>Pekerjaan yang dikumpulkan : </span>
-                                </div>
-                                <a class="text-decoration-none" href="{{$pengumpulan->bukti_pengumpulan ?? '-'}}">
-                                    {{ $pengumpulan->bukti_pengumpulan ?? '-' }}</a>
+                        <div class="card-body">
+                            <div class="d-flex align-items-center gap-2">
+                                <span>Pekerjaan yang dikumpulkan : </span>
                             </div>
+
+                            @if($pengumpulan && $pengumpulan->bukti_pengumpulan)
+                                @if(str_starts_with($pengumpulan->bukti_pengumpulan, 'https://'))
+                                    <!-- Jika bukti_pengumpulan adalah URL yang dimulai dengan 'https://' -->
+                                    <a class="text-decoration-none" href="{{ $pengumpulan->bukti_pengumpulan }}">
+                                        {{ $pengumpulan->bukti_pengumpulan }}
+                                    </a>
+                                @elseif(str_starts_with($pengumpulan->bukti_pengumpulan, 'pengumpulan_gambar/'))
+                                    <!-- Jika bukti_pengumpulan adalah file yang disimpan di folder 'pengumpulan_gambar/' -->
+                                    <a class="text-decoration-none" href="{{ asset('storage/' . $pengumpulan->bukti_pengumpulan) }}">
+                                        {{ $pengumpulan->bukti_pengumpulan }}
+                                    </a>
+                                @else
+                                    <!-- Jika bukti_pengumpulan tidak memenuhi kedua kondisi di atas, tampilkan '-'' -->
+                                    <span>-</span>
+                                @endif
+                            @else
+                                <!-- Jika $pengumpulan atau bukti_pengumpulan tidak ditemukan -->
+                                <span>-</span>
+                            @endif
                         </div>
+
                     </div>
                 </div>
             </div>

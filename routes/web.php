@@ -217,6 +217,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/link',[riwayatController::class,'store_link']);
         Route::get('/{id}/hapus_ajax',[riwayatController::class,'hapus_ajax']);
         Route::delete('/{id}/hapus',[riwayatController::class,'hapus']);
+        Route::post('/gambar',[riwayatController::class,'store_gambar']);
     });
 
     // NOTIFFF

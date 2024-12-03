@@ -7,6 +7,7 @@ use App\Models\PengumpulanModel;
 use App\Models\ProgresModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class riwayatController extends Controller
 {
@@ -140,6 +141,11 @@ class riwayatController extends Controller
 
             if ($progres && $pengumpulan) {
                 try {
+                    // Hapus file dari penyimpanan jika ada
+                    if ($pengumpulan->bukti_pengumpulan && Storage::disk('public')->exists($pengumpulan->bukti_pengumpulan)) {
+                        Storage::disk('public')->delete($pengumpulan->bukti_pengumpulan);
+                    }
+
                     // Update pengumpulan_id di tabel progres menjadi null
                     $progres->update(['pengumpulan_id' => null]);
 
@@ -148,7 +154,7 @@ class riwayatController extends Controller
 
                     return response()->json([
                         'status' => true,
-                        'message' => 'Data berhasil dihapus'
+                        'message' => 'Data dan file berhasil dihapus'
                     ]);
                 } catch (\Illuminate\Database\QueryException $e) {
                     return response()->json([
@@ -165,11 +171,16 @@ class riwayatController extends Controller
         }
     }
 
-    public function store_gambar(Request $request){
+
+
+    public function store_gambar(Request $request)
+    {
         $request->validate([
             'progres_id' => 'required|exists:progres,progres_id',
             'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
+
+
 
         $progres = ProgresModel::findorfail($request->progres_id);
         if ($progres->pengumpulan_id) {
@@ -186,10 +197,20 @@ class riwayatController extends Controller
             ], 403);
         }
 
-        $gambar = $request->file('image')->store('pengumpulan_gambar','public');
+        $gambar = $request->file('image')->store('pengumpulan_gambar', 'public');
         $pengumpulan = new PengumpulanModel();
         $pengumpulan->progres_id = $request->progres_id;
+        $pengumpulan->user_id = Auth::id();
+        $pengumpulan->bukti_pengumpulan = $gambar;
+        $pengumpulan->status = 'pending';
+        $pengumpulan->save();
 
+        $progres->pengumpulan_id = $pengumpulan->pengumpulan_id;
+        $progres->save();
 
+        return response()->json([
+            'status' => true,
+            'message' => 'Pengumpulan berhasil disimpan.',
+        ]);
     }
 }

@@ -30,40 +30,55 @@
             </div>
         </div>
     </div>
-</form>
-<script>
-    $(document).ready(function() {
+</form><script>
+    $(document).ready(function () {
         $("#form-tambah").validate({
             rules: {
-            image: {required: true},
+                image: { required: true },
             },
-            submitHandler: function(form) {
+            submitHandler: function (form) {
+                // Buat objek FormData untuk mengirimkan file
+                let formData = new FormData(form);
+
                 $.ajax({
                     url: form.action,
                     type: form.method,
-                    data: $(form).serialize(),
-                    success: function(response) {
-                        if(response.status){
-                            $('#myModal').modal('hide');
+                    data: formData,
+                    processData: false, // Tidak memproses data sebagai string
+                    contentType: false, // Tidak menetapkan contentType default
+                    success: function (response) {
+                        if (response.status) {
+                            $('#modal-master').modal('hide');
                             Swal.fire({
                                 icon: 'success',
                                 title: 'Berhasil',
-                                text: response.message
-                            });
-                            dataLevel.ajax.reload();
-                        }else{
+                                text: response.message,
+                            }).then((result) => {
+                            if (result.isConfirmed) {
+                                location.reload(); // Reload the page after confirming the success message
+                            }
+                        });
+                        } else {
                             $('.error-text').text('');
-                            $.each(response.msgField, function(prefix, val) {
-                                $('#error-'+prefix).text(val[0]);
+                            $.each(response.msgField, function (prefix, val) {
+                                $('#error-' + prefix).text(val[0]);
                             });
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Terjadi Kesalahan',
-                                text: response.message
+                                text: response.message,
                             });
                         }
-                    }
+                    },
+                    error: function (xhr) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Terjadi Kesalahan',
+                            text: 'Unggahan gagal. Silakan coba lagi.',
+                        });
+                    },
                 });
+
                 return false;
             },
             errorElement: 'span',
@@ -76,7 +91,7 @@
             },
             unhighlight: function (element, errorClass, validClass) {
                 $(element).removeClass('is-invalid');
-            }
+            },
         });
     });
 </script>
