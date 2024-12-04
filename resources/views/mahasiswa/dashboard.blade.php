@@ -2,21 +2,22 @@
 
 @section('content')
     <div class="container-fluid">
-       <!-- Pesan Jika Ada Tanggungan Kompen -->
-       @if ($jamkompen->sum('akumulasi_jam') > 0)
-    <div class="alert alert-danger d-flex align-items-center justify-content-center py-3 px-4" style="font-size: 1.4rem;">
-        <i class="bi bi-emoji-smile text-white me-3 mr-4" style="font-size: 3.2rem;"></i>
-        <div>
-            <p class="mb-0">
-                Hai, <strong class="text-white">{{ $user->nama }}</strong>! 😊 <br>
-                Silakan selesaikan kompen Anda agar bisa mengikuti <strong>UAS</strong>. Semangat, ya! 💪
-            </p>
-        </div>
-    </div>
-@endif
+        <!-- Pesan Jika Ada Tanggungan Kompen -->
+        @if ($jamkompen->sum('akumulasi_jam') > 0)
+            <div class="alert alert-danger d-flex align-items-center justify-content-center py-3 px-4"
+                style="font-size: 1.4rem;">
+                <i class="bi bi-emoji-astonished-fill text-white me-3 mr-4" style="font-size: 3.2rem;"></i>
+                <div>
+                    <p class="mb-0">
+                        Hai, <strong class="text-white">{{ $user->nama }}</strong>!<br>
+                        Silakan selesaikan kompen Anda agar bisa mengikuti <strong>UAS</strong>. Semangat, ya! 💪
+                    </p>
+                </div>
+            </div>
+        @endif
 
 
-           <!-- Bagian Atas: Informasi Mahasiswa -->
+        <!-- Bagian Atas: Informasi Mahasiswa -->
         <div class="row mb-4">
             <div class="col-12">
                 <div class="card shadow-lg border-0">
@@ -28,8 +29,7 @@
                             <div class="profile-picture mb-3 mr-4 ml-4">
                                 <img id="profile-avatar"
                                     src="{{ $user->avatar ? asset('storage/' . $user->avatar) : asset('user.png') }}"
-                                    alt="User Avatar"
-                                    class="img-fluid rounded-circle border border-dark shadow"
+                                    alt="User Avatar" class="img-fluid rounded-circle border border-dark shadow"
                                     style="object-fit: cover; width: 120px; height: 120px;">
                             </div>
                             <h5 class="fw-bold text-primary">{{ $user->nama }}</h5>
@@ -86,65 +86,66 @@
             </div>
         </div>
 
-    <!-- Bagian Bawah: Informasi Jam Kompen -->
-    <div class="row mt-4">
-        <div class="col-12">
-            <div class="card shadow">
-                <div class="card-header bg-warning text-white text-center">
-                    <h4>Informasi Jam Kompen</h4>
-                </div>
-                <div class="card-body">
-                    @if ($jamkompen && $jamkompen->isNotEmpty())
-                        <!-- Akumulasi Jam Kompen -->
-                        <div class="mb-4 text-center">
-                            <p class="fw-bold text-primary" style="font-size: 1.25rem;">
-                                <i class="bi bi-clock-history me-2"></i>
-                                Total Akumulasi Jam Kompen: 
-                                <span class="text-danger">{{ $jamkompen->sum('akumulasi_jam') }}</span> Jam
-                            </p>
-                        </div>
-                        
-                        @foreach ($jamkompen as $item)
-                            <div class="mb-4">
-                                <!-- Periode -->
-                                <p class="mb-2">
-                                    <i class="bi bi-calendar3 me-2 text-primary"></i>
-                                    <strong>Periode:</strong>
-                                    <span class="text-secondary">{{ $item->periode->periode_nama }}</span>
+        <!-- Bagian Bawah: Informasi Jam Kompen -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card shadow">
+                    <div class="card-header bg-warning text-white text-center">
+                        <h4>Informasi Jam Kompen</h4>
+                    </div>
+                    <div class="card-body">
+                        @if ($jamkompen && $jamkompen->isNotEmpty())
+                            <!-- Akumulasi Jam Kompen -->
+                            <div class="mb-4 text-center">
+                                <p class="fw-bold text-primary" style="font-size: 1.25rem;">
+                                    <i class="bi bi-clock-history me-2"></i>
+                                    Total Akumulasi Jam Kompen:
+                                    <span class="text-danger">{{ $jamkompen->sum('akumulasi_jam') }}</span> Jam
                                 </p>
-    
-                                <!-- Detail Kompen -->
-                                <h5 class="text-success">
-                                    <i class="bi bi-list-task me-2"></i> Detail Kompen:
-                                </h5>
-                                <ul class="list-group">
-                                    @foreach ($item->detail_jamKompen as $detail)
-                                        <li class="list-group-item d-flex align-items-center">
-                                            <i class="bi bi-bookmark-fill text-info me-3" style="font-size: 1.5rem;"></i>
-                                            <div>
-                                                <p class="mb-1">
-                                                    <strong>Mata Kuliah:</strong>
-                                                    {{ $detail->matkul->matkul_nama ?? 'Tidak Diketahui' }}
-                                                </p>
-                                                <p class="mb-0">
-                                                    <strong>Jam:</strong> {{ $detail->jumlah_jam }} Jam
-                                                </p>
-                                            </div>
-                                        </li>
-                                    @endforeach
-                                </ul>
                             </div>
-                            <hr class="text-muted">
-                        @endforeach
-                    @else
-                        <p class="text-danger text-center">
-                            <i class="bi bi-exclamation-circle"></i> Data jam kompen tidak tersedia.
-                        </p>
-                    @endif
+
+                            @foreach ($jamkompen as $item)
+                                <div class="mb-4">
+                                    <!-- Periode -->
+                                    <p class="mb-2">
+                                        <i class="bi bi-calendar3 me-2 text-primary"></i>
+                                        <strong>Periode:</strong>
+                                        <span class="text-secondary">{{ $item->periode->periode_nama }}</span>
+                                    </p>
+
+                                    <!-- Detail Kompen -->
+                                    <h5 class="text-success">
+                                        <i class="bi bi-list-task me-2"></i> Detail Kompen:
+                                    </h5>
+                                    <ul class="list-group">
+                                        @foreach ($item->detail_jamKompen as $detail)
+                                            <li class="list-group-item d-flex align-items-center">
+                                                <i class="bi bi-bookmark-fill text-info me-3"
+                                                    style="font-size: 1.5rem;"></i>
+                                                <div>
+                                                    <p class="mb-1">
+                                                        <strong>Mata Kuliah:</strong>
+                                                        {{ $detail->matkul->matkul_nama ?? 'Tidak Diketahui' }}
+                                                    </p>
+                                                    <p class="mb-0">
+                                                        <strong>Jam:</strong> {{ $detail->jumlah_jam }} Jam
+                                                    </p>
+                                                </div>
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                                <hr class="text-muted">
+                            @endforeach
+                        @else
+                            <p class="text-danger text-center">
+                                <i class="bi bi-exclamation-circle"></i> Data jam kompen tidak tersedia.
+                            </p>
+                        @endif
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    
 
-@endsection
+
+    @endsection

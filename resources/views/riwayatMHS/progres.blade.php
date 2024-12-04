@@ -60,7 +60,7 @@
                                         </span>
                                     @else
                                         <span class="text-secondary">
-                                            Nilai :
+                                            Telah dinilai :
                                             @if ($pengumpulan->status == 'pending')
                                                 -
                                             @elseif ($pengumpulan->status == 'accept')
