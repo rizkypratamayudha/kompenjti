@@ -134,24 +134,38 @@
                             </div>
 
                             @if ($pengumpulan && $pengumpulan->bukti_pengumpulan)
-                                @if (str_starts_with($pengumpulan->bukti_pengumpulan, 'https://'))
-                                    <!-- Jika bukti_pengumpulan adalah URL yang dimulai dengan 'https://' -->
-                                    <a class="text-decoration-none" href="{{ $pengumpulan->bukti_pengumpulan }}">
-                                        {{ $pengumpulan->bukti_pengumpulan }}
-                                    </a>
-                                @elseif(str_starts_with($pengumpulan->bukti_pengumpulan, 'pengumpulan_gambar/'))
-                                    <!-- Jika bukti_pengumpulan adalah file yang disimpan di folder 'pengumpulan_gambar/' -->
-                                    <img class="text-decoration-none mt-3"
-                                        src="{{ asset('storage/' . $pengumpulan->bukti_pengumpulan) }}"
-                                        style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; ">
-                                @else
-                                    <!-- Jika bukti_pengumpulan tidak memenuhi kedua kondisi di atas, tampilkan '-'' -->
-                                    <span>-</span>
-                                @endif
+                            @if (str_starts_with($pengumpulan->bukti_pengumpulan, 'https://'))
+                                <!-- If the bukti_pengumpulan is a URL that starts with 'https://' -->
+                                <a class="text-decoration-none" href="{{ $pengumpulan->bukti_pengumpulan }}">
+                                    {{ $pengumpulan->bukti_pengumpulan }}
+                                </a>
+                            @elseif(str_starts_with($pengumpulan->bukti_pengumpulan, 'pengumpulan_gambar/'))
+                                <!-- If bukti_pengumpulan is an image stored in 'pengumpulan_gambar/' -->
+                                <img class="text-decoration-none mt-3"
+                                    src="{{ asset('storage/' . $pengumpulan->bukti_pengumpulan) }}"
+                                    style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px;">
+                            @elseif(str_starts_with($pengumpulan->bukti_pengumpulan, 'pengumpulan_file/'))
+                                <!-- If bukti_pengumpulan is a file stored in 'pengumpulan_file/' -->
+                                @php
+                                    // Extract the original file name by getting the last part of the path
+                                    $filePath = storage_path('app/public/' . $pengumpulan->bukti_pengumpulan);
+                                    $fileName = $pengumpulan->namaoriginal
+                                @endphp
+                                <i class="fa fa-file-pdf" style="color: red"></i>
+                                <a class="text-decoration-none mt-3"
+                                    href="{{ asset('storage/' . $pengumpulan->bukti_pengumpulan) }}"
+                                    download="{{ $fileName }}">
+                                    {{ $fileName }}
+
+                                </a>
                             @else
-                                <!-- Jika $pengumpulan atau bukti_pengumpulan tidak ditemukan -->
+                                <!-- If bukti_pengumpulan does not match any of the conditions above, display '-' -->
                                 <span>-</span>
                             @endif
+                        @else
+                            <!-- If $pengumpulan or bukti_pengumpulan is not found -->
+                            <span>-</span>
+                        @endif
                         </div>
 
                     </div>

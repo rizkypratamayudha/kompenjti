@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Auth;
 
 class PekerjaanModel extends Model
 {
@@ -41,5 +42,14 @@ class PekerjaanModel extends Model
 
     public function approve(){
         return $this->belongsTo(ApprovePekerjaanModel::class,'pekerjaan_id', 'pekerjaan_id');
+    }
+
+    public function getCanRequestTTDAttribute()
+    {
+        // Memeriksa apakah pengumpulan untuk user yang login sudah diterima
+        $pengumpulan = $this->pengumpulan->where('user_id', Auth::id())->first();
+
+        // Mengembalikan apakah user bisa request TTD berdasarkan status pengumpulan
+        return $pengumpulan && $pengumpulan->status != 'pending';
     }
 }

@@ -185,6 +185,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/{id}/list',[PekerjanController::class,'list']);
         Route::get('{id}/detail-progres',[PekerjanController::class,'detail_progres']);
         Route::post('/approve/{id}',[PekerjanController::class,'approve']);
+        Route::post('/decline/{id}',[PekerjanController::class,'decline']);
     });
 
     // MAHASISWAA
@@ -223,6 +224,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/{id}/hapus_ajax',[riwayatController::class,'hapus_ajax']);
         Route::delete('/{id}/hapus',[riwayatController::class,'hapus']);
         Route::post('/gambar',[riwayatController::class,'store_gambar']);
+        Route::post('/file',[riwayatController::class,'store_file']);
     });
 
     Route::group(['prefix'=> 'lihat','middleware'=> 'authorize:ADM'], function () {

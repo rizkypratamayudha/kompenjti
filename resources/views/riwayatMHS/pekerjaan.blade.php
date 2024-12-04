@@ -40,6 +40,7 @@
             <div class="alert alert-danger">{{ session('error') }}</div>
         @endif
 
+
         <div class="card text-center">
             <div class="card-header">
                 <ul class="nav nav-tabs card-header-tabs">

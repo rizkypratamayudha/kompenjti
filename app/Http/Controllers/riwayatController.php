@@ -12,22 +12,23 @@ use Illuminate\Support\Facades\Storage;
 class riwayatController extends Controller
 {
     public function index()
-    {
-        $breadcrumb = (object) [
-            'title' => 'Page Pengerjaan dan Riwayat Pekerjaan',
-            'list' => ['Home', 'Riwayat'],
-        ];
+{
+    $breadcrumb = (object) [
+        'title' => 'Page Pengerjaan dan Riwayat Pekerjaan',
+        'list' => ['Home', 'Riwayat'],
+    ];
 
-        $page = (object)[
-            'title' => 'Page Pengerjaan dan Riwayat Pekerjaan',
-        ];
+    $page = (object)[
+        'title' => 'Page Pengerjaan dan Riwayat Pekerjaan',
+    ];
 
-        $activeMenu = 'riwayatMhs';
-        $tugas = PekerjaanModel::with('detail_pekerjaan', 'progres')->whereHas('approve', function ($query) {
-            $query->where('user_id', Auth::id());
-        })->get();
-        return view('riwayatMHS.index', ['activeMenu' => $activeMenu, 'page' => $page, 'breadcrumb' => $breadcrumb, 'tugas' => $tugas]);
-    }
+    $activeMenu = 'riwayatMhs';
+    $tugas = PekerjaanModel::with(['detail_pekerjaan', 'pengumpulan']) // Mengambil relasi tugas dan pengumpulan
+        ->get();
+
+    return view('riwayatMHS.index', ['activeMenu' => $activeMenu, 'page' => $page, 'breadcrumb' => $breadcrumb, 'tugas' => $tugas]);
+}
+
 
     public function show_ajax($id)
     {
@@ -41,7 +42,7 @@ class riwayatController extends Controller
     {
         $breadcrumb = (object)[
             'title' => 'Pekerjaan',
-            'list' => ['Home', 'Pekerjaan']
+            'list' => ['Home','Riwayat', 'Pekerjaan']
         ];
 
         $page = (object)[
@@ -117,6 +118,8 @@ class riwayatController extends Controller
         if ($progres->deadline && \Carbon\Carbon::now()->greaterThan(\Carbon\Carbon::parse($progres->deadline))) {
             return response()->json(['status' => false, 'message' => 'Aksi tidak diperbolehkan, deadline sudah terlewati'], 403);
         }
+
+
 
         $pengumpulan = new PengumpulanModel();
         $pengumpulan->progres_id = $request->progres_id;
@@ -204,11 +207,14 @@ class riwayatController extends Controller
             ], 403);
         }
 
+        $namafile = $request->file('image')->getClientOriginalName();
+
         $gambar = $request->file('image')->store('pengumpulan_gambar', 'public');
         $pengumpulan = new PengumpulanModel();
         $pengumpulan->progres_id = $request->progres_id;
         $pengumpulan->user_id = Auth::id();
         $pengumpulan->bukti_pengumpulan = $gambar;
+        $pengumpulan->namaoriginal = $namafile;
         $pengumpulan->status = 'pending';
         $pengumpulan->save();
 
@@ -218,4 +224,44 @@ class riwayatController extends Controller
             'message' => 'Pengumpulan berhasil disimpan.',
         ]);
     }
+    public function store_file(Request $request)
+    {
+        $request->validate([
+            'progres_id' => 'required|exists:progres,progres_id',
+            'file' => 'required|mimes:pdf,xlsx,docx|max:2048'
+        ]);
+
+        $progres = ProgresModel::findorfail($request->progres_id);
+        if ($progres->pengumpulan_id) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Pengumpulan sudah ada untuk progres ini.',
+            ]);
+        }
+
+        if ($progres->deadline && \Carbon\Carbon::now()->greaterThan(\Carbon\Carbon::parse($progres->deadline))) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Aksi tidak diperbolehkan, deadline sudah terlewati.',
+            ], 403);
+        }
+
+        $namafile = $request->file('file')->getClientOriginalName();
+
+        $file = $request->file('file')->store('pengumpulan_file', 'public');
+        $pengumpulan = new PengumpulanModel();
+        $pengumpulan->progres_id = $request->progres_id;
+        $pengumpulan->user_id = Auth::id();
+        $pengumpulan->bukti_pengumpulan = $file;
+        $pengumpulan->namaoriginal = $namafile;
+        $pengumpulan->status = 'pending';
+        $pengumpulan->save();
+
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Pengumpulan berhasil disimpan.',
+        ]);
+    }
+
 }

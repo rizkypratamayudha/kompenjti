@@ -19,6 +19,6 @@ class ProgresModel extends Model
     }
 
     public function pengumpulan(){
-        return $this->hasMany(PengumpulanModel::class,'pengumpulan_id','pengumpulan_id');
+        return $this->hasMany(PengumpulanModel::class,'progres_id','progres_id');
     }
 }

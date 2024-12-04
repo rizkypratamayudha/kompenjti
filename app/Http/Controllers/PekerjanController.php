@@ -20,6 +20,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -589,8 +590,17 @@ class PekerjanController extends Controller
                 return $pengumpulan->user->nama ?? '-';
             })
             ->addColumn('status', function ($pengumpulan) {
-                return $pengumpulan->status === 'pending' ? 'Sudah Diserahkan' : $pengumpulan->status = 'Sudah Dinilai';
+                if ($pengumpulan->status === 'pending') {
+                    return 'Sudah Diserahkan';
+                } elseif ($pengumpulan->status === 'accept') {
+                    // Jika status 'accept', tampilkan 'Sudah Dinilai' dan jumlah 'jam_kompen'
+                    return 'Sudah Dinilai : ' . ($pengumpulan->progres->jam_kompen ?? 0);
+                } else {
+                    // Jika status selain 'pending' dan 'accept', tampilkan 0
+                    return 'Sudah Dinilai : 0';
+                }
             })
+
             ->addColumn('aksi', function ($pengumpulan) {
                 $btn  = '<button onclick="modalAction(\'' . url('/dosen/' . $pengumpulan->pengumpulan_id .
                     '/detail-progres') . '\')" class="btn btn-info btn-sm">Detail</button> ';
@@ -607,53 +617,92 @@ class PekerjanController extends Controller
     }
 
     public function approve($id)
-{
-    DB::beginTransaction(); // Mulai transaksi
-    try {
-        // Ambil data pengumpulan yang terkait dengan progres dan user
-        $pengumpulan = PengumpulanModel::with('user', 'progres')->findOrFail($id);
+    {
+        DB::beginTransaction(); // Mulai transaksi
+        try {
+            // Ambil data pengumpulan yang terkait dengan progres dan user
+            $pengumpulan = PengumpulanModel::with('user', 'progres')->findOrFail($id);
 
-        if (!$pengumpulan->progres || !$pengumpulan->user) {
-            DB::rollBack(); // Rollback jika ada kesalahan
-            return response()->json(['error' => 'Data progres atau user tidak ditemukan.'], 404);
-        }
-
-        // Mengubah status pengumpulan menjadi 'accept'
-        $pengumpulan->status = 'accept';
-        $pengumpulan->save();
-
-        // Mengakses user yang terkait dengan pengumpulan
-        $user = $pengumpulan->user;
-
-        // Mengakses jam_kompen yang terkait dengan user
-        $jamKompen = $user->jamKompen;
-
-        if ($jamKompen) {
-            // Mengambil nilai akumulasi_jam
-            $currentAkumulasiJam = $jamKompen->akumulasi_jam;
-            $jamKompenProgres = $pengumpulan->progres->jam_kompen; // Jam kompen yang diambil dari progres
-
-            // Mengecek apakah cukup untuk mengurangi
-            if ($currentAkumulasiJam >= $jamKompenProgres) {
-                // Kurangi akumulasi_jam
-                $jamKompen->akumulasi_jam -= $jamKompenProgres;
-                $jamKompen->save(); // Simpan perubahan
-            } else {
-                // Set akumulasi_jam menjadi 0 jika tidak cukup
-                $jamKompen->akumulasi_jam = 0;
-                $jamKompen->save();
+            if (!$pengumpulan->progres || !$pengumpulan->user) {
+                DB::rollBack(); // Rollback jika ada kesalahan
+                return response()->json(['error' => 'Data progres atau user tidak ditemukan.'], 404);
             }
 
-            DB::commit(); // Commit jika berhasil
-            return response()->json(['message' => 'Tugas berhasil disetujui.']);
-        } else {
-            DB::rollBack(); // Rollback jika jamKompen tidak ditemukan
-            return response()->json(['error' => 'Jam Kompen tidak ditemukan untuk user tersebut.'], 404);
+            // Mengubah status pengumpulan menjadi 'accept'
+            $pengumpulan->status = 'accept';
+            $pengumpulan->save();
+
+            // Mengakses user yang terkait dengan pengumpulan
+            $user = $pengumpulan->user;
+
+            // Mengakses jam_kompen yang terkait dengan user
+            $jamKompen = $user->jamKompen;
+
+            if ($jamKompen) {
+                // Mengambil nilai akumulasi_jam
+                $currentAkumulasiJam = $jamKompen->akumulasi_jam;
+                $jamKompenProgres = $pengumpulan->progres->jam_kompen; // Jam kompen yang diambil dari progres
+                // Mengecek apakah cukup untuk mengurangi
+                if ($currentAkumulasiJam >= $jamKompenProgres) {
+                    // Kurangi akumulasi_jam
+                    $jamKompen->akumulasi_jam -= $jamKompenProgres;
+                    $jamKompen->save(); // Simpan perubahan
+                } else {
+                    // Set akumulasi_jam menjadi 0 jika tidak cukup
+                    $jamKompen->akumulasi_jam = 0;
+                    $jamKompen->save();
+                }
+
+                DB::commit(); // Commit jika berhasil
+                return response()->json(['message' => 'Tugas berhasil disetujui.']);
+            } else {
+                DB::rollBack(); // Rollback jika jamKompen tidak ditemukan
+                return response()->json(['error' => 'Jam Kompen tidak ditemukan untuk user tersebut.'], 404);
+            }
+        } catch (\Exception $e) {
+            DB::rollBack(); // Rollback transaksi jika terjadi error
+            return response()->json(['error' => 'Terjadi kesalahan saat menyetujui tugas: ' . $e->getMessage()], 500);
         }
-    } catch (\Exception $e) {
-        DB::rollBack(); // Rollback transaksi jika terjadi error
-        return response()->json(['error' => 'Terjadi kesalahan saat menyetujui tugas: ' . $e->getMessage()], 500);
     }
+
+    public function decline($id)
+    {
+        $pengumpulan = PengumpulanModel::with('user', 'progres')->findOrFail($id);
+        $pengumpulan->status = 'decline';
+        $pengumpulan->save();
+
+        return response()->json(['message' => 'Tugas berhasil disetujui.']);
+    }
+
+    public function checkProgressAndShowButton($id)
+{
+    $userId = Auth::id();
+
+    // Mengambil semua progres yang terkait dengan pekerjaan dan pengguna yang login
+    $progres = ProgresModel::where('pekerjaan_id', $id)
+        ->where('user_id', $userId)
+        ->get();
+
+    // Mengecek apakah semua progres memiliki status selain 'pending'
+    $allCompleted = $progres->every(function ($item) {
+        return $item->status !== 'pending'; // Memastikan status bukan pending
+    });
+
+    // Mengecek apakah semua pengumpulan (tugas) sudah diterima dan bukan 'pending'
+    $pengumpulan = PengumpulanModel::where('user_id', $userId)
+        ->where('pekerjaan_id', $id)
+        ->get();
+
+    $allPengumpulanAccepted = $pengumpulan->every(function ($item) {
+        return $item->status !== 'pending'; // Memastikan status bukan pending
+    });
+
+    // Debugging untuk memastikan data dikirim
+    Log::debug('Progres Status: ' . $allCompleted . ', Pengumpulan Status: ' . $allPengumpulanAccepted);
+
+    return response()->json([
+        'status' => $allCompleted && $allPengumpulanAccepted
+    ]);
 }
 
 

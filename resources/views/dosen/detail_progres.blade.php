@@ -41,9 +41,10 @@
                     <td class="col-9">
                         @if ($pengumpulan->status == 'pending')
                             Sudah Diserahkan
+                        @elseif($pengumpulan->status =='accept')
+                            Sudah Dinilai : {{$pengumpulan->progres->jam_kompen}}
                         @else
-                            Sudah Dinilai
-
+                            Sudah Dinilai : 0 
                         @endif
                     </td>
                 </tr>
@@ -52,21 +53,35 @@
                     <td class="col-9">
                         @if ($pengumpulan && $pengumpulan->bukti_pengumpulan)
                             @if (str_starts_with($pengumpulan->bukti_pengumpulan, 'https://'))
-                                <!-- Jika bukti_pengumpulan adalah URL yang dimulai dengan 'https://' -->
+                                <!-- If the bukti_pengumpulan is a URL that starts with 'https://' -->
                                 <a class="text-decoration-none" href="{{ $pengumpulan->bukti_pengumpulan }}">
                                     {{ $pengumpulan->bukti_pengumpulan }}
                                 </a>
                             @elseif(str_starts_with($pengumpulan->bukti_pengumpulan, 'pengumpulan_gambar/'))
-                                <!-- Jika bukti_pengumpulan adalah file yang disimpan di folder 'pengumpulan_gambar/' -->
+                                <!-- If bukti_pengumpulan is an image stored in 'pengumpulan_gambar/' -->
                                 <img class="text-decoration-none mt-3"
                                     src="{{ asset('storage/' . $pengumpulan->bukti_pengumpulan) }}"
-                                    style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; ">
+                                    style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px;">
+                            @elseif(str_starts_with($pengumpulan->bukti_pengumpulan, 'pengumpulan_file/'))
+                                <!-- If bukti_pengumpulan is a file stored in 'pengumpulan_file/' -->
+                                @php
+                                    // Extract the original file name by getting the last part of the path
+                                    $filePath = storage_path('app/public/' . $pengumpulan->bukti_pengumpulan);
+                                    $fileName = $pengumpulan->namaoriginal;
+                                @endphp
+                                <i class="fa fa-file-pdf" style="color: red"></i>
+                                <a class="text-decoration-none mt-3"
+                                    href="{{ asset('storage/' . $pengumpulan->bukti_pengumpulan) }}"
+                                    download="{{ $fileName }}">
+                                    {{ $fileName }}
+
+                                </a>
                             @else
-                                <!-- Jika bukti_pengumpulan tidak memenuhi kedua kondisi di atas, tampilkan '-'' -->
+                                <!-- If bukti_pengumpulan does not match any of the conditions above, display '-' -->
                                 <span>-</span>
                             @endif
                         @else
-                            <!-- Jika $pengumpulan atau bukti_pengumpulan tidak ditemukan -->
+                            <!-- If $pengumpulan or bukti_pengumpulan is not found -->
                             <span>-</span>
                         @endif
                     </td>
@@ -75,12 +90,14 @@
         </div>
         <div class="modal-footer">
             @if ($pengumpulan->status == 'pending')
-            <button type="button" class="btn btn-success" onclick="approveTugas('{{$pengumpulan->pengumpulan_id}}')">
-                Accept
-            </button>
-            <button type="button" class="btn btn-danger" onclick="declineTugas('{{$pengumpulan->pengumpulan_id}}')">
-                Decline
-            </button>
+                <button type="button" class="btn btn-success"
+                    onclick="approveTugas('{{ $pengumpulan->pengumpulan_id }}')">
+                    Accept
+                </button>
+                <button type="button" class="btn btn-danger"
+                    onclick="declineTugas('{{ $pengumpulan->pengumpulan_id }}')">
+                    Decline
+                </button>
             @endif
         </div>
     </div>
@@ -88,28 +105,54 @@
 
 <script>
     function approveTugas(pengumpulanId) {
-            $.ajax({
-                url: '{{ url("dosen/approve") }}/' + pengumpulanId,
-                type: 'POST',
-                data: {
-                    _token: '{{ csrf_token() }}'
-                },
-                success: function(response) {
-                    $('#myModal').modal('hide');
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Tugas Disetujui',
-                        text: response.message
-                    });
-                    dataUser.ajax.reload();
-                },
-                error: function(response) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Tugas Disetujui gagal',
-                        text: response.responseJSON.error
-                    });
-                }
-            });
-        }
+        $.ajax({
+            url: '{{ url('dosen/approve') }}/' + pengumpulanId,
+            type: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}'
+            },
+            success: function(response) {
+                $('#myModal').modal('hide');
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Tugas Disetujui',
+                    text: response.message
+                });
+                dataUser.ajax.reload();
+            },
+            error: function(response) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Tugas Disetujui gagal',
+                    text: response.responseJSON.error
+                });
+            }
+        });
+    }
+
+    function declineTugas(pengumpulanId) {
+        $.ajax({
+            url: '{{ url('dosen/decline') }}/' + pengumpulanId,
+            type: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}'
+            },
+            success: function(response) {
+                $('#myModal').modal('hide');
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Tugas Ditolak dan bernilai 0',
+                    text: response.message
+                });
+                dataUser.ajax.reload();
+            },
+            error: function(response) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Tugas Disetujui gagal',
+                    text: response.responseJSON.error
+                });
+            }
+        });
+    }
 </script>

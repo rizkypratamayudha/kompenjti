@@ -9,6 +9,7 @@
                 </button>
             </div>
             <div class="modal-body">
+                <input type="hidden" value="{{$progres->progres_id}}" name="progres_id">
                 <div class="form-group">
                     <label>Progres : {{$progres->judul_progres}}</label>
                 </div>
@@ -31,51 +32,58 @@
     </div>
 </form>
 <script>
-    $(document).ready(function() {
-        $("#form-tambah").validate({
-            rules: {
-            file: {required: true},
-            },
-            submitHandler: function(form) {
-                $.ajax({
-                    url: form.action,
-                    type: form.method,
-                    data: $(form).serialize(),
-                    success: function(response) {
-                        if(response.status){
-                            $('#myModal').modal('hide');
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Berhasil',
-                                text: response.message
-                            });
-                            dataLevel.ajax.reload();
-                        }else{
-                            $('.error-text').text('');
-                            $.each(response.msgField, function(prefix, val) {
-                                $('#error-'+prefix).text(val[0]);
-                            });
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Terjadi Kesalahan',
-                                text: response.message
-                            });
-                        }
+$(document).ready(function() {
+    $("#form-tambah").validate({
+        rules: {
+            file: { required: true },
+        },
+        submitHandler: function(form) {
+            var formData = new FormData(form); // Use FormData to include the file
+            $.ajax({
+                url: form.action,
+                type: form.method,
+                data: formData,
+                processData: false,  // Don't process the data
+                contentType: false,  // Don't set content-type header
+                success: function(response) {
+                    if (response.status) {
+                        $('#myModal').modal('hide');
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil',
+                            text: response.message
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                location.reload(); // Reload the page after confirming the success message
+                            }
+                        });
+                    } else {
+                        $('.error-text').text('');
+                        $.each(response.msgField, function(prefix, val) {
+                            $('#error-' + prefix).text(val[0]);
+                        });
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Terjadi Kesalahan',
+                            text: response.message
+                        });
                     }
-                });
-                return false;
-            },
-            errorElement: 'span',
-            errorPlacement: function (error, element) {
-                error.addClass('invalid-feedback');
-                element.closest('.form-group').append(error);
-            },
-            highlight: function (element, errorClass, validClass) {
-                $(element).addClass('is-invalid');
-            },
-            unhighlight: function (element, errorClass, validClass) {
-                $(element).removeClass('is-invalid');
-            }
-        });
+                }
+            });
+            return false;
+        },
+        errorElement: 'span',
+        errorPlacement: function (error, element) {
+            error.addClass('invalid-feedback');
+            element.closest('.form-group').append(error);
+        },
+        highlight: function (element, errorClass, validClass) {
+            $(element).addClass('is-invalid');
+        },
+        unhighlight: function (element, errorClass, validClass) {
+            $(element).removeClass('is-invalid');
+        }
     });
+});
+
 </script>

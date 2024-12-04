@@ -32,7 +32,13 @@
                     </tr>
                     <tr>
                         <th class="text-right col-3">Pekerjaan :</th>
-                        <td class="col-9">{{ $pengumpulan->bukti_pengumpulan }}</td>
+                        <td class="col-9">
+                            @if ($pengumpulan->namaoriginal == null)
+                                {{$pengumpulan->bukti_pengumpulan}}
+                            @else
+                                {{$pengumpulan->namaoriginal}}
+                            @endif
+                        </td>
                     </tr>
                 </table>
             </div>
