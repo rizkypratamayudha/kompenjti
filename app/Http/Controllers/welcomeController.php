@@ -28,16 +28,16 @@ class welcomeController extends Controller
 
     //     return view('mahasiswa.dashboard',['breadcrumb'=>$breadcrumb,'activeMenu'=>$activeMenu]);
     // }
-    public function dosen(){
-        $breadcrumb = (object)[
-            'title'=>'Selamat Datang',
-            'list'=>['Home','Dashboard Dosen']
-        ];
+    // public function dosen(){
+    //     $breadcrumb = (object)[
+    //         'title'=>'Selamat Datang',
+    //         'list'=>['Home','Dashboard Dosen']
+    //     ];
 
-        $activeMenu = 'dashboardDos';
+    //     $activeMenu = 'dashboardDos';
 
-        return view('dosen.dashboard',['breadcrumb'=>$breadcrumb,'activeMenu'=>$activeMenu]);
-    }
+    //     return view('dosen.dashboard',['breadcrumb'=>$breadcrumb,'activeMenu'=>$activeMenu]);
+    // }
     public function kaprodi(){
         $breadcrumb = (object)[
             'title'=>'Selamat Datang',

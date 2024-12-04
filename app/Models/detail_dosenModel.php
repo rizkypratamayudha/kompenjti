@@ -19,4 +19,8 @@ class detail_dosenModel extends Model
     {
         return $this->belongsTo(UserModel::class, 'user_id');
     }
+    public function pekerjaan(): BelongsTo
+    {
+        return $this->belongsTo(PekerjaanModel::class, 'dosen_id', 'detail_dosen_id');
+    }
 }

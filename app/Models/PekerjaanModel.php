@@ -21,9 +21,9 @@ class PekerjaanModel extends Model
         return $this->belongsTo(UserModel::class, 'user_id', 'user_id');
     }
 
-    public function detail_pekerjaan(): BelongsTo
+    public function detail_pekerjaan()
     {
-        return $this->belongsTo(detail_pekerjaanModel::class, 'pekerjaan_id', 'pekerjaan_id');
+        return $this->hasMany(detail_pekerjaanModel::class, 'pekerjaan_id', 'pekerjaan_id');
     }
     public function progres(): HasMany
     {
