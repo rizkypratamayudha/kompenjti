@@ -12,22 +12,22 @@ use Illuminate\Support\Facades\Storage;
 class riwayatController extends Controller
 {
     public function index()
-{
-    $breadcrumb = (object) [
-        'title' => 'Page Pengerjaan dan Riwayat Pekerjaan',
-        'list' => ['Home', 'Riwayat'],
-    ];
+    {
+        $breadcrumb = (object) [
+            'title' => 'Page Pengerjaan dan Riwayat Pekerjaan',
+            'list' => ['Home', 'Riwayat'],
+        ];
 
-    $page = (object)[
-        'title' => 'Page Pengerjaan dan Riwayat Pekerjaan',
-    ];
+        $page = (object)[
+            'title' => 'Page Pengerjaan dan Riwayat Pekerjaan',
+        ];
 
-    $activeMenu = 'riwayatMhs';
-    $tugas = PekerjaanModel::with(['detail_pekerjaan', 'pengumpulan']) // Mengambil relasi tugas dan pengumpulan
-        ->get();
-
-    return view('riwayatMHS.index', ['activeMenu' => $activeMenu, 'page' => $page, 'breadcrumb' => $breadcrumb, 'tugas' => $tugas]);
-}
+        $activeMenu = 'riwayatMhs';
+        $tugas = PekerjaanModel::with('detail_pekerjaan', 'progres')->whereHas('approve', function ($query) {
+            $query->where('user_id', Auth::id());
+        })->get();
+        return view('riwayatMHS.index', ['activeMenu' => $activeMenu, 'page' => $page, 'breadcrumb' => $breadcrumb, 'tugas' => $tugas]);
+    }
 
 
     public function show_ajax($id)

@@ -44,10 +44,6 @@ class PekerjaanModel extends Model
         return $this->belongsTo(ApprovePekerjaanModel::class,'pekerjaan_id', 'pekerjaan_id');
     }
 
-    public function pengumpulan(){
-        return $this->belongsTo(PengumpulanModel::class,'pengumpulan_id', 'id', );
-    }
-
     public function getCanRequestTTDAttribute()
     {
         // Memeriksa apakah pengumpulan untuk user yang login sudah diterima
