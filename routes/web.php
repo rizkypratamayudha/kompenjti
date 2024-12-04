@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminLihatPekerjaan;
 use App\Http\Controllers\PeriodeController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardMahasiswaController;
@@ -224,10 +225,22 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/gambar',[riwayatController::class,'store_gambar']);
     });
 
+    Route::group(['prefix'=> 'lihat','middleware'=> 'authorize:ADM'], function () {
+        Route::get('/',[AdminLihatPekerjaan::class,'index']);
+        Route::get('/{id}/show_ajax',[AdminLihatPekerjaan::class,'show_ajax']);
+
+    });
+
+    Route::group(['prefix'=> 'admintambah','middleware'=> 'authorize:ADM'], function () {
+        Route::get('/',[PekerjanController::class,'index']);
+    });
+
     // NOTIFFF
     Route::get('/hitung-notif', [ValidasiController::class, 'hitung_notif']);
     Route::get('/hitung-notif-pelamar', [ValidasiController::class, 'hitung_notif_pelamar']);
+    Route::get('/hitung-notif-pelamar-admin', [ValidasiController::class, 'hitung_notif_pelamar_admin']);
     Route::get('pekerjaan/{id}/get-anggota',[ListPekerjaanMHSController::class,'get_anggota']);
+    Route::get('lihat/{id}/get-anggota',[ListPekerjaanMHSController::class,'get_anggota']);
     Route::get('/server-time', function () {
         return response()->json(['server_time' => now()]);
     })->name('server-time');

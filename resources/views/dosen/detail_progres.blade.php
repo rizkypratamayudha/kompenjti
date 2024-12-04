@@ -27,7 +27,7 @@
             <div class="alert alert-info">
                 <h5><i class="icon fas fa-info"></i> Detail Informasi Pengumpulan</h5>
             </div>
-            <table class="table table-sm table-bordered table-striped table-responsive">
+            <table class="table table-sm table-bordered table-striped">
                 <tr>
                     <th class="text-right col-3">Nama Mahasiswa :</th>
                     <td class="col-9">{{ $pengumpulan->user->nama }}</td>
@@ -43,7 +43,7 @@
                             Sudah Diserahkan
                         @else
                             Sudah Dinilai
-                        
+
                         @endif
                     </td>
                 </tr>

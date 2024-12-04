@@ -166,8 +166,19 @@ class ValidasiController extends Controller
         return ['jumlah' => $jumlah];
     }
 
-    public function hitung_notif_pelamar(){
-        $jumlah = PendingPekerjaanModel::count();
+    public function hitung_notif_pelamar() {
+        $jumlah = PendingPekerjaanModel::whereHas('pekerjaan.user.level', function($query) {
+            $query->where('level_id', 2);
+        })->count();
+
         return ['jumlah' => $jumlah];
     }
+    public function hitung_notif_pelamar_admin() {
+        $jumlah = PendingPekerjaanModel::whereHas('pekerjaan.user.level', function($query) {
+            $query->where('level_id', 1);
+        })->count();
+
+        return ['jumlah' => $jumlah];
+    }
+
 }

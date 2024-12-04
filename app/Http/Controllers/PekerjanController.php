@@ -36,8 +36,8 @@ class PekerjanController extends Controller
             'title' => 'Page Buat Pekerjaan'
         ];
 
-        $activeMenu = 'dosen';
-        $activeTab = 'progres'; // Menetapkan tab aktif default ke 'progres'
+        $activeMenu = ['dosen' || 'admintambah'];
+        $activeTab = 'progres';
 
         $pekerjaan = PekerjaanModel::with('detail_pekerjaan', 'progres')->where('user_id', Auth::id())->get();
 

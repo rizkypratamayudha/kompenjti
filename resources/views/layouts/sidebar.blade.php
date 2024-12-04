@@ -33,9 +33,18 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="{{ url('/riwayat') }}" class="nav-link {{ $activeMenu == 'riwayat' ? 'active' : '' }}">
+                        <a href="{{ url('/lihat') }}" class="nav-link {{ $activeMenu == 'riwayat' ? 'active' : '' }}">
                             <i class="nav-icon fas fa-history"></i>
-                            <p>Riwayat Kompensasi</p>
+                            <p>Lihat Kompensasi</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url('/admintambah') }}" class="nav-link {{ $activeMenu == 'admintambah' ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-plus"></i>
+                            <p>Tambah Kompensasi
+                                <span class="badge badge-danger badge-pelamar-admin position-absolute top-0 start-100 translate-middle rounded-pill">
+                                </span>
+                            </p>
                         </a>
                     </li>
                     <li class="nav-header">Validasi Registrasi</li>
@@ -111,7 +120,7 @@
                             <i class="nav-icon fas fa-plus"></i>
                             <p>
                                 Tambah Pekerjaan
-                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                <span class="badge badge-danger badge-pelamar position-absolute top-0 start-100 translate-middle rounded-pill">
                                 </span>
                             </p>
                         </a>
@@ -193,49 +202,43 @@
     </div>
     <!-- /.sidebar -->
 </aside>
-
-
 @push('js')
-    <script>
-        $(document).ready(function() {
-    // Request untuk menghitung notifikasi pengguna yang belum diproses
-    $.ajax({
-        url: '{{ url('/hitung-notif') }}',  // URL untuk menghitung notifikasi
-        method: 'GET',
-        success: function(response) {
-            var jumlahNotif = response.jumlah;
-            if (jumlahNotif > 99) {
-                $('.badge').text('99+');
-            } else if (jumlahNotif == 0) {
-                $('.badge').remove(); // Menghapus elemen span badge
-            } else {
-                $('.badge').text(jumlahNotif);
-            }
-        },
-        error: function() {
-            console.error("Gagal memuat data notifikasi.");
-        }
-    });
+<script>
+    $(document).ready(function () {
+        // Fungsi untuk memperbarui badge
+        function updateBadge(url, selector) {
+            $.ajax({
+                url: url,
+                method: 'GET',
+                success: function (response) {
+                    const jumlahNotif = response.jumlah;
+                    const badge = $(selector);
 
-    // Request untuk menghitung notifikasi pelamar pekerjaan
-    $.ajax({
-        url: '{{ url('/hitung-notif-pelamar') }}',  // URL untuk menghitung notifikasi pelamar pekerjaan
-        method: 'GET',
-        success: function(response) {
-            var jumlahNotif = response.jumlah;
-            if (jumlahNotif > 99) {
-                $('.badge-pelamar').text('99+'); // pastikan elemen badge-pelamar ada di HTML
-            } else if (jumlahNotif == 0) {
-                $('.badge-pelamar').remove(); // Menghapus elemen span badge-pelamar
-            } else {
-                $('.badge-pelamar').text(jumlahNotif);
-            }
-        },
-        error: function() {
-            console.error("Gagal memuat data notifikasi pelamar.");
-        }
-    });
-});
+                    if (badge.length === 0) {
+                        console.warn("Elemen badge tidak ditemukan:", selector);
+                        return;
+                    }
 
-    </script>
+                    // Tampilkan atau sembunyikan badge berdasarkan jumlah notifikasi
+                    if (jumlahNotif > 99) {
+                        badge.text('99+').show();
+                    } else if (jumlahNotif > 0) {
+                        badge.text(jumlahNotif).show();
+                    } else {
+                        badge.hide();
+                    }
+                },
+                error: function () {
+                    console.error("Gagal memuat data dari URL:", url);
+                }
+            });
+        }
+
+        // Panggil fungsi untuk badge pelamar pekerjaan
+        updateBadge('{{ url('/hitung-notif-pelamar') }}', '.badge-pelamar');
+        updateBadge('{{ url('/hitung-notif-pelamar-admin') }}', '.badge-pelamar-admin');
+        updateBadge('{{ url('/hitung-notif') }}', '.badge');
+    });
+</script>
+
 @endpush
