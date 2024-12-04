@@ -16,8 +16,6 @@
         </div>
     </div>
 @else
-    <input name="pekerjaan_id" value="{{ $pekerjaan->pekerjaan_id }}" hidden>
-    <input name="user_id" value="{{ Auth::id() }}" hidden>
     <div id="modal-master" class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -36,7 +34,7 @@
                     </tr>
                     <tr>
                         <th class="text-right col-3">Nomor HP Dosen :</th>
-                        <td class="col-9">{{ $pekerjaan->user->detailDosen->no_hp }}</td>
+                        <td class="col-9">{{ $pekerjaan->user->detailDosen->no_hp ?? '-'}}</td>
                     </tr>
                     <tr>
                         <th class="text-right col-3">Jenis Pekerjaan :</th>
@@ -56,7 +54,7 @@
                     </tr>
                     <tr>
                         <th class="text-right col-3">Jumlah Anggota :</th>
-                        <td class="col-9">{{ $detailPekerjaan ? $detailPekerjaan->jumlah_anggota : 'Tidak tersedia' }}</td>
+                        <td class="col-9">{{ $pekerjaan->detail_pekerjaan->jumlah_anggota }}</td>
                     </tr>
                     <tr>
                         <th class="text-right col-3">Persyaratan :</th>
@@ -81,17 +79,7 @@
 
                     <tr>
                         <th class="text-right col-3">Deskripsi Tugas :</th>
-                        <td class="col-9">
-                            @if($pekerjaan->detail_pekerjaan->isNotEmpty())
-                                <ul>
-                                    @foreach ($pekerjaan->detail_pekerjaan as $detail)
-                                        <li>{{ $detail->deskripsi_tugas }}</li>
-                                    @endforeach
-                                </ul>
-                            @else
-                                Tidak tersedia
-                            @endif
-                        </td>
+                        <td class="col-9">{{ $pekerjaan->detail_pekerjaan->deskripsi_tugas }}</td>
                     </tr>
                 </table>
             </div>

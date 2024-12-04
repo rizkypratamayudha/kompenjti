@@ -56,7 +56,7 @@
                             </p>
                             <div class="d-flex justify-content-between align-items-center">
                                 <a href="javascript:void(0)"
-                                onclick="modalAction('{{ url('/dosen/' . $item->pekerjaan_id . '/show_ajax') }}')"
+                                onclick="modalAction('{{ url('/dosen/' . $item->pekerjaan_id . '/show_ajaxdosen') }}')"
                                     class="btn btn-outline-primary btn-sm">
                                     Lihat Detail
                                 </a>

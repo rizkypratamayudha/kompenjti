@@ -23,7 +23,7 @@ class PekerjaanModel extends Model
 
     public function detail_pekerjaan()
     {
-        return $this->hasMany(detail_pekerjaanModel::class, 'pekerjaan_id', 'pekerjaan_id');
+        return $this->belongsTo(detail_pekerjaanModel::class, 'pekerjaan_id', 'pekerjaan_id');
     }
     public function progres(): HasMany
     {
@@ -42,6 +42,10 @@ class PekerjaanModel extends Model
 
     public function approve(){
         return $this->belongsTo(ApprovePekerjaanModel::class,'pekerjaan_id', 'pekerjaan_id');
+    }
+
+    public function pengumpulan(){
+        return $this->belongsTo(PengumpulanModel::class,'pengumpulan_id', 'id', );
     }
 
     public function getCanRequestTTDAttribute()

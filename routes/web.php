@@ -182,7 +182,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/{id}/lihat-pekerjaan',[PekerjanController::class,'lihatPekerjaan']);
         Route::get('/{id}/hitung-notif', [PekerjanController::class, 'hitung_notif_pelamar']);
         Route::get('/{id}/mulai',[PekerjanController::class,'mulai']);
-        Route::get('/{id}/show_ajax',[DashboardDosenController::class,'show_ajax']);
+        Route::get('/{id}/show_ajaxdosen',[DashboardDosenController::class,'show_ajax']);
         Route::get('/{id}/mulai',action: [PekerjanController::class,'mulai']);
         Route::get('/masukdosen/{id}/enter-progres',[PekerjanController::class,'enter_progres']);
         Route::post('/{id}/list',[PekerjanController::class,'list']);
@@ -204,7 +204,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/{id}/show_ajax', [ListPekerjaanMHSController::class, 'show_ajax']);
         Route::post('/apply',[ListPekerjaanMHSController::class,'apply']);
         Route::get('/check-if-applied', [ListPekerjaanMHSController::class, 'checkIfApplied'])->name('checkIfApplied');
-        
+
     });
     Route::group(['prefix' => 'kompetensi','middleware' => 'authorize:MHS'],function(){
         Route::get('/',[KompetensiController::class,'index']);

@@ -44,32 +44,14 @@ class DashboardDosenController extends Controller
     }
     public function show_ajax($id)
     {
-        // Ambil data pekerjaan beserta relasi
-        $pekerjaan = PekerjaanModel::with([
-            'detail_pekerjaan.persyaratan', 
-            'detail_pekerjaan.kompetensiDosen.kompetensiAdmin'
-        ])->where('pekerjaan_id', $id)->first();
-    
-        if (!$pekerjaan) {
-            return response()->json(['error' => 'Pekerjaan not found'], 404);
-        }
-    
-        // Pastikan mengambil hanya satu detail pekerjaan
-        $detailPekerjaan = $pekerjaan->detail_pekerjaan->first();
-    
-        // Jika tidak ada detail pekerjaan, pastikan data tetap valid
-        $persyaratan = $detailPekerjaan ? $detailPekerjaan->persyaratan : collect();
-        $kompetensi = $detailPekerjaan ? $detailPekerjaan->kompetensiDosen : collect();
+        $pekerjaan = PekerjaanModel::with('detail_pekerjaan.persyaratan', 'detail_pekerjaan.kompetensiDosen.kompetensiAdmin')->where('pekerjaan_id', $id)->first();
         $jumlahProgres = ProgresModel::where('pekerjaan_id', $id)->count();
-    
+
         return view('dosen.show_ajax', [
             'pekerjaan' => $pekerjaan,
             'jumlahProgres' => $jumlahProgres,
-            'detailPekerjaan' => $detailPekerjaan,
-            'persyaratan' => $persyaratan,
-            'kompetensi' => $kompetensi,
+            'persyaratan' => $pekerjaan->detail_pekerjaan->persyaratan ?? collect(),
+            'kompetensi' => $pekerjaan->detail_pekerjaan->kompetensiDosen ?? collect(),
         ]);
     }
-    
-    
 }
