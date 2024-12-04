@@ -48,7 +48,7 @@ class UserModel extends Authenticatable implements JWTSubject
     }
     public function jamKompen(): BelongsTo
     {
-        return $this->belongsTo(jamKompenModel::class, 'jam_kompen_id');
+        return $this->belongsTo(jamKompenModel::class, 'user_id','user_id');
     }
 
     public function pekerjaan():BelongsTo{

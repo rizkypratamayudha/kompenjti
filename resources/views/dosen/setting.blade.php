@@ -238,35 +238,35 @@
 
         // Update tags bubble dari pilihan baru
         function updateTags() {
-        const select = document.getElementById('kompetensi_id');
-        const selectedOptions = Array.from(select.selectedOptions);
-        const tagsContainer = $('#selected-tags');
-        tagsContainer.empty();
+            const select = document.getElementById('kompetensi_id');
+            const selectedOptions = Array.from(select.selectedOptions);
+            const tagsContainer = $('#selected-tags');
+            tagsContainer.empty();
 
-        selectedOptions.forEach(option => {
-            const tag = $(
-                `<span class="tag-blue">
+            selectedOptions.forEach(option => {
+                const tag = $(
+                    `<span class="tag-blue">
                     ${option.text}
                     <span class="remove-tag" data-value="${option.value}">×</span>
                 </span>`
-            );
-            tagsContainer.append(tag);
-        });
-    }
-
-        // Hapus tag saat tanda "×" diklik
-        $(document).on('click', '.remove-tag', function () {
-        const valueToRemove = $(this).data('value');
-        const select = $('#kompetensi_id')[0];
-
-        for(let option of select.options) {
-            if(option.value === valueToRemove.toString()) {
-                option.selected = false;
-            }
+                );
+                tagsContainer.append(tag);
+            });
         }
 
-        updateTags();
-    });
+        // Hapus tag saat tanda "×" diklik
+        $(document).on('click', '.remove-tag', function() {
+            const valueToRemove = $(this).data('value');
+            const select = $('#kompetensi_id')[0];
+
+            for (let option of select.options) {
+                if (option.value === valueToRemove.toString()) {
+                    option.selected = false;
+                }
+            }
+
+            updateTags();
+        });
 
         // Update bubble saat pilihan berubah
         $('#kompetensi_id').on('change', updateTags);
@@ -316,26 +316,30 @@
         $('#status-input').val(status);
     });
 
+    // Deklarasi variabel global
     const $progresRows = $("#progres-rows");
     const $jumlahProgres = $("#jumlah_progres");
     const $totalNilai = $("#total-nilai");
 
     // Fungsi untuk menambahkan baris
     $("#add-row").on("click", function() {
-        const index = $progresRows.children("tr").length + 1; // Hitung jumlah baris
+        const index = $progresRows.children("tr").length + 1;
         const newRow = `
-                <tr>
-                    <td>${index}</td>
-                    <td><input type="text" name="judul_progres[]" class="form-control" placeholder="Judul Progres" required></td>
-                    <td><input type="number" name="jam_kompen[]" class="form-control nilai-jam-kompen" placeholder="Nilai Jam Kompen" required></td>
-                    <td><input type="text" name="hari[]" class="form-control" placeholder="Hari" required></td>
-                    <td><button type="button" class="btn btn-danger btn-sm remove-row"><i class="fas fa-trash"></i></button></td>
-                </tr>
-            `;
+        <tr>
+            <td>${index}</td>
+            <td><input type="text" name="judul_progres[]" class="form-control" placeholder="Judul Progres" required></td>
+            <td><input type="number" name="jam_kompen[]" class="form-control nilai-jam-kompen" placeholder="Nilai Jam Kompen" required></td>
+            <td><input type="text" name="hari[]" class="form-control" placeholder="Hari" required></td>
+            <td><button type="button" class="btn btn-danger btn-sm remove-row"><i class="fas fa-trash"></i></button></td>
+        </tr>
+    `;
         $progresRows.append(newRow);
-        updateJumlahProgres(); // Perbarui jumlah progres
-        attachInputEvent(); // Pasang event input
+        updateJumlahProgres();
+        attachInputEvent();
     });
+
+    // Fungsi lainnya tetap sama
+
 
     // Fungsi untuk menghapus baris
     $progresRows.on("click", ".remove-row", function() {
@@ -406,7 +410,8 @@
                             text: response.message
                         }).then((result) => {
                             if (result.isConfirmed) {
-                                location.reload(); // Reload the page after confirming the success message
+                                location
+                            .reload(); // Reload the page after confirming the success message
                             }
                         });
                     } else {
@@ -428,58 +433,58 @@
 
     // Fungsi hapus pekerjaan
     $(document).on('click', '.delete-btn', function(e) {
-    e.preventDefault();
+        e.preventDefault();
 
-    // Ambil ID dari atribut data-id
-    let pekerjaanId = $(this).data('id');
-    let csrfToken = $('meta[name="csrf-token"]').attr('content');
+        // Ambil ID dari atribut data-id
+        let pekerjaanId = $(this).data('id');
+        let csrfToken = $('meta[name="csrf-token"]').attr('content');
 
-    // Tampilkan konfirmasi menggunakan SweetAlert
-    Swal.fire({
-        title: 'Apakah Anda yakin?',
-        text: "Data yang dihapus tidak dapat dikembalikan!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Ya, hapus!',
-        cancelButtonText: 'Batal'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            // Lakukan penghapusan via Ajax
-            $.ajax({
-                url: `dosen/${pekerjaanId}/delete_ajax`, // URL sesuai dengan route
-                type: 'DELETE',
-                headers: {
-                    'X-CSRF-TOKEN': csrfToken
-                },
-                success: function(response) {
-                    if (response.status) {
+        // Tampilkan konfirmasi menggunakan SweetAlert
+        Swal.fire({
+            title: 'Apakah Anda yakin?',
+            text: "Data yang dihapus tidak dapat dikembalikan!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Ya, hapus!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Lakukan penghapusan via Ajax
+                $.ajax({
+                    url: `dosen/${pekerjaanId}/delete_ajax`, // URL sesuai dengan route
+                    type: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    success: function(response) {
+                        if (response.status) {
+                            Swal.fire(
+                                'Terhapus!',
+                                response.message,
+                                'success'
+                            ).then(() => {
+                                location.reload(); // Refresh halaman jika berhasil
+                            });
+                        } else {
+                            Swal.fire(
+                                'Gagal!',
+                                response.message,
+                                'error'
+                            );
+                        }
+                    },
+                    error: function(xhr) {
                         Swal.fire(
-                            'Terhapus!',
-                            response.message,
-                            'success'
-                        ).then(() => {
-                            location.reload(); // Refresh halaman jika berhasil
-                        });
-                    } else {
-                        Swal.fire(
-                            'Gagal!',
-                            response.message,
+                            'Error!',
+                            'Terjadi kesalahan: ' + (xhr.responseJSON ? xhr.responseJSON
+                                .message : 'Error'),
                             'error'
                         );
                     }
-                },
-                error: function(xhr) {
-                    Swal.fire(
-                        'Error!',
-                        'Terjadi kesalahan: ' + (xhr.responseJSON ? xhr.responseJSON
-                            .message : 'Error'),
-                        'error'
-                    );
-                }
-            });
-        }
-    });
+                });
+            }
+        });
     });
 </script>

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminLihatPekerjaan;
 use App\Http\Controllers\PeriodeController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardDosenController;
@@ -182,6 +183,11 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/{id}/hitung-notif', [PekerjanController::class, 'hitung_notif_pelamar']);
         Route::get('/{id}/mulai',[PekerjanController::class,'mulai']);
         Route::get('/{id}/show_ajax',[DashboardDosenController::class,'show_ajax']);
+        Route::get('/{id}/mulai',action: [PekerjanController::class,'mulai']);
+        Route::get('/masukdosen/{id}/enter-progres',[PekerjanController::class,'enter_progres']);
+        Route::post('/{id}/list',[PekerjanController::class,'list']);
+        Route::get('{id}/detail-progres',[PekerjanController::class,'detail_progres']);
+        Route::post('/approve/{id}',[PekerjanController::class,'approve']);
     });
 
     // MAHASISWAA
@@ -222,10 +228,22 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/gambar',[riwayatController::class,'store_gambar']);
     });
 
+    Route::group(['prefix'=> 'lihat','middleware'=> 'authorize:ADM'], function () {
+        Route::get('/',[AdminLihatPekerjaan::class,'index']);
+        Route::get('/{id}/show_ajax',[AdminLihatPekerjaan::class,'show_ajax']);
+
+    });
+
+    Route::group(['prefix'=> 'admintambah','middleware'=> 'authorize:ADM'], function () {
+        Route::get('/',[PekerjanController::class,'index']);
+    });
+
     // NOTIFFF
     Route::get('/hitung-notif', [ValidasiController::class, 'hitung_notif']);
     Route::get('/hitung-notif-pelamar', [ValidasiController::class, 'hitung_notif_pelamar']);
+    Route::get('/hitung-notif-pelamar-admin', [ValidasiController::class, 'hitung_notif_pelamar_admin']);
     Route::get('pekerjaan/{id}/get-anggota',[ListPekerjaanMHSController::class,'get_anggota']);
+    Route::get('lihat/{id}/get-anggota',[ListPekerjaanMHSController::class,'get_anggota']);
     Route::get('/server-time', function () {
         return response()->json(['server_time' => now()]);
     })->name('server-time');

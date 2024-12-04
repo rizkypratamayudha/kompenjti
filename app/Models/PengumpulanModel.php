@@ -12,7 +12,7 @@ class PengumpulanModel extends Model
     protected $table = 'pengumpulan';
 
     protected $primaryKey = 'pengumpulan_id';
-    protected $fillable = ['pengumpulan_id','user_id','bukti_pengumpulan','status','created_at','updated_at'];
+    protected $fillable = ['pengumpulan_id','user_id','progres_id','bukti_pengumpulan','status','created_at','updated_at'];
 
     public function user(){
         return $this->belongsTo(UserModel::class,'user_id','user_id');

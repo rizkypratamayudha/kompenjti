@@ -197,7 +197,11 @@
                                 icon: 'success',
                                 title: 'Berhasil',
                                 text: response.message
-                            });
+                            }).then((result) => {
+                            if (result.isConfirmed) {
+                                location.reload(); // Reload the page after confirming the success message
+                            }
+                        });
                         } else {
                             $('.error-text').text('');
                             $.each(response.errors, function(prefix, val) {

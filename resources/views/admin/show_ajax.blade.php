@@ -38,7 +38,7 @@
                         </tr>
                         <tr>
                             <th class="text-right col-3">Nomor HP Dosen :</th>
-                            <td class="col-9">{{ $pekerjaan->user->detailDosen->no_hp ?? '-'}}</td>
+                            <td class="col-9">{{ $pekerjaan->user->detailDosen->no_hp }}</td>
                         </tr>
                         <tr>
                             <th class="text-right col-3">Jenis Pekerjaan :</th>
@@ -65,7 +65,7 @@
                             <td class="col-9">
                                 <ul>
                                     @foreach ($persyaratan as $item)
-                                        <li>{{ $item->persyaratan_nama ?? '-'}}</li>
+                                        <li>{{ $item->persyaratan_nama }}</li>
                                     @endforeach
                                 </ul>
                             </td>
@@ -86,10 +86,6 @@
                             <td class="col-9">{{ $pekerjaan->detail_pekerjaan->deskripsi_tugas }}</td>
                         </tr>
                     </table>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" data-dismiss="modal" class="btn btnwarning">Batal</button>
-                    <button type="submit" class="btn btn-outline-success btn-sm">Apply</button>
                 </div>
             </div>
         </div>

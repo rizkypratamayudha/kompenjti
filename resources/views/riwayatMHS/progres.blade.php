@@ -54,13 +54,13 @@
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-center mb-3">
                                     <h6 class="mb-0">Pekerjaan</h6>
-                                    @if ($progres->pengumpulan_id == null)
+                                    @if ($pengumpulan == null)
                                         <span class="text-secondary">
                                             Belum diserahkan
                                         </span>
                                     @else
                                         <span class="text-secondary">
-                                            Nilai :
+                                            Telah dinilai :
                                             @if ($pengumpulan->status == 'pending')
                                                 -
                                             @elseif ($pengumpulan->status == 'accept')
@@ -72,7 +72,7 @@
                                     @endif
                                 </div>
                                 <div class="text-center">
-                                    @if ($progres->pengumpulan_id == null)
+                                    @if ($pengumpulan == null)
                                         <!-- Dropdown -->
                                         <div class="dropdown">
                                             {{-- @php
@@ -118,7 +118,7 @@
                                 </div>
                                 @endif
 
-                                @if ($progres->pengumpulan_id != null)
+                                @if ($pengumpulan != null)
                                     <div class="mt-5 mb-2">
                                         <button class="btn btn-danger w-100"
                                             onclick="modalAction('{{ url('/riwayat/' . $progres->progres_id . '/hapus_ajax') }}')">Batalkan
@@ -130,7 +130,7 @@
 
                         <div class="card-body">
                             <div class="d-flex align-items-center gap-2">
-                                <span>Pekerjaan yang dikumpulkan : </span>
+                                <span>Bukti pekerjaan yang dikumpulkan : </span>
                             </div>
 
                             @if ($pengumpulan && $pengumpulan->bukti_pengumpulan)

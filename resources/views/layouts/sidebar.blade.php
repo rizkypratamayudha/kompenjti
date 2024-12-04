@@ -33,9 +33,18 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="{{ url('/riwayat') }}" class="nav-link {{ $activeMenu == 'riwayat' ? 'active' : '' }}">
+                        <a href="{{ url('/lihat') }}" class="nav-link {{ $activeMenu == 'riwayat' ? 'active' : '' }}">
                             <i class="nav-icon fas fa-history"></i>
-                            <p>Riwayat Kompensasi</p>
+                            <p>Lihat Kompensasi</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url('/admintambah') }}" class="nav-link {{ $activeMenu == 'admintambah' ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-plus"></i>
+                            <p>Tambah Kompensasi
+                                <span class="badge badge-danger badge-pelamar-admin position-absolute top-0 start-100 translate-middle rounded-pill">
+                                </span>
+                            </p>
                         </a>
                     </li>
                     <li class="nav-header">Validasi Registrasi</li>
@@ -111,7 +120,7 @@
                             <i class="nav-icon fas fa-plus"></i>
                             <p>
                                 Tambah Pekerjaan
-                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                <span class="badge badge-danger badge-pelamar position-absolute top-0 start-100 translate-middle rounded-pill">
                                 </span>
                             </p>
                         </a>
@@ -193,42 +202,43 @@
     </div>
     <!-- /.sidebar -->
 </aside>
-
-
 @push('js')
-    <script>
-        $(document).ready(function() {
+<script>
+    $(document).ready(function () {
+        // Fungsi untuk memperbarui badge
+        function updateBadge(url, selector) {
             $.ajax({
-                url: '{{ url('/hitung-notif') }}',
+                url: url,
                 method: 'GET',
-                success: function(response) {
-                    var jumlahNotif = response.jumlah;
-                    if (jumlahNotif > 99) {
-                        $('.badge').text('99+');
-                    } else if (jumlahNotif == 0) {
-                        $('.badge').remove(); // Menghapus elemen span badge
-                    } else {
-                        $('.badge').text(jumlahNotif);
-                    }
-                }
-            });
-        });
+                success: function (response) {
+                    const jumlahNotif = response.jumlah;
+                    const badge = $(selector);
 
-        $(document).ready(function() {
-            $.ajax({
-                url: '{{ url('/hitung-notif-pelamar') }}', // Sesuaikan URL di sini
-                method: 'GET',
-                success: function(response) {
-                    var jumlahNotif = response.jumlah;
-                    if (jumlahNotif > 99) {
-                        $('.badge').text('99+');
-                    } else if (jumlahNotif == 0) {
-                        $('.badge').remove(); // Menghapus elemen span badge
-                    } else {
-                        $('.badge').text(jumlahNotif);
+                    if (badge.length === 0) {
+                        console.warn("Elemen badge tidak ditemukan:", selector);
+                        return;
                     }
+
+                    // Tampilkan atau sembunyikan badge berdasarkan jumlah notifikasi
+                    if (jumlahNotif > 99) {
+                        badge.text('99+').show();
+                    } else if (jumlahNotif > 0) {
+                        badge.text(jumlahNotif).show();
+                    } else {
+                        badge.hide();
+                    }
+                },
+                error: function () {
+                    console.error("Gagal memuat data dari URL:", url);
                 }
             });
-        });
-    </script>
+        }
+
+        // Panggil fungsi untuk badge pelamar pekerjaan
+        updateBadge('{{ url('/hitung-notif-pelamar') }}', '.badge-pelamar');
+        updateBadge('{{ url('/hitung-notif-pelamar-admin') }}', '.badge-pelamar-admin');
+        updateBadge('{{ url('/hitung-notif') }}', '.badge');
+    });
+</script>
+
 @endpush
