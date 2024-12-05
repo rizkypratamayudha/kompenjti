@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\PekerjaanModel;
 use App\Models\PengumpulanModel;
 use App\Models\ProgresModel;
+use App\Models\t_approve_cetak_model;
+use App\Models\t_pending_cetak_model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -23,10 +25,20 @@ class riwayatController extends Controller
         ];
 
         $activeMenu = 'riwayatMhs';
-        $tugas = PekerjaanModel::with('detail_pekerjaan', 'progres')->whereHas('approve', function ($query) {
+
+        $tugas = PekerjaanModel::whereHas('t_approve_pekerjaan', function ($query) {
             $query->where('user_id', Auth::id());
-        })->get();
-        return view('riwayatMHS.index', ['activeMenu' => $activeMenu, 'page' => $page, 'breadcrumb' => $breadcrumb, 'tugas' => $tugas]);
+        })->with(['progres', 'progres.pengumpulan' => function ($query) {
+            $query->where('user_id', Auth::id());
+        }])->get();
+
+
+        return view('riwayatMHS.index', [
+            'activeMenu' => $activeMenu,
+            'page' => $page,
+            'breadcrumb' => $breadcrumb,
+            'tugas' => $tugas,
+        ]);
     }
 
 
@@ -42,7 +54,7 @@ class riwayatController extends Controller
     {
         $breadcrumb = (object)[
             'title' => 'Pekerjaan',
-            'list' => ['Home','Riwayat', 'Pekerjaan']
+            'list' => ['Home', 'Riwayat', 'Pekerjaan']
         ];
 
         $page = (object)[
@@ -224,6 +236,7 @@ class riwayatController extends Controller
             'message' => 'Pengumpulan berhasil disimpan.',
         ]);
     }
+
     public function store_file(Request $request)
     {
         $request->validate([
@@ -263,5 +276,49 @@ class riwayatController extends Controller
             'message' => 'Pengumpulan berhasil disimpan.',
         ]);
     }
+    public function request_cetak_surat(Request $request, $pekerjaan_id)
+    {
+        try {
+            $userId = Auth::id();
 
+            // Validasi apakah user memiliki hak untuk mencetak surat
+            $isValid = PekerjaanModel::where('pekerjaan_id', $pekerjaan_id)
+                ->whereHas('progres.pengumpulan', function ($query) use ($userId) {
+                    $query->where('user_id', $userId)
+                        ->where('status', 'accept');
+                })
+                ->exists();
+
+            if (!$isValid) {
+                return redirect()->back()->with('error', 'Anda tidak memiliki hak untuk membuat permintaan surat ini.');
+            }
+
+            // Cek apakah kombinasi pekerjaan_id dan user_id sudah ada
+            $isExists = t_pending_cetak_model::where('user_id', $userId)
+                ->where('pekerjaan_id', $pekerjaan_id)
+                ->exists();
+
+            if ($isExists) {
+                return redirect()->back()->with('error', 'Permintaan cetak surat sudah pernah dibuat.');
+            }
+
+            $isExistsapprove = t_approve_cetak_model::where('user_id', $userId)
+                ->where('pekerjaan_id', $pekerjaan_id)
+                ->exists();
+
+            if ($isExistsapprove) {
+                return redirect()->back()->with('error', 'Permintaan cetak surat sudah pernah dibuat dan telah disetujui Kaprodi');
+            }
+
+            // Buat data baru jika belum ada
+            t_pending_cetak_model::create([
+                'user_id' => $userId,
+                'pekerjaan_id' => $pekerjaan_id,
+            ]);
+
+            return redirect()->back()->with('success', 'Permintaan cetak surat berhasil dibuat.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
 }

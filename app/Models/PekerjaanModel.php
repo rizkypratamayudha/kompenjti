@@ -40,16 +40,22 @@ class PekerjaanModel extends Model
         return $this->hasManyThrough(kompetensi_dosenModel::class, detail_pekerjaanModel::class);
     }
 
-    public function approve(){
-        return $this->belongsTo(ApprovePekerjaanModel::class,'pekerjaan_id', 'pekerjaan_id');
+    public function approve()
+    {
+        return $this->belongsTo(ApprovePekerjaanModel::class, 'pekerjaan_id', 'pekerjaan_id');
     }
 
-    public function getCanRequestTTDAttribute()
+    public function getCanRequestSuratAttribute()
     {
-        // Memeriksa apakah pengumpulan untuk user yang login sudah diterima
-        $pengumpulan = $this->pengumpulan->where('user_id', Auth::id())->first();
+        // Periksa apakah semua progres pekerjaan ini sudah dikumpulkan dengan status bukan 'pending'
+        return $this->progres->every(function ($progres) {
+            return $progres->pengumpulan->isNotEmpty() &&
+                $progres->pengumpulan->first()->status !== 'pending';
+        });
+    }
 
-        // Mengembalikan apakah user bisa request TTD berdasarkan status pengumpulan
-        return $pengumpulan && $pengumpulan->status != 'pending';
+    public function t_approve_pekerjaan()
+    {
+        return $this->hasMany(ApprovePekerjaanModel::class, 'pekerjaan_id');
     }
 }

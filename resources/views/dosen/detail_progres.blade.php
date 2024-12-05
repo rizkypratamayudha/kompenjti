@@ -44,7 +44,7 @@
                         @elseif($pengumpulan->status =='accept')
                             Sudah Dinilai : {{$pengumpulan->progres->jam_kompen}}
                         @else
-                            Sudah Dinilai : 0 
+                            Sudah Dinilai : 0
                         @endif
                     </td>
                 </tr>

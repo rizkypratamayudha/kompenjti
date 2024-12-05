@@ -21,7 +21,7 @@
             <div class="col-12">
                 <div class="card shadow-lg border-0">
                     <div class="card-header text-primary text-center" style="background-color: white;">
-                        <h4>Informasi Mahasiawa</h4>
+                        <h4>Informasi Mahasiswa</h4>
                     </div>
                     <div class="card-body d-flex flex-column flex-md-row align-items-start gap-4">
                         <div class="text-center">

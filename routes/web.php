@@ -12,9 +12,12 @@ use App\Http\Controllers\ListPekerjaanMHSController;
 use App\Http\Controllers\MahasiswaController;
 use App\Http\Controllers\matkulController;
 use App\Http\Controllers\PekerjanController;
+use App\Http\Controllers\PenerimaanSuratController;
+use App\Http\Controllers\PermintaanSuratController;
 use App\Http\Controllers\ProdiController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\riwayatController;
+use App\Http\Controllers\riwayatPermintaanSuratController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ValidasiController;
 use App\Http\Controllers\welcomeController;
@@ -228,17 +231,35 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/{id}/hapus',[riwayatController::class,'hapus']);
         Route::post('/gambar',[riwayatController::class,'store_gambar']);
         Route::post('/file',[riwayatController::class,'store_file']);
+        Route::post('/{id}/requestcetaksurat',[riwayatController::class,'request_cetak_surat']);
     });
 
     Route::group(['prefix'=> 'lihat','middleware'=> 'authorize:ADM'], function () {
         Route::get('/',[AdminLihatPekerjaan::class,'index']);
         Route::get('/{id}/show_ajax',[AdminLihatPekerjaan::class,'show_ajax']);
+    });
 
+    Route::group(['prefix'=> 'penerimaan','middleware'=> 'authorize:KPD'], function () {
+        Route::get('/',[PenerimaanSuratController::class,'index']);
+        Route::post('/list',[PenerimaanSuratController::class,'list']);
+        Route::post('/{id}/confirm', [PenerimaanSuratController::class, 'approve']);
+    });
+
+    Route::group(['prefix'=> 'riwayatPenerimaan','middleware'=> 'authorize:KPD'], function () {
+        Route::get('/',[riwayatPermintaanSuratController::class,'index']);
+        Route::post('/list',[riwayatPermintaanSuratController::class,'list']);
     });
 
     Route::group(['prefix'=> 'admintambah','middleware'=> 'authorize:ADM'], function () {
         Route::get('/',[PekerjanController::class,'index']);
     });
+
+    Route::group(['prefix'=> 'surat','middleware'=> 'authorize:MHS'], function () {
+        Route::get('/',[PermintaanSuratController::class,'index']);
+        Route::post('/list',[PermintaanSuratController::class,'list']);
+    });
+
+
 
     // NOTIFFF
     Route::get('/hitung-notif', [ValidasiController::class, 'hitung_notif']);

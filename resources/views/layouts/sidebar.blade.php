@@ -158,6 +158,13 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a href="{{ url('/surat') }}"
+                            class="nav-link {{ $activeMenu == 'surat' ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-history"></i>
+                            <p>Permintaan Surat</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a href="{{ url('/notifikasi') }}"
                             class="nav-link {{ $activeMenu == 'notifikasi' ? 'active' : '' }}">
                             <i class="nav-icon fas fa-bell"></i>
