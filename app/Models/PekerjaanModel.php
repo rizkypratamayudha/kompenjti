@@ -46,13 +46,20 @@ class PekerjaanModel extends Model
     }
 
     public function getCanRequestSuratAttribute()
-    {
-        // Periksa apakah semua progres pekerjaan ini sudah dikumpulkan dengan status bukan 'pending'
-        return $this->progres->every(function ($progres) {
-            return $progres->pengumpulan->isNotEmpty() &&
-                $progres->pengumpulan->first()->status !== 'pending';
-        });
-    }
+{
+    // Periksa apakah semua progres pekerjaan ini sudah dikumpulkan dengan status bukan 'pending'
+    $progresSelesai = $this->progres->every(function ($progres) {
+        return $progres->pengumpulan->isNotEmpty() &&
+            $progres->pengumpulan->first()->status !== 'pending';
+    });
+
+    // Periksa apakah akumulasi_deadline sudah melewati tanggal saat ini
+    $deadlineTerlewati = $this->akumulasi_deadline < now();
+
+    // Request Cetak Surat diperbolehkan jika salah satu kondisi terpenuhi
+    return $progresSelesai || $deadlineTerlewati;
+}
+
 
     public function t_approve_pekerjaan()
     {

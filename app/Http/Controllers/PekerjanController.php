@@ -8,6 +8,7 @@ use App\Models\detail_pekerjaanModel;
 use App\Models\kompetensi_adminModel;
 use App\Models\kompetensi_dosenModel;
 use App\Models\kompetensiModel;
+use App\Models\notifikasiModel;
 use App\Models\PekerjaanModel;
 use App\Models\PendingPekerjaanController;
 use App\Models\PendingPekerjaanModel;
@@ -286,6 +287,13 @@ class PekerjanController extends Controller
         ]);
 
         PendingPekerjaanModel::where('user_id', $request->user_id)->where('pekerjaan_id', $request->pekerjaan_id)->delete();
+        notifikasiModel::create([
+            'user_id' => $request->user_id,
+            'pekerjaan_id' => $request->pekerjaan_id,
+            'pesan' => 'Selamat!!, anda telah diterima pada pekerjaan ini',
+            'status' => 'belum',
+            'user_id_kap' => null
+        ]);
 
         return response()->json(['status' => true, 'message' => 'Pekerjaan berhasil disetujui']);
     }
@@ -306,6 +314,13 @@ class PekerjanController extends Controller
         }
 
         PendingPekerjaanModel::where('user_id', $request->user_id)->where('pekerjaan_id', $request->pekerjaan_id)->delete();
+        notifikasiModel::create([
+            'user_id' => $request->user_id,
+            'pekerjaan_id' => $request->pekerjaan_id,
+            'pesan' => 'Mohon maaf, anda tidak diterima pada pekerjaan ini, coba apply di pekerjaan lain',
+            'status' => 'belum',
+            'user_id_kap' => null
+        ]);
         return response()->json(['status' => true, 'message' => 'Pelamar berhasil ditolak']);
     }
 
@@ -325,6 +340,13 @@ class PekerjanController extends Controller
         }
 
         ApprovePekerjaanModel::where('user_id', $request->user_id)->where('pekerjaan_id', $request->pekerjaan_id)->delete();
+        notifikasiModel::create([
+            'user_id' => $request->user_id,
+            'pekerjaan_id' => $request->pekerjaan_id,
+            'pesan' => 'Anda telah di kick pada pekerjaan ini, coba apply di pekerjaan lain',
+            'status' => 'belum',
+            'user_id_kap' => null
+        ]);
         return response()->json(['status' => true, 'message' => 'Anggota berhasil dikick']);
     }
 
@@ -635,8 +657,11 @@ class PekerjanController extends Controller
             // Mengakses user yang terkait dengan pengumpulan
             $user = $pengumpulan->user;
 
+            $userId = $user->user_id;
+            $pekerjaanId = $pengumpulan->progres->pekerjaan_id;
             // Mengakses jam_kompen yang terkait dengan user
             $jamKompen = $user->jamKompen;
+
 
             if ($jamKompen) {
                 // Mengambil nilai akumulasi_jam
@@ -652,6 +677,14 @@ class PekerjanController extends Controller
                     $jamKompen->akumulasi_jam = 0;
                     $jamKompen->save();
                 }
+
+                notifikasiModel::create([
+                    'user_id' => $userId,
+                    'pekerjaan_id' => $pekerjaanId,
+                    'pesan' => 'Jam Kompen Anda Berkurang!!, pengumpulan anda telah dinilai',
+                    'status' => 'belum',
+                    'user_id_kap' => null
+                ]);
 
                 DB::commit(); // Commit jika berhasil
                 return response()->json(['message' => 'Tugas berhasil disetujui.']);
@@ -670,6 +703,16 @@ class PekerjanController extends Controller
         $pengumpulan = PengumpulanModel::with('user', 'progres')->findOrFail($id);
         $pengumpulan->status = 'decline';
         $pengumpulan->save();
+
+        $userId = $pengumpulan->user->user_id;
+        $pekerjaanId = $pengumpulan->progres->pekerjaan_id;
+        notifikasiModel::create([
+            'user_id' => $userId,
+            'pekerjaan_id' => $pekerjaanId,
+            'pesan' => 'Mohon Maaf Pengumpulan anda ditolak, coba kumpulkan pekerjaan dengan baik',
+            'status' => 'belum',
+            'user_id_kap' => null
+        ]);
 
         return response()->json(['message' => 'Tugas berhasil disetujui.']);
     }
