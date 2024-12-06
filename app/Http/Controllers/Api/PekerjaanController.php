@@ -74,29 +74,46 @@ class PekerjaanController extends Controller
         ], 200);
     }
 
-    public function getPelamaran($id)
-    {
-        try {
-            $loggedInUserId = Auth::id();
+    public function getPelamaran($userId)
+{
+    try {
+        // Verifikasi apakah user yang login memiliki akses terhadap data ini
+        $loggedInUserId = Auth::id();
 
-            $pelamaran = PendingPekerjaanModel::with('user.detailMahasiswa.prodi', 'pekerjaan.user', 'user.kompetensi.kompetensiAdmin')
-                ->where('pekerjaan_id', $id)
-                ->whereHas('pekerjaan', function ($query) use ($loggedInUserId) {
-                    $query->where('user_id', $loggedInUserId);
-                })
-                ->get();
-
-            return response()->json([
-                'status' => true,
-                'data' => $pelamaran,
-            ], 200);
-        } catch (\Exception $e) {
+        if ($loggedInUserId != $userId) {
             return response()->json([
                 'status' => false,
-                'message' => 'Gagal mendapatkan data pelamaran.',
-                'error' => $e->getMessage(),
-            ], 500);
+                'message' => 'Unauthorized',
+            ], 403);
         }
+
+        $pelamaran = PendingPekerjaanModel::with('user.detailMahasiswa.prodi', 'pekerjaan.user', 'user.kompetensi.kompetensiAdmin')
+            ->whereHas('pekerjaan', function ($query) use ($loggedInUserId) {
+                $query->where('user_id', $loggedInUserId);
+            })
+            ->get();
+
+        return response()->json([
+            'status' => true,
+            'data' => $pelamaran,
+        ], 200);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => false,
+            'message' => 'Gagal mendapatkan data pelamaran.',
+            'error' => $e->getMessage(),
+        ], 500);
+    }
+}
+
+
+    public function get_anggota($id){
+        $anggotaJumlah = ApprovePekerjaanModel::where('pekerjaan_id',$id)->count();
+
+        return response()->json([
+            'status' => true,
+            'anggotaJumlah' => $anggotaJumlah
+        ]);
     }
 
     public function store(Request $request)
