@@ -22,4 +22,8 @@ class detail_kaprodiModel extends Model
     {
         return $this->belongsTo(ProdiModel::class, 'prodi_id');
     }
+    public function t_pending_cetak()
+    {
+        return $this->hasMany(t_pending_cetak_model::class, 'user_id', 'user_id');
+    }
 }
