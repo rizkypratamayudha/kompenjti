@@ -290,7 +290,7 @@ class PekerjanController extends Controller
         notifikasiModel::create([
             'user_id' => $request->user_id,
             'pekerjaan_id' => $request->pekerjaan_id,
-            'pesan' => 'Selamat!!, anda telah diterima pada pekerjaan ini',
+            'pesan' => 'Selamat!!, anda telah diterima pada pekerjaan',
             'status' => 'belum',
             'user_id_kap' => null
         ]);
@@ -317,7 +317,7 @@ class PekerjanController extends Controller
         notifikasiModel::create([
             'user_id' => $request->user_id,
             'pekerjaan_id' => $request->pekerjaan_id,
-            'pesan' => 'Mohon maaf, anda tidak diterima pada pekerjaan ini, coba apply di pekerjaan lain',
+            'pesan' => 'Mohon maaf, anda tidak diterima pada pekerjaan',
             'status' => 'belum',
             'user_id_kap' => null
         ]);
@@ -343,7 +343,7 @@ class PekerjanController extends Controller
         notifikasiModel::create([
             'user_id' => $request->user_id,
             'pekerjaan_id' => $request->pekerjaan_id,
-            'pesan' => 'Anda telah di kick pada pekerjaan ini, coba apply di pekerjaan lain',
+            'pesan' => 'Coba apply di pekerjaan lain, anda telah ditolak di pekerjaan',
             'status' => 'belum',
             'user_id_kap' => null
         ]);
@@ -718,35 +718,33 @@ class PekerjanController extends Controller
     }
 
     public function checkProgressAndShowButton($id)
-{
-    $userId = Auth::id();
+    {
+        $userId = Auth::id();
 
-    // Mengambil semua progres yang terkait dengan pekerjaan dan pengguna yang login
-    $progres = ProgresModel::where('pekerjaan_id', $id)
-        ->where('user_id', $userId)
-        ->get();
+        // Mengambil semua progres yang terkait dengan pekerjaan dan pengguna yang login
+        $progres = ProgresModel::where('pekerjaan_id', $id)
+            ->where('user_id', $userId)
+            ->get();
 
-    // Mengecek apakah semua progres memiliki status selain 'pending'
-    $allCompleted = $progres->every(function ($item) {
-        return $item->status !== 'pending'; // Memastikan status bukan pending
-    });
+        // Mengecek apakah semua progres memiliki status selain 'pending'
+        $allCompleted = $progres->every(function ($item) {
+            return $item->status !== 'pending'; // Memastikan status bukan pending
+        });
 
-    // Mengecek apakah semua pengumpulan (tugas) sudah diterima dan bukan 'pending'
-    $pengumpulan = PengumpulanModel::where('user_id', $userId)
-        ->where('pekerjaan_id', $id)
-        ->get();
+        // Mengecek apakah semua pengumpulan (tugas) sudah diterima dan bukan 'pending'
+        $pengumpulan = PengumpulanModel::where('user_id', $userId)
+            ->where('pekerjaan_id', $id)
+            ->get();
 
-    $allPengumpulanAccepted = $pengumpulan->every(function ($item) {
-        return $item->status !== 'pending'; // Memastikan status bukan pending
-    });
+        $allPengumpulanAccepted = $pengumpulan->every(function ($item) {
+            return $item->status !== 'pending'; // Memastikan status bukan pending
+        });
 
-    // Debugging untuk memastikan data dikirim
-    Log::debug('Progres Status: ' . $allCompleted . ', Pengumpulan Status: ' . $allPengumpulanAccepted);
+        // Debugging untuk memastikan data dikirim
+        Log::debug('Progres Status: ' . $allCompleted . ', Pengumpulan Status: ' . $allPengumpulanAccepted);
 
-    return response()->json([
-        'status' => $allCompleted && $allPengumpulanAccepted
-    ]);
-}
-
-
+        return response()->json([
+            'status' => $allCompleted && $allPengumpulanAccepted
+        ]);
+    }
 }

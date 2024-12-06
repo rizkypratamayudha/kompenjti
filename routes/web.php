@@ -264,6 +264,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::group(['prefix'=> 'notifikasi','middleware'=> 'authorize:MHS'], function (){
         Route::get('/',[notifikasiController::class,'index']);
+        Route::get('/{id}/dibaca',[notifikasiController::class,'dibaca'])->name('notifikasi.dibaca');;
     });
 
     // NOTIFFF
