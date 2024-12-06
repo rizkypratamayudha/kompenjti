@@ -12,6 +12,7 @@ use App\Http\Controllers\LevelController;
 use App\Http\Controllers\ListPekerjaanMHSController;
 use App\Http\Controllers\MahasiswaController;
 use App\Http\Controllers\matkulController;
+use App\Http\Controllers\notifikasiController;
 use App\Http\Controllers\PekerjanController;
 use App\Http\Controllers\PenerimaanSuratController;
 use App\Http\Controllers\PermintaanSuratController;
@@ -258,9 +259,12 @@ Route::middleware(['auth'])->group(function () {
     Route::group(['prefix'=> 'surat','middleware'=> 'authorize:MHS'], function () {
         Route::get('/',[PermintaanSuratController::class,'index']);
         Route::post('/list',[PermintaanSuratController::class,'list']);
+        Route::get('/download-pdf/{id}',[PermintaanSuratController::class,'export_pdf']);
     });
 
-
+    Route::group(['prefix'=> 'notifikasi','middleware'=> 'authorize:MHS'], function (){
+        Route::get('/',[notifikasiController::class,'index']);
+    });
 
     // NOTIFFF
     Route::get('/hitung-notif', [ValidasiController::class, 'hitung_notif']);

@@ -19,8 +19,7 @@
                         <th>No</th>
                         <th>Pekerjaan</th>
                         <th>Kaprodi</th>
-                        <th>Status</th>
-                        <th>Diajukan pada</th>
+                        <th>Disetujui pada</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
@@ -69,16 +68,10 @@
                         searchable: true
                     },
                     {
-                        data: "user.nama",
+                        data: "kaprodi.nama",
                         className: "",
                         orderable: true,
                         searchable: true
-                    },
-                    {
-                        data: "status",
-                        className: "",
-                        orderable: false,
-                        searchable: false
                     }, {
 
                         data: "created_at",

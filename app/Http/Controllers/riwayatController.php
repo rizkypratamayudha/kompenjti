@@ -277,48 +277,55 @@ class riwayatController extends Controller
         ]);
     }
     public function request_cetak_surat(Request $request, $pekerjaan_id)
-    {
-        try {
-            $userId = Auth::id();
+{
+    try {
+        $userId = Auth::id();
 
-            // Validasi apakah user memiliki hak untuk mencetak surat
-            $isValid = PekerjaanModel::where('pekerjaan_id', $pekerjaan_id)
-                ->whereHas('progres.pengumpulan', function ($query) use ($userId) {
-                    $query->where('user_id', $userId)
-                        ->where('status', 'accept');
-                })
-                ->exists();
+        // Cek apakah pekerjaan sudah melewati akumulasi_deadline
+        $isDeadlineTerlewati = PekerjaanModel::where('pekerjaan_id', $pekerjaan_id)
+            ->where('akumulasi_deadline', '<', now()) // Cek apakah akumulasi_deadline sudah lewat
+            ->exists();
 
-            if (!$isValid) {
-                return redirect()->back()->with('error', 'Anda tidak memiliki hak untuk membuat permintaan surat ini.');
-            }
+        // Validasi apakah user memiliki hak untuk mencetak surat
+        $isValid = PekerjaanModel::where('pekerjaan_id', $pekerjaan_id)
+            ->whereHas('progres.pengumpulan', function ($query) use ($userId) {
+                $query->where('user_id', $userId)
+                    ->whereIn('status', ['accept', 'decline']); // Status bisa accept atau decline
+            })
+            ->exists();
 
-            // Cek apakah kombinasi pekerjaan_id dan user_id sudah ada
-            $isExists = t_pending_cetak_model::where('user_id', $userId)
-                ->where('pekerjaan_id', $pekerjaan_id)
-                ->exists();
-
-            if ($isExists) {
-                return redirect()->back()->with('error', 'Permintaan cetak surat sudah pernah dibuat.');
-            }
-
-            $isExistsapprove = t_approve_cetak_model::where('user_id', $userId)
-                ->where('pekerjaan_id', $pekerjaan_id)
-                ->exists();
-
-            if ($isExistsapprove) {
-                return redirect()->back()->with('error', 'Permintaan cetak surat sudah pernah dibuat dan telah disetujui Kaprodi');
-            }
-
-            // Buat data baru jika belum ada
-            t_pending_cetak_model::create([
-                'user_id' => $userId,
-                'pekerjaan_id' => $pekerjaan_id,
-            ]);
-
-            return redirect()->back()->with('success', 'Permintaan cetak surat berhasil dibuat.');
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        // Jika deadline terlewati dan validasi status sudah terpenuhi
+        if (!$isValid && !$isDeadlineTerlewati) {
+            return redirect()->back()->with('error', 'Anda tidak memiliki hak untuk membuat permintaan surat ini.');
         }
+
+        // Cek apakah kombinasi pekerjaan_id dan user_id sudah ada
+        $isExists = t_pending_cetak_model::where('user_id', $userId)
+            ->where('pekerjaan_id', $pekerjaan_id)
+            ->exists();
+
+        if ($isExists) {
+            return redirect()->back()->with('error', 'Permintaan cetak surat sudah pernah dibuat.');
+        }
+
+        $isExistsapprove = t_approve_cetak_model::where('user_id', $userId)
+            ->where('pekerjaan_id', $pekerjaan_id)
+            ->exists();
+
+        if ($isExistsapprove) {
+            return redirect()->back()->with('error', 'Permintaan cetak surat sudah pernah dibuat dan telah disetujui Kaprodi.');
+        }
+
+        // Buat data baru jika belum ada
+        t_pending_cetak_model::create([
+            'user_id' => $userId,
+            'pekerjaan_id' => $pekerjaan_id,
+        ]);
+
+        return redirect()->back()->with('success', 'Permintaan cetak surat berhasil dibuat.');
+    } catch (\Exception $e) {
+        return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
     }
+}
+
 }
