@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\ApprovePekerjaanModel;
 use App\Models\detail_pekerjaanModel;
+use App\Models\notifikasiModel;
 use App\Models\PekerjaanModel;
 use App\Models\PendingPekerjaanModel;
 use App\Models\ProgresModel;
@@ -75,46 +76,113 @@ class PekerjaanController extends Controller
     }
 
     public function getPelamaran($userId)
-{
-    try {
-        // Verifikasi apakah user yang login memiliki akses terhadap data ini
-        $loggedInUserId = Auth::id();
+    {
+        try {
+            // Verifikasi apakah user yang login memiliki akses terhadap data ini
+            $loggedInUserId = Auth::id();
 
-        if ($loggedInUserId != $userId) {
+            if ($loggedInUserId != $userId) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Unauthorized',
+                ], 403);
+            }
+
+            $pelamaran = PendingPekerjaanModel::with('user.detailMahasiswa.prodi', 'pekerjaan.user', 'user.kompetensi.kompetensiAdmin')
+                ->whereHas('pekerjaan', function ($query) use ($loggedInUserId) {
+                    $query->where('user_id', $loggedInUserId);
+                })
+                ->get();
+
+            return response()->json([
+                'status' => true,
+                'data' => $pelamaran,
+            ], 200);
+        } catch (\Exception $e) {
             return response()->json([
                 'status' => false,
-                'message' => 'Unauthorized',
-            ], 403);
+                'message' => 'Gagal mendapatkan data pelamaran.',
+                'error' => $e->getMessage(),
+            ], 500);
         }
-
-        $pelamaran = PendingPekerjaanModel::with('user.detailMahasiswa.prodi', 'pekerjaan.user', 'user.kompetensi.kompetensiAdmin')
-            ->whereHas('pekerjaan', function ($query) use ($loggedInUserId) {
-                $query->where('user_id', $loggedInUserId);
-            })
-            ->get();
-
-        return response()->json([
-            'status' => true,
-            'data' => $pelamaran,
-        ], 200);
-    } catch (\Exception $e) {
-        return response()->json([
-            'status' => false,
-            'message' => 'Gagal mendapatkan data pelamaran.',
-            'error' => $e->getMessage(),
-        ], 500);
     }
-}
 
 
-    public function get_anggota($id){
-        $anggotaJumlah = ApprovePekerjaanModel::where('pekerjaan_id',$id)->count();
+    public function get_anggota($id)
+    {
+        $anggotaJumlah = ApprovePekerjaanModel::where('pekerjaan_id', $id)->count();
 
         return response()->json([
             'status' => true,
             'anggotaJumlah' => $anggotaJumlah
         ]);
     }
+
+    public function approvePekerjaan(Request $request)
+    {
+        // Validasi data yang diterima dari request
+        $validator = Validator::make($request->all(), [
+            'pekerjaan_id' => 'required|exists:pekerjaan,pekerjaan_id',
+            'user_id' => 'required|exists:m_user,user_id',
+        ]);
+
+        // Jika validasi gagal, kirimkan respons dengan status 422 dan pesan error
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Validasi gagal',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        // Periksa apakah pelamar sudah ada pada pekerjaan ini
+        $existingApprove = ApprovePekerjaanModel::where('pekerjaan_id', $request->pekerjaan_id)
+            ->where('user_id', $request->user_id)
+            ->exists();
+
+        if ($existingApprove) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Pelamar sudah ada pada anggota pekerjaan ini'
+            ], 400); // Menggunakan status 400 untuk permintaan yang salah
+        }
+
+        // Proses persetujuan pekerjaan
+        try {
+            ApprovePekerjaanModel::create([
+                'pekerjaan_id' => $request->pekerjaan_id,
+                'user_id' => $request->user_id,
+            ]);
+
+            // Hapus pekerjaan yang masih dalam status pending
+            PendingPekerjaanModel::where('user_id', $request->user_id)
+                ->where('pekerjaan_id', $request->pekerjaan_id)
+                ->delete();
+
+            // Kirimkan notifikasi kepada pelamar
+            notifikasiModel::create([
+                'user_id' => $request->user_id,
+                'pekerjaan_id' => $request->pekerjaan_id,
+                'pesan' => 'Selamat!!, Anda telah diterima pada pekerjaan',
+                'status' => 'belum',
+                'user_id_kap' => null,
+            ]);
+
+            // Kirimkan respons sukses jika semuanya berjalan dengan baik
+            return response()->json([
+                'status' => true,
+                'message' => 'Pekerjaan berhasil disetujui'
+            ], 200); // Status 200 untuk sukses
+        } catch (\Exception $e) {
+            // Jika ada kesalahan, kirimkan respons error
+            return response()->json([
+                'status' => false,
+                'message' => 'Terjadi kesalahan saat menyetujui pekerjaan',
+                'error' => $e->getMessage()
+            ], 500); // Status 500 untuk kesalahan server
+        }
+    }
+
 
     public function store(Request $request)
     {

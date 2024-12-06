@@ -33,4 +33,9 @@ class notifikasiController extends Controller
 
         return response()->json(['status' => 'error', 'message' => 'Notifikasi tidak ditemukan']);
     }
+
+    public function hitung_notif_notifikasi(){
+        $jumlah = notifikasiModel::where('user_id',Auth::id())->count();
+        return ['jumlah' => $jumlah];
+    }
 }

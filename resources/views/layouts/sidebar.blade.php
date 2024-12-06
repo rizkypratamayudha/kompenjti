@@ -1,4 +1,4 @@
-<aside class="main-sidebar sidebar-dark-primary elevation-4 position-fixed">
+<aside class="main-sidebar sidebar-dark-primary elevation-4 posti">
     <!-- Brand Logo -->
     <a href="{{ url('/') }}" class="brand-link">
         <img src="{{ asset('logo.png') }}" alt="AdminLTE Logo" class="brand-image" style="opacity: .8">
@@ -169,6 +169,8 @@
                             class="nav-link {{ $activeMenu == 'notifikasi' ? 'active' : '' }}">
                             <i class="nav-icon fas fa-bell"></i>
                             <p>Notifikasi</p>
+                            <span class="badge badge-danger badge-notifikasi position-absolute top-0 start-100 translate-middle rounded-pill">
+                            </span>
                         </a>
                     </li>
                     <li class="nav-header">Manage Kompetensi</li>
@@ -245,6 +247,7 @@
         updateBadge('{{ url('/hitung-notif-pelamar') }}', '.badge-pelamar');
         updateBadge('{{ url('/hitung-notif-pelamar-admin') }}', '.badge-pelamar-admin');
         updateBadge('{{ url('/hitung-notif') }}', '.badge');
+        updateBadge('{{ url('/hitung-notif-notifikasi') }}', '.badge-notifikasi');
     });
 </script>
 

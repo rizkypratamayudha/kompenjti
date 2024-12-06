@@ -238,7 +238,8 @@ class PekerjanController extends Controller
 
                 // Hapus data detail pekerjaan
                 $pekerjaan->detail_pekerjaan()->delete();
-
+                $pekerjaan->t_approve_pekerjaan()->delete();
+                $pekerjaan->t_pending_pekerjaan()->delete();
                 $pekerjaan->progres()->delete();
                 // Hapus data pekerjaan itu sendiri
                 $pekerjaan->delete();
