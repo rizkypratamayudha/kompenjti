@@ -4,6 +4,7 @@ use App\Http\Controllers\AdminLihatPekerjaan;
 use App\Http\Controllers\PeriodeController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardDosenController;
+use App\Http\Controllers\DashboardKaprodiController;
 use App\Http\Controllers\DashboardMahasiswaController;
 use App\Http\Controllers\kompetensi_adminController;
 use App\Http\Controllers\KompetensiController;
@@ -47,7 +48,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/', [welcomeController::class, 'index'])->middleware('authorize:ADM');
     Route::get('/dashboardMhs', [DashboardMahasiswaController::class, 'index'])->middleware('authorize:MHS');
     Route::get('/dashboardDos', [DashboardDosenController::class, 'index'])->middleware('authorize:DSN');
-    Route::get('/dashboardKap', [welcomeController::class, 'kaprodi'])->middleware('authorize:KPD');
+    Route::get('/dashboardKap', [DashboardKaprodiController::class, 'index'])->middleware('authorize:KPD');
     Route::get('/contact', [welcomeController::class,'contact']);
 
 

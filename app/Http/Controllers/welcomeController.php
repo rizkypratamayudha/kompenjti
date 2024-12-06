@@ -38,16 +38,16 @@ class welcomeController extends Controller
 
     //     return view('dosen.dashboard',['breadcrumb'=>$breadcrumb,'activeMenu'=>$activeMenu]);
     // }
-    public function kaprodi(){
-        $breadcrumb = (object)[
-            'title'=>'Selamat Datang',
-            'list'=>['Home','Dashboard Kaprodi']
-        ];
+    // public function kaprodi(){
+    //     $breadcrumb = (object)[
+    //         'title'=>'Selamat Datang',
+    //         'list'=>['Home','Dashboard Kaprodi']
+    //     ];
 
-        $activeMenu = 'dashboardKap';
+    //     $activeMenu = 'dashboardKap';
 
-        return view('kaprodi.dashboard',['breadcrumb'=>$breadcrumb,'activeMenu'=>$activeMenu]);
-    }
+    //     return view('kaprodi.dashboard',['breadcrumb'=>$breadcrumb,'activeMenu'=>$activeMenu]);
+    // }
 
     public function contact(){
         $breadcrumb = (object)[
