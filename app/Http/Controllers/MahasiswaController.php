@@ -37,7 +37,9 @@ class MahasiswaController extends Controller
     {
         $jamKompen = jamKompenModel::select('jam_kompen_id', 'akumulasi_jam', 'user_id', 'periode_id')
         -> with('user')
-        -> with('periode');
+        -> with('periode')
+        ->where('akumulasi_jam','>', 0 )
+        ;
 
         if ($request->periode_id){
             $jamKompen->where('periode_id',$request->periode_id);
@@ -78,7 +80,7 @@ class MahasiswaController extends Controller
             'jumlah_jam' => 'required|array|min:1',
             'jumlah_jam.*' => 'required|integer|min:1',
         ]);
-    
+
         if ($validator->fails()) {
             return response()->json([
                 'status' => false,
@@ -86,12 +88,12 @@ class MahasiswaController extends Controller
                 'errors' => $validator->errors()
             ], 422);
         }
-    
+
         DB::beginTransaction();
         try {
             // Cek apakah user_id sudah ada di jam_kompen
             $jamKompen = jamKompenModel::where('user_id', $request->user_id)->first();
-    
+
             if (!$jamKompen) {
                 // Buat record baru di jam_kompen
                 $akumulasi_jam = array_sum($request->jumlah_jam);
@@ -101,12 +103,12 @@ class MahasiswaController extends Controller
                     'akumulasi_jam' => $akumulasi_jam,
                 ]);
             }
-    
+
             foreach ($request->matkul_id as $index => $matkul) {
                 $detailJamKompen = detail_jamKompenModel::where('jam_kompen_id', $jamKompen->jam_kompen_id)
                     ->where('matkul_id', $matkul)
                     ->first();
-    
+
                 if ($detailJamKompen) {
                     // Update jumlah_jam pada matkul yang sama
                     $detailJamKompen->update([
@@ -121,16 +123,16 @@ class MahasiswaController extends Controller
                     ]);
                 }
             }
-    
+
             // Update akumulasi_jam setelah semua operasi selesai
             $jamKompen->update(['akumulasi_jam' => detail_jamKompenModel::where('jam_kompen_id', $jamKompen->jam_kompen_id)->sum('jumlah_jam')]);
-    
+
             DB::commit();
             return response()->json([
                 'status' => true,
                 'message' => 'Data pekerjaan berhasil disimpan'
             ]);
-    
+
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
@@ -171,7 +173,7 @@ class MahasiswaController extends Controller
             'jumlah_jam' => 'required|array|min:1',
             'jumlah_jam.*' => 'required|integer|min:1',
         ]);
-    
+
         if ($validator->fails()) {
             return response()->json([
                 'status' => false,
@@ -179,24 +181,24 @@ class MahasiswaController extends Controller
                 'errors' => $validator->errors(),
             ], 422);
         }
-    
+
         DB::beginTransaction();
         try {
             $jamKompen = jamKompenModel::where('user_id', $request->user_id)->first();
-    
+
             if (!$jamKompen) {
                 return response()->json([
                     'status' => false,
                     'message' => 'Data tidak ditemukan',
                 ], 404);
             }
-    
+
             $jamKompen->detail_jamKompen()->delete();
             foreach ($request->matkul_id as $index => $matkul) {
                 $detailJamKompen = detail_jamKompenModel::where('jam_kompen_id', $jamKompen->jam_kompen_id)
                     ->where('matkul_id', $matkul)
                     ->first();
-    
+
                 if ($detailJamKompen) {
                     // Update jumlah_jam pada matkul yang sama
                     $detailJamKompen->update([
@@ -211,10 +213,10 @@ class MahasiswaController extends Controller
                     ]);
                 }
             }
-    
+
             // Update akumulasi_jam setelah semua operasi selesai
             $jamKompen->update(['akumulasi_jam' => detail_jamKompenModel::where('jam_kompen_id', $jamKompen->jam_kompen_id)->sum('jumlah_jam')]);
-    
+
             DB::commit();
             return response()->json([
                 'status' => true,
@@ -229,7 +231,7 @@ class MahasiswaController extends Controller
             ], 500);
         }
     }
-    
+
     public function show_ajax(string $id)
     {
         $jamkompen = jamKompenModel::with('detail_jamKompen','user','periode','detail_jamKompen.matkul')->find($id);
@@ -410,6 +412,7 @@ class MahasiswaController extends Controller
         $jamKompen = jamKompenModel::select('jam_kompen_id', 'user_id', 'periode_id', 'akumulasi_jam')
             ->with(['detail_jamKompen.matkul']) // Pastikan relasi sudah terdefinisi
             ->orderBy('periode_id')
+            ->where('akumulasi_jam','>',0)
             ->get();
 
         // Load library excel
@@ -477,6 +480,8 @@ class MahasiswaController extends Controller
         $jamKompen = jamKompenModel::select('jam_kompen_id', 'user_id', 'periode_id', 'akumulasi_jam')
             ->with(['detail_jamKompen.matkul']) // Pastikan relasi sudah terdefinisi
             ->orderBy('periode_id')
+            ->where('akumulasi_jam','>', 0
+            )
             ->get();
 
 
