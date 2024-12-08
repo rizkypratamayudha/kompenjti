@@ -9,6 +9,12 @@
             </div>
             <div class="modal-body">
                 <div class="form-group">
+                    <label>Kode Mata Kuliah</label>
+                    <input value="" type="text" name="matkul_kode" id="matkul_kode" class="form-control"
+                    required>
+                    <small id="error-matkul_kode" class="error-text form-text text-danger"></small>
+                </div>
+                <div class="form-group">
                     <label>Nama Mata Kuliah</label>
                     <input value="" type="text" name="matkul_nama" id="matkul_nama" class="form-control"
                     required>
@@ -26,6 +32,7 @@
     $(document).ready(function() {
         $("#form-tambah").validate({
             rules: {
+                matkul_kode: {required: true, minlength: 3, maxlength: 100},
                 matkul_nama: {required: true, minlength: 3, maxlength: 100},
             },
             submitHandler: function(form) {

@@ -231,40 +231,67 @@ class PekerjaanController extends Controller
     }
 
     public function getPekerjaanPengerjaan($userId)
-{
-    try {
+    {
+        try {
 
-        $login = Auth::id();
+            $login = Auth::id();
 
-        if ($login != $userId) {
+            if ($login != $userId) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Unauthorized',
+                ], 403);
+            }
+            // Ambil data pekerjaan berdasarkan user yang sedang login
+            $tugas = PekerjaanModel::whereHas('t_approve_pekerjaan', function ($query) use ($login) {
+                $query->where('user_id', $login);
+            })->with(['progres', 'progres.pengumpulan' => function ($query) use ($login) {
+                $query->where('user_id', $login);
+            }])->get();
+
+            // Buat struktur data respons
+            $response = [
+                'status' => true,
+                'message' => 'Data berhasil diambil',
+                'data' => $tugas
+            ];
+
+            return response()->json($response, 200);
+        } catch (\Exception $e) {
+            // Tangani jika terjadi kesalahan
             return response()->json([
                 'status' => false,
-                'message' => 'Unauthorized',
-            ], 403);
+                'message' => 'Terjadi kesalahan saat mengambil data',
+                'error' => $e->getMessage()
+            ], 500);
         }
-        // Ambil data pekerjaan berdasarkan user yang sedang login
-        $tugas = PekerjaanModel::whereHas('t_approve_pekerjaan', function ($query) use ($login) {
-            $query->where('user_id', $login);
-        })->with(['progres', 'progres.pengumpulan' => function ($query) use ($login) {
-            $query->where('user_id', $login);
-        }])->get();
-
-        // Buat struktur data respons
-        $response = [
-            'status' => true,
-            'message' => 'Data berhasil diambil',
-            'data' => $tugas
-        ];
-
-        return response()->json($response, 200);
-    } catch (\Exception $e) {
-        // Tangani jika terjadi kesalahan
-        return response()->json([
-            'status' => false,
-            'message' => 'Terjadi kesalahan saat mengambil data',
-            'error' => $e->getMessage()
-        ], 500);
     }
-}
 
+    public function getProgres($pekerjaanId){
+        try{
+            $pekerjaan = PekerjaanModel::findOrFail($pekerjaanId);
+
+            $progres = ProgresModel::where('pekerjaan_id',$pekerjaanId)->orderBy('progres_id','asc')
+            ->get();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Progress data retrieved successfully',
+                'data' => $progres
+            ], 200);
+
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Pekerjaan not found'
+            ], 404);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'An error occurred while retrieving progress data',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 }

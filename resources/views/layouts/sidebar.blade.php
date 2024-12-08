@@ -131,12 +131,17 @@
                             </p>
                         </a>
                     </li>
-
                     <li class="nav-item">
                         <a href="{{ url('/alphadosen') }}"
                             class="nav-link {{ $activeMenu == 'alphadosen' ? 'active' : '' }}">
                             <i class="nav-icon fas fa-history"></i>
                             <p>Data Alpha Mahasiswa</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url('/riwayatkompen') }}" class="nav-link {{ $activeMenu == 'riwayatkompen' ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-envelope"></i>
+                            <p>Riwayat Cetak Surat</p>
                         </a>
                     </li>
                 @elseif (Auth::user()->level_id == 3)

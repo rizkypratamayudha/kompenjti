@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminLihatPekerjaan;
+use App\Http\Controllers\alphadosenController;
 use App\Http\Controllers\PeriodeController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardDosenController;
@@ -101,7 +102,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/approve/{id}', [ValidasiController::class, 'approve']);
         Route::post('/decline/{id}', [ValidasiController::class, 'decline']);
     });
-    Route::group(['prefix' => 'mahasiswa', 'middleware' => 'authorize:ADM'], function () {
+    Route::group(['prefix' => 'mahasiswa', 'middleware' => 'authorize:ADM,DSN'], function () {
         Route::get('/', [MahasiswaController::class, 'index']);
         Route::post('/list', [MahasiswaController::class, 'list']);
         Route::get('/create_ajax', [MahasiswaController::class, 'create_ajax']);
@@ -239,7 +240,7 @@ Route::middleware(['auth'])->group(function () {
     });
 
     Route::group(['prefix'=> 'alphadosen','middleware'=> 'authorize:DSN'], function () {
-
+        Route::get('/',[alphadosenController::class,'index']);
     });
 
     Route::group(['prefix'=> 'lihat','middleware'=> 'authorize:ADM'], function () {
@@ -274,7 +275,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/{id}/dibaca',[notifikasiController::class,'dibaca'])->name('notifikasi.dibaca');;
     });
 
-    Route::group(['prefix'=> 'riwayatkompen','middleware'=> 'authorize:ADM'], function () {
+    Route::group(['prefix'=> 'riwayatkompen','middleware'=> 'authorize:ADM,DSN'], function () {
         Route::get('/',[riwayatkompenadminController::class,'index']);
         Route::post('/list',[riwayatkompenadminController::class,'list']);
         Route::get('/download-pdf/{id}',[riwayatkompenadminController::class,'export_pdf']);

@@ -41,13 +41,6 @@ Route::get('/dosen/pekerjaan/{user_id}', [DosenBuatPekerjaanController::class, '
 Route::post('/dosen/pekerjaan/create', [DosenBuatPekerjaanController::class, 'store']);
 
 
-
-
-
-
-
-
-
 Route::middleware(['auth:api'])->group(function () {
     Route::post('/updatePhoto', [ProfileController::class, 'updatePhoto']);
     Route::put('/updatePassword', [ProfileController::class, 'updatePassword']);
@@ -64,6 +57,7 @@ Route::middleware(['auth:api'])->group(function () {
         Route::post('/approve-pekerjaan',[PekerjaanController::class,'approvePekerjaan']);
         Route::post('/decline-pekerjaan',[PekerjaanController::class,'declinePekerjaan']);
         Route::get('/{id}/getPekerjaanPengerjaan',[PekerjaanController::class,'getPekerjaanPengerjaan']);
+        Route::get('{id}/getProgres',[PekerjaanController::class,'getProgres']);
     });
 
     Route::group(['prefix' => 'mahasiswa'], function () {
