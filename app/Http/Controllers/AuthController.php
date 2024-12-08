@@ -10,11 +10,24 @@ class AuthController extends Controller
 {
     public function login()
     {
-        if (Auth::check()) { // jika sudah login, maka redirect ke halaman home
-            return redirect('/');
+        if (Auth::check()) {
+            $user = Auth::user();
+
+            // Redirect based on user's level
+            $redirectUrl = match ($user->level->kode_level) {
+                'ADM' => '/dashboardAdm',
+                'MHS' => '/dashboardMhs',
+                'DSN' => '/dashboardDos',
+                'KPD' => '/dashboardKap',
+                default => '/',
+            };
+
+            return redirect($redirectUrl);
         }
+
         return view('auth.login');
     }
+
 
     public function postlogin(Request $request)
     {
