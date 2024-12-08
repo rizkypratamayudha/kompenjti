@@ -41,18 +41,8 @@ Route::get('/dosen/pekerjaan/{user_id}', [DosenBuatPekerjaanController::class, '
 Route::post('/dosen/pekerjaan/create', [DosenBuatPekerjaanController::class, 'store']);
 
 
-Route::group(['prefix' => 'mahasiswa'], function () {
-    // Mendapatkan informasi user (termasuk data jam kompen dan detail mahasiswa)
-    Route::get('/user-info', [DashboardMhsController::class, 'getUserInfo']);
-    // Mendapatkan jam kompen berdasarkan periode
-    Route::get('/jam-kompen', [DashboardMhsController::class, 'getJamKompen']);
-    // Mendapatkan detail jam kompen berdasarkan periode
-    Route::get('/detail-jam-kompen', [DashboardMhsController::class, 'getDetailJamKompen']);
-    // Mendapatkan daftar periode
-    Route::get('/periode', [DashboardMhsController::class, 'getPeriode']);
-    // Mendapatkan daftar mata kuliah
-    Route::get('/matkul', [DashboardMhsController::class, 'getMatkul']);
-});
+
+
 
 
 
@@ -74,5 +64,9 @@ Route::middleware(['auth:api'])->group(function () {
 
     Route::group(['prefix' => 'dosen'], function(){
         Route::get('/{id}/pelamaran',[PekerjaanController::class,'getPelamaran']);
+    });
+
+    Route::group(['prefix' => 'mahasiswa'], function () {
+        Route::get('/dashboard', [DashboardMhsController::class, 'index']);
     });
 });
