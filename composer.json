@@ -12,6 +12,7 @@
         "laravel/sanctum": "^3.3",
         "laravel/tinker": "^2.8",
         "phpoffice/phpspreadsheet": "^3.3",
+        "simplesoftwareio/simple-qrcode": "^4.2",
         "tymon/jwt-auth": "^2.1",
         "yajra/laravel-datatables-oracle": "10.3.1"
     },

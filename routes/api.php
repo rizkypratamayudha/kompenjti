@@ -57,7 +57,6 @@ Route::middleware(['auth:api'])->group(function () {
         Route::post('/approve-pekerjaan',[PekerjaanController::class,'approvePekerjaan']);
         Route::post('/decline-pekerjaan',[PekerjaanController::class,'declinePekerjaan']);
         Route::get('/{id}/getPekerjaanPengerjaan',[PekerjaanController::class,'getPekerjaanPengerjaan']);
-        Route::get('{id}/getProgres',[PekerjaanController::class,'getProgres']);
     });
 
     Route::group(['prefix' => 'mahasiswa'], function () {

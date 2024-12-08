@@ -6,6 +6,8 @@ use App\Models\PengumpulanModel;
 use App\Models\t_approve_cetak_model;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Yajra\DataTables\Facades\DataTables;
 
 class riwayatkompenadminController extends Controller
@@ -77,8 +79,18 @@ class riwayatkompenadminController extends Controller
                 // Gabungkan hasil ke dalam koleksi utama
                 $pengumpulan = $pengumpulan->merge($data);
             }
+
+            $url = url('riwayatkompen/download-pdf/' . $penerimaan->t_approve_cetak_id );
+
+            $qrCodePath = public_path('storage/qrcodes/' . $penerimaan->t_approve_cetak_id . '.png');
+
+            if (!file_exists(public_path('storage/qrcodes'))) {
+                mkdir(public_path('storage/qrcodes'), 0777, true);
+            }
+
+            $qrCodeBase = QrCode::size(150)->generate($url, $qrCodePath);
             // Generate PDF
-            $pdf = Pdf::loadView('surat.export_pdf', ['penerimaan' => $penerimaan, 'pengumpulan' => $pengumpulan]);
+            $pdf = Pdf::loadView('surat.export_pdf', ['penerimaan' => $penerimaan, 'pengumpulan' => $pengumpulan,'qrcode'=> asset('storage/qrcodes' .$penerimaan->t_approve_cetak_id. '.png')]);
             $pdf->setPaper('a4', 'portrait');
             $pdf->setOption("isRemoteEnabled", true);
 

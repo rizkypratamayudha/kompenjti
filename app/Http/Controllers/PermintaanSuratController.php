@@ -5,9 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\PengumpulanModel;
 use App\Models\t_approve_cetak_model;
 use App\Models\t_pending_cetak_model;
+use BaconQrCode\Encoder\QrCode;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use SimpleSoftwareIO\QrCode\Facades\QrCode as FacadesQrCode;
 use Yajra\DataTables\Facades\DataTables;
 
 class PermintaanSuratController extends Controller
@@ -82,8 +85,18 @@ class PermintaanSuratController extends Controller
                 // Gabungkan hasil ke dalam koleksi utama
                 $pengumpulan = $pengumpulan->merge($data);
             }
+
+            $url = url('surat/download-pdf/' . $penerimaan->t_approve_cetak_id );
+
+            $qrCodePath = public_path('storage/qrcodes/' . $penerimaan->t_approve_cetak_id . '.png');
+
+            if (!file_exists(public_path('storage/qrcodes'))) {
+                mkdir(public_path('storage/qrcodes'), 0777, true);
+            }
+
+            $qrCodeBase = FacadesQrCode::size(150)->generate($url, $qrCodePath);
             // Generate PDF
-            $pdf = Pdf::loadView('surat.export_pdf', ['penerimaan' => $penerimaan, 'pengumpulan' => $pengumpulan]);
+            $pdf = Pdf::loadView('surat.export_pdf', ['penerimaan' => $penerimaan, 'pengumpulan' => $pengumpulan,'qrcode'=> asset('storage/qrcodes' .$penerimaan->t_approve_cetak_id. '.png')]);
             $pdf->setPaper('a4', 'portrait');
             $pdf->setOption("isRemoteEnabled", true);
 

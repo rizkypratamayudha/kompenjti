@@ -267,31 +267,5 @@ class PekerjaanController extends Controller
         }
     }
 
-    public function getProgres($pekerjaanId){
-        try{
-            $pekerjaan = PekerjaanModel::findOrFail($pekerjaanId);
-
-            $progres = ProgresModel::where('pekerjaan_id',$pekerjaanId)->orderBy('progres_id','asc')
-            ->get();
-
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Progress data retrieved successfully',
-                'data' => $progres
-            ], 200);
-
-
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Pekerjaan not found'
-            ], 404);
-        } catch (\Throwable $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'An error occurred while retrieving progress data',
-                'error' => $e->getMessage()
-            ], 500);
-        }
-    }
+    
 }

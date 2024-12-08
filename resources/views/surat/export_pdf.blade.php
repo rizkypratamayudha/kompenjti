@@ -226,6 +226,9 @@
             <td class="text-kanan">{{$penerimaan->kaprodi->nama}}</td>
         </tr>
     </table>
+    <div>
+        <img src="{{ asset('storage/qrcodes/' . $penerimaan->t_approve_cetak_id . '.png') }}" alt="QR Code">
+    </div>
 </body>
 
 </html>

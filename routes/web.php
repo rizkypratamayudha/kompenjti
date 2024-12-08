@@ -52,7 +52,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboardMhs', [DashboardMahasiswaController::class, 'index'])->middleware('authorize:MHS');
     Route::get('/dashboardDos', [DashboardDosenController::class, 'index'])->middleware('authorize:DSN');
     Route::get('/dashboardKap', [DashboardKaprodiController::class, 'index'])->middleware('authorize:KPD');
-  
+
 
 
     Route::group(['prefix'=>'profile'], function(){
@@ -254,7 +254,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/{id}/confirm', [PenerimaanSuratController::class, 'approve']);
     });
 
-    Route::group(['prefix'=> 'riwayatPenerimaan','middleware'=> 'authorize:KPD'], function () {
+    Route::group(['prefix'=> 'riwayatPenerimaan','middleware'=> 'authorize:KPD,DSN,MHS,ADM'], function () {
         Route::get('/',[riwayatPermintaanSuratController::class,'index']);
         Route::post('/list',[riwayatPermintaanSuratController::class,'list']);
         Route::get('/download-pdf/{id}',[riwayatPermintaanSuratController::class,'export_pdf']);
@@ -264,7 +264,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/',[PekerjanController::class,'index']);
     });
 
-    Route::group(['prefix'=> 'surat','middleware'=> 'authorize:MHS'], function () {
+    Route::group(['prefix'=> 'surat','middleware'=> 'authorize:MHS,DSN,ADM,KPD'], function () {
         Route::get('/',[PermintaanSuratController::class,'index']);
         Route::post('/list',[PermintaanSuratController::class,'list']);
         Route::get('/download-pdf/{id}',[PermintaanSuratController::class,'export_pdf']);
@@ -275,7 +275,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/{id}/dibaca',[notifikasiController::class,'dibaca'])->name('notifikasi.dibaca');;
     });
 
-    Route::group(['prefix'=> 'riwayatkompen','middleware'=> 'authorize:ADM,DSN'], function () {
+    Route::group(['prefix'=> 'riwayatkompen','middleware'=> 'authorize:ADM,DSN,MHS,KPD'], function () {
         Route::get('/',[riwayatkompenadminController::class,'index']);
         Route::post('/list',[riwayatkompenadminController::class,'list']);
         Route::get('/download-pdf/{id}',[riwayatkompenadminController::class,'export_pdf']);
