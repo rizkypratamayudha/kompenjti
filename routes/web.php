@@ -4,6 +4,7 @@ use App\Http\Controllers\AdminLihatPekerjaan;
 use App\Http\Controllers\PeriodeController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardDosenController;
+use App\Http\Controllers\DashboardKaprodiController;
 use App\Http\Controllers\DashboardMahasiswaController;
 use App\Http\Controllers\kompetensi_adminController;
 use App\Http\Controllers\KompetensiController;
@@ -18,6 +19,7 @@ use App\Http\Controllers\PermintaanSuratController;
 use App\Http\Controllers\ProdiController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\riwayatController;
+use App\Http\Controllers\riwayatkompenadminController;
 use App\Http\Controllers\riwayatPermintaanSuratController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ValidasiController;
@@ -48,7 +50,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/', [DashboardAdminController::class, 'index'])->middleware('authorize:ADM');
     Route::get('/dashboardMhs', [DashboardMahasiswaController::class, 'index'])->middleware('authorize:MHS');
     Route::get('/dashboardDos', [DashboardDosenController::class, 'index'])->middleware('authorize:DSN');
-    Route::get('/dashboardKap', [welcomeController::class, 'kaprodi'])->middleware('authorize:KPD');
+    Route::get('/dashboardKap', [DashboardKaprodiController::class, 'index'])->middleware('authorize:KPD');
     Route::get('/contact', [welcomeController::class,'contact']);
 
 
@@ -236,6 +238,10 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/{id}/requestcetaksurat',[riwayatController::class,'request_cetak_surat']);
     });
 
+    Route::group(['prefix'=> 'alphadosen','middleware'=> 'authorize:DSN'], function () {
+
+    });
+
     Route::group(['prefix'=> 'lihat','middleware'=> 'authorize:ADM'], function () {
         Route::get('/',[AdminLihatPekerjaan::class,'index']);
         Route::get('/{id}/show_ajax',[AdminLihatPekerjaan::class,'show_ajax']);
@@ -250,6 +256,7 @@ Route::middleware(['auth'])->group(function () {
     Route::group(['prefix'=> 'riwayatPenerimaan','middleware'=> 'authorize:KPD'], function () {
         Route::get('/',[riwayatPermintaanSuratController::class,'index']);
         Route::post('/list',[riwayatPermintaanSuratController::class,'list']);
+        Route::get('/download-pdf/{id}',[riwayatPermintaanSuratController::class,'export_pdf']);
     });
 
     Route::group(['prefix'=> 'admintambah','middleware'=> 'authorize:ADM'], function () {
@@ -264,10 +271,18 @@ Route::middleware(['auth'])->group(function () {
 
     Route::group(['prefix'=> 'notifikasi','middleware'=> 'authorize:MHS'], function (){
         Route::get('/',[notifikasiController::class,'index']);
+        Route::get('/{id}/dibaca',[notifikasiController::class,'dibaca'])->name('notifikasi.dibaca');;
+    });
+
+    Route::group(['prefix'=> 'riwayatkompen','middleware'=> 'authorize:ADM'], function () {
+        Route::get('/',[riwayatkompenadminController::class,'index']);
+        Route::post('/list',[riwayatkompenadminController::class,'list']);
+        Route::get('/download-pdf/{id}',[riwayatkompenadminController::class,'export_pdf']);
     });
 
     // NOTIFFF
     Route::get('/hitung-notif', [ValidasiController::class, 'hitung_notif']);
+    Route::get('/hitung-notif-notifikasi', [notifikasiController::class, 'hitung_notif_notifikasi']);
     Route::get('/hitung-notif-pelamar', [ValidasiController::class, 'hitung_notif_pelamar']);
     Route::get('/hitung-notif-pelamar-admin', [ValidasiController::class, 'hitung_notif_pelamar_admin']);
     Route::get('pekerjaan/{id}/get-anggota',[ListPekerjaanMHSController::class,'get_anggota']);

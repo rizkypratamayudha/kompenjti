@@ -19,6 +19,7 @@
                         <th>No</th>
                         <th>NIM</th>
                         <th>Nama</th>
+                        <th>Prodi</th>
                         <th>Pekerjaan</th>
                         <th>Disetujui pada</th>
                         <th>Aksi</th>
@@ -49,7 +50,7 @@
             dataUser = $('#table_user').DataTable({
                 serverSide: true,
                 ajax: {
-                    "url": "{{ url('riwayatPenerimaan/list') }}",
+                    "url": "{{ url('riwayatkompen/list') }}",
                     "dataType": "json",
                     "type": "POST",
                     "data": function(d) {
@@ -70,6 +71,11 @@
                     },
                     {
                         data: "user.nama",
+                        className: "",
+                        orderable: true,
+                        searchable: true
+                    },{
+                        data: "prodi",
                         className: "",
                         orderable: true,
                         searchable: true

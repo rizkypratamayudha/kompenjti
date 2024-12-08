@@ -41,15 +41,7 @@ Route::get('/dosen/pekerjaan/{user_id}', [DosenBuatPekerjaanController::class, '
 Route::post('/dosen/pekerjaan/create', [DosenBuatPekerjaanController::class, 'store']);
 
 
-Route::get('/periode', [DashboardMhsController::class, 'getPeriode']);
-Route::get('/jam-kompen', [DashboardMhsController::class, 'getJamKompen']);
-Route::get('/detail-jam-kompen', [DashboardMhsController::class, 'getDetailJamKompenByUserAndPeriode']);
-Route::get('/matkul', [DashboardMhsController::class, 'getMatkul']);
 
-Route::prefix('mahasiswa')->group(function () {
-    Route::get('/periode', [DashboardMhsController::class, 'getPeriode']);
-    Route::post('/jam-kompen', [DashboardMhsController::class, 'getJamKompen']);
-});
 
 
 
@@ -61,13 +53,20 @@ Route::middleware(['auth:api'])->group(function () {
     Route::put('/updatePassword', [ProfileController::class, 'updatePassword']);
     Route::delete('/deleteAvatar', [ProfileController::class, 'deleteAvatar']);
 
+    Route::group(['prefix' => 'dosen'], function(){
+        Route::get('/{id}/pelamaran',[PekerjaanController::class,'getPelamaran']);
+    });
 
     Route::group(['prefix' => 'pekerjaan'], function(){
         Route::get('/',[PekerjaanController::class,'index']);
         Route::post('/apply',[PekerjaanController::class,'apply']);
+        Route::get('/{id}/get-anggota',[PekerjaanController::class,'get_anggota']);
+        Route::post('/approve-pekerjaan',[PekerjaanController::class,'approvePekerjaan']);
+        Route::post('/decline-pekerjaan',[PekerjaanController::class,'declinePekerjaan']);
+        Route::get('/{id}/getPekerjaanPengerjaan',[PekerjaanController::class,'getPekerjaanPengerjaan']);
     });
 
-    Route::group(['prefix' => 'dosen'], function(){
-        Route::get('/{id}/pelamaran',[PekerjaanController::class,'getPelamaran']);
+    Route::group(['prefix' => 'mahasiswa'], function () {
+        Route::get('/dashboard', [DashboardMhsController::class, 'index']);
     });
 });

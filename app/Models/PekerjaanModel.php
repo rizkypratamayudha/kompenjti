@@ -65,4 +65,8 @@ class PekerjaanModel extends Model
     {
         return $this->hasMany(ApprovePekerjaanModel::class, 'pekerjaan_id');
     }
+    public function t_pending_pekerjaan()
+    {
+        return $this->hasMany(PendingPekerjaanModel::class, 'pekerjaan_id');
+    }
 }

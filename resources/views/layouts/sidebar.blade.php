@@ -1,4 +1,4 @@
-<aside class="main-sidebar sidebar-dark-primary elevation-4">
+<aside class="main-sidebar sidebar-dark-primary elevation-4 posti">
     <!-- Brand Logo -->
     <a href="{{ url('/') }}" class="brand-link">
         <img src="{{ asset('logo.png') }}" alt="AdminLTE Logo" class="brand-image" style="opacity: .8">
@@ -45,6 +45,12 @@
                                 <span class="badge badge-danger badge-pelamar-admin position-absolute top-0 start-100 translate-middle rounded-pill">
                                 </span>
                             </p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url('/riwayatkompen') }}" class="nav-link {{ $activeMenu == 'riwayatkompen' ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-envelope"></i>
+                            <p>Riwayat Cetak Surat</p>
                         </a>
                     </li>
                     <li class="nav-header">Validasi Registrasi</li>
@@ -127,10 +133,10 @@
                     </li>
 
                     <li class="nav-item">
-                        <a href="{{ url('/riwayatPekerjaan') }}"
-                            class="nav-link {{ $activeMenu == 'riwayatPek' ? 'active' : '' }}">
+                        <a href="{{ url('/alphadosen') }}"
+                            class="nav-link {{ $activeMenu == 'alphadosen' ? 'active' : '' }}">
                             <i class="nav-icon fas fa-history"></i>
-                            <p>Riwayat</p>
+                            <p>Data Alpha Mahasiswa</p>
                         </a>
                     </li>
                 @elseif (Auth::user()->level_id == 3)
@@ -160,7 +166,7 @@
                     <li class="nav-item">
                         <a href="{{ url('/surat') }}"
                             class="nav-link {{ $activeMenu == 'surat' ? 'active' : '' }}">
-                            <i class="nav-icon fas fa-history"></i>
+                            <i class="nav-icon fas fa-envelope"></i>
                             <p>Permintaan Surat</p>
                         </a>
                     </li>
@@ -169,6 +175,8 @@
                             class="nav-link {{ $activeMenu == 'notifikasi' ? 'active' : '' }}">
                             <i class="nav-icon fas fa-bell"></i>
                             <p>Notifikasi</p>
+                            <span class="badge badge-danger badge-notifikasi position-absolute top-0 start-100 translate-middle rounded-pill">
+                            </span>
                         </a>
                     </li>
                     <li class="nav-header">Manage Kompetensi</li>
@@ -245,6 +253,7 @@
         updateBadge('{{ url('/hitung-notif-pelamar') }}', '.badge-pelamar');
         updateBadge('{{ url('/hitung-notif-pelamar-admin') }}', '.badge-pelamar-admin');
         updateBadge('{{ url('/hitung-notif') }}', '.badge');
+        updateBadge('{{ url('/hitung-notif-notifikasi') }}', '.badge-notifikasi');
     });
 </script>
 
