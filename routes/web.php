@@ -264,10 +264,12 @@ Route::middleware(['auth'])->group(function () {
 
     Route::group(['prefix'=> 'notifikasi','middleware'=> 'authorize:MHS'], function (){
         Route::get('/',[notifikasiController::class,'index']);
+        Route::get('/{id}/dibaca',[notifikasiController::class,'dibaca'])->name('notifikasi.dibaca');;
     });
 
     // NOTIFFF
     Route::get('/hitung-notif', [ValidasiController::class, 'hitung_notif']);
+    Route::get('/hitung-notif-notifikasi', [notifikasiController::class, 'hitung_notif_notifikasi']);
     Route::get('/hitung-notif-pelamar', [ValidasiController::class, 'hitung_notif_pelamar']);
     Route::get('/hitung-notif-pelamar-admin', [ValidasiController::class, 'hitung_notif_pelamar_admin']);
     Route::get('pekerjaan/{id}/get-anggota',[ListPekerjaanMHSController::class,'get_anggota']);

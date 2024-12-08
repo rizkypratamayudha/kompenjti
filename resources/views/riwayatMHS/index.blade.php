@@ -48,7 +48,7 @@
                             <div
                                 class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                                 <h5 class="card-title mb-0">{{ $item->pekerjaan_nama }}</h5>
-                                @if ($item->canRequestSurat)
+                                @if ($item->canRequestSurat && $item->akumulasi_deadline !== null)
                                     <div class="d-flex justify-content-center ml-4">
                                         <form method="POST" action="{{url('riwayat/' .$item->pekerjaan_id. '/requestcetaksurat')}}">
                                             @csrf
