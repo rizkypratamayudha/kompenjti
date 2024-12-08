@@ -4,7 +4,7 @@ use Illuminate\Http\Request;
 use App\Models\UserModel;
 use App\Models\detail_mahasiswaModel;
 use App\Models\jamKompenModel;
-use Illuminate\Support\Facades\Auth;  
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class DashboardAdminController extends Controller
@@ -23,9 +23,7 @@ class DashboardAdminController extends Controller
             ->distinct('user_id')
             ->count();
 
-        $mahasiswaSudahKompen = DB::table('t_approve_cetak')
-            ->distinct('user_id')
-            ->count();
+        $mahasiswaSudahKompen = jamKompenModel::where('akumulasi_jam', '<=', 0)->count();
 
         // Menyusun breadcrumb
         $breadcrumb = (object)[
@@ -37,11 +35,11 @@ class DashboardAdminController extends Controller
         $chartData = [
             'labels' => ['Mahasiswa', 'Dosen/Tendik', 'Kaprodi', 'Pekerjaan', 'Belum Kompen', 'Sudah Kompen'], // Label yang unik
             'data' => [
-                $totalMahasiswa, 
-                $totalDosenTendik, 
-                $totalKaprodi, 
-                $totalPekerjaan, 
-                $mahasiswaBelumKompen, 
+                $totalMahasiswa,
+                $totalDosenTendik,
+                $totalKaprodi,
+                $totalPekerjaan,
+                $mahasiswaBelumKompen,
                 $mahasiswaSudahKompen
             ],
         ];
