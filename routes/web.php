@@ -27,6 +27,7 @@ use App\Http\Controllers\ValidasiController;
 use App\Http\Controllers\welcomeController;
 use App\Models\kompetensi_adminModel;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\DashboardAdminController;
 
 /*
 |--------------------------------------------------------------------------
@@ -47,7 +48,7 @@ Route::post('register', [RegisterController::class, 'store']);
 Route::post('logout', [AuthController::class, 'logout'])->middleware('auth');
 
 Route::middleware(['auth'])->group(function () {
-    Route::get('/', [welcomeController::class, 'index'])->middleware('authorize:ADM');
+    Route::get('/', [DashboardAdminController::class, 'index'])->middleware('authorize:ADM');
     Route::get('/dashboardMhs', [DashboardMahasiswaController::class, 'index'])->middleware('authorize:MHS');
     Route::get('/dashboardDos', [DashboardDosenController::class, 'index'])->middleware('authorize:DSN');
     Route::get('/dashboardKap', [DashboardKaprodiController::class, 'index'])->middleware('authorize:KPD');
