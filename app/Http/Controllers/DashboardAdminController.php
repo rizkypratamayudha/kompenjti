@@ -9,17 +9,23 @@ use Illuminate\Support\Facades\DB;
 
 class DashboardAdminController extends Controller
 {
-    public function index() {
-        $user = UserModel::with([
-            'level',
-            'jamKompen',
-            'jamKompen.periode',
-            'jamKompen.detail_jamKompen.matkul',
-            'detailMahasiswa.prodi',
-            'detailMahasiswa.periode'
-        ])->where('user_id', Auth::id())->first();
-        
-        $jamkompen = jamKompenModel::with('user','detail_jamKompen')->where('user_id', Auth::id())->get();
+    public function index()
+    {
+        // Data untuk chart dan dashboard
+        $totalMahasiswa = DB::table('m_user')->where('level_id', 3)->count();
+        $totalDosenTendik = DB::table('m_user')->where('level_id', 2)->count();
+        $totalKaprodi = DB::table('m_user')->where('level_id', 4)->count();
+
+        $totalPekerjaan = DB::table('pekerjaan')->count();
+
+        $mahasiswaBelumKompen = DB::table('jam_kompen')
+            ->where('akumulasi_jam', '>', 0)
+            ->distinct('user_id')
+            ->count();
+
+        $mahasiswaSudahKompen = DB::table('t_approve_cetak')
+            ->distinct('user_id')
+            ->count();
 
         // Menyusun breadcrumb
         $breadcrumb = (object)[
@@ -27,21 +33,32 @@ class DashboardAdminController extends Controller
             'list' => ['Home', 'Dashboard Admin']
         ];
 
-        // Menyusun menu aktif
-        $activeMenu = 'dashboardADM';
+        // Data untuk chart
+        $chartData = [
+            'labels' => ['Mahasiswa', 'Dosen/Tendik', 'Kaprodi', 'Pekerjaan', 'Belum Kompen', 'Sudah Kompen'], // Label yang unik
+            'data' => [
+                $totalMahasiswa, 
+                $totalDosenTendik, 
+                $totalKaprodi, 
+                $totalPekerjaan, 
+                $mahasiswaBelumKompen, 
+                $mahasiswaSudahKompen
+            ],
+        ];
 
-        // Query untuk Total Mahasiswa
-        $totalMahasiswa = DB::table('m_user')
-            ->where('level_id', 3) // Level ID untuk mahasiswa
-            ->count();
+        $activeMenu = 'dashboardAdm';
 
-        // Mengirim data ke view dashboard mahasiswa
+        // Mengirim data ke view
         return view('admin.dashboard', [
             'breadcrumb' => $breadcrumb,
             'activeMenu' => $activeMenu,
-            'user' => $user,
-            'jamkompen' => $jamkompen,
-            'totalMahasiswa' => $totalMahasiswa
+            'totalMahasiswa' => $totalMahasiswa,
+            'totalDosenTendik' => $totalDosenTendik,
+            'totalKaprodi' => $totalKaprodi,
+            'totalPekerjaan' => $totalPekerjaan,
+            'mahasiswaBelumKompen' => $mahasiswaBelumKompen,
+            'mahasiswaSudahKompen' => $mahasiswaSudahKompen,
+            'chartData' => $chartData
         ]);
     }
 }

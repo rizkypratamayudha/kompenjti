@@ -47,11 +47,11 @@ Route::post('register', [RegisterController::class, 'store']);
 Route::post('logout', [AuthController::class, 'logout'])->middleware('auth');
 
 Route::middleware(['auth'])->group(function () {
-    Route::get('/', [DashboardAdminController::class, 'index'])->middleware('authorize:ADM');
+    Route::get('/dashboardAdm', [DashboardAdminController::class, 'index'])->middleware('authorize:ADM');
     Route::get('/dashboardMhs', [DashboardMahasiswaController::class, 'index'])->middleware('authorize:MHS');
     Route::get('/dashboardDos', [DashboardDosenController::class, 'index'])->middleware('authorize:DSN');
     Route::get('/dashboardKap', [DashboardKaprodiController::class, 'index'])->middleware('authorize:KPD');
-    Route::get('/contact', [welcomeController::class,'contact']);
+  
 
 
     Route::group(['prefix'=>'profile'], function(){

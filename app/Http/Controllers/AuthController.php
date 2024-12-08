@@ -25,7 +25,7 @@ class AuthController extends Controller
                 $user = Auth::user();
 
                 $redirectUrl = match ($user->level->kode_level) {
-                    'ADM' => url('/'),
+                    'ADM' => url('/dashboardAdm'),
                     'MHS' => url('/dashboardMhs'),
                     'DSN' => url('/dashboardDos'),
                     'KPD' => url('/dashboardKap')
