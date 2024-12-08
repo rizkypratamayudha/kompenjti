@@ -30,7 +30,7 @@ class MatkulController extends Controller
 
     public function list(Request $request)
     {
-        $matkul = matkulModel::select('matkul_id', 'matkul_nama',);
+        $matkul = matkulModel::select('matkul_id', 'matkul_kode', 'matkul_nama',);
 
         if ($request->matkul_id){
             $matkul->where('matkul_id',$request->matkul_id);
@@ -53,6 +53,7 @@ class MatkulController extends Controller
     public function store_ajax(Request $request){
         if($request->ajax()||$request->wantsJson()){
             $rules = [
+                'matkul_kode'=>'required|string|max:100',
                 'matkul_nama'=>'required|string|max:100'
             ];
 
@@ -83,6 +84,7 @@ class MatkulController extends Controller
     public function update_ajax (Request $request, $matkul_id){
         if ($request->ajax() || $request->wantsJson()) {
             $rules = [
+                'matkul_kode'=>'required|string|max:100',
                 'matkul_nama'=>'required|string|max:100'
             ];
 
@@ -188,7 +190,8 @@ class MatkulController extends Controller
                 foreach ($data as $baris => $value) { 
                     if($baris > 1){ // baris ke 1 adalah header, maka lewati 
                         $insert[] = [ 
-                            'matkul_nama' => $value['A'], 
+                            'matkul_kode'=> $value['A'],
+                            'matkul_nama' => $value['B'], 
                             'created_at' => now(), 
                         ]; 
                     } 
@@ -215,7 +218,7 @@ class MatkulController extends Controller
         public function export_excel()
     {
         // Ambil data dari matkulmodel
-        $matkul = matkulmodel::select( 'matkul_nama')->get();
+        $matkul = matkulmodel::select( 'matkul_kode', 'matkul_nama')->get();
 
         // Inisialisasi Spreadsheet
         $spreadsheet = new Spreadsheet();
@@ -223,24 +226,26 @@ class MatkulController extends Controller
 
         // Set Header Kolom
         $sheet->setCellValue('A1', 'No');
-        $sheet->setCellValue('B1', 'Nama Mata Kuliah');
+        $sheet->setCellValue('B1', 'Kode Mata Kuliah');
+        $sheet->setCellValue('C1', 'Nama Mata Kuliah');
 
         // Buat header menjadi bold
-        $sheet->getStyle('A1:B1')->getFont()->setBold(true);
+        $sheet->getStyle('A1:C1')->getFont()->setBold(true);
 
         // Isi data
         $no = 1; // Nomor data dimulai dari 1
         $baris = 2; // Baris data dimulai dari baris ke-2
         foreach ($matkul as $key => $value) {
             $sheet->setCellValue('A' . $baris, $no);
-            $sheet->setCellValue('B' . $baris, $value->matkul_nama);
+            $sheet->setCellValue('B' . $baris, $value->matkul_kode);
+            $sheet->setCellValue('C' . $baris, $value->matkul_nama);
 
             $baris++;
             $no++;
         }
 
         // Set ukuran kolom otomatis untuk semua kolom
-        foreach (range('A', 'B') as $columnID) {
+        foreach (range('A', 'C') as $columnID) {
             $sheet->getColumnDimension($columnID)->setAutoSize(true);
         }
 
@@ -267,7 +272,7 @@ class MatkulController extends Controller
     public function export_pdf()
     {
         // Ambil data barang dari database
-        $matkul = matkulModel::select( 'matkul_nama') 
+        $matkul = matkulModel::select( 'matkul_kode', 'matkul_nama') 
         ->get();
 
         // Gunakan library Dompdf untuk membuat PDF
