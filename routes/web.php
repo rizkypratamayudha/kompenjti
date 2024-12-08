@@ -19,6 +19,7 @@ use App\Http\Controllers\PermintaanSuratController;
 use App\Http\Controllers\ProdiController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\riwayatController;
+use App\Http\Controllers\riwayatkompenadminController;
 use App\Http\Controllers\riwayatPermintaanSuratController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ValidasiController;
@@ -236,6 +237,10 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/{id}/requestcetaksurat',[riwayatController::class,'request_cetak_surat']);
     });
 
+    Route::group(['prefix'=> 'alphadosen','middleware'=> 'authorize:DSN'], function () {
+
+    });
+
     Route::group(['prefix'=> 'lihat','middleware'=> 'authorize:ADM'], function () {
         Route::get('/',[AdminLihatPekerjaan::class,'index']);
         Route::get('/{id}/show_ajax',[AdminLihatPekerjaan::class,'show_ajax']);
@@ -250,6 +255,7 @@ Route::middleware(['auth'])->group(function () {
     Route::group(['prefix'=> 'riwayatPenerimaan','middleware'=> 'authorize:KPD'], function () {
         Route::get('/',[riwayatPermintaanSuratController::class,'index']);
         Route::post('/list',[riwayatPermintaanSuratController::class,'list']);
+        Route::get('/download-pdf/{id}',[riwayatPermintaanSuratController::class,'export_pdf']);
     });
 
     Route::group(['prefix'=> 'admintambah','middleware'=> 'authorize:ADM'], function () {
@@ -265,6 +271,12 @@ Route::middleware(['auth'])->group(function () {
     Route::group(['prefix'=> 'notifikasi','middleware'=> 'authorize:MHS'], function (){
         Route::get('/',[notifikasiController::class,'index']);
         Route::get('/{id}/dibaca',[notifikasiController::class,'dibaca'])->name('notifikasi.dibaca');;
+    });
+
+    Route::group(['prefix'=> 'riwayatkompen','middleware'=> 'authorize:ADM'], function () {
+        Route::get('/',[riwayatkompenadminController::class,'index']);
+        Route::post('/list',[riwayatkompenadminController::class,'list']);
+        Route::get('/download-pdf/{id}',[riwayatkompenadminController::class,'export_pdf']);
     });
 
     // NOTIFFF

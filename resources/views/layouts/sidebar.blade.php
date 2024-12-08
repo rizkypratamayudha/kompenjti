@@ -47,6 +47,12 @@
                             </p>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a href="{{ url('/riwayatkompen') }}" class="nav-link {{ $activeMenu == 'riwayatkompen' ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-envelope"></i>
+                            <p>Riwayat Cetak Surat</p>
+                        </a>
+                    </li>
                     <li class="nav-header">Validasi Registrasi</li>
                     <li class="nav-item">
                         <a href="{{ url('/validasi') }}"
@@ -127,10 +133,10 @@
                     </li>
 
                     <li class="nav-item">
-                        <a href="{{ url('/riwayatPekerjaan') }}"
-                            class="nav-link {{ $activeMenu == 'riwayatPek' ? 'active' : '' }}">
+                        <a href="{{ url('/alphadosen') }}"
+                            class="nav-link {{ $activeMenu == 'alphadosen' ? 'active' : '' }}">
                             <i class="nav-icon fas fa-history"></i>
-                            <p>Riwayat</p>
+                            <p>Data Alpha Mahasiswa</p>
                         </a>
                     </li>
                 @elseif (Auth::user()->level_id == 3)
@@ -160,7 +166,7 @@
                     <li class="nav-item">
                         <a href="{{ url('/surat') }}"
                             class="nav-link {{ $activeMenu == 'surat' ? 'active' : '' }}">
-                            <i class="nav-icon fas fa-history"></i>
+                            <i class="nav-icon fas fa-envelope"></i>
                             <p>Permintaan Surat</p>
                         </a>
                     </li>

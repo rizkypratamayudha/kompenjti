@@ -31,14 +31,14 @@
                             <strong>No HP:</strong> {{ $user->detailKaprodi->no_hp ?? 'Tidak Diketahui' }}
                         </p>
                         <p><i class="bi bi-envelope text-primary"></i>
-                            <strong>Prodi:</strong> {{ $user->detailKaprodi->prodi_id ?? 'Tidak Diketahui' }}
+                            <strong>Prodi:</strong> {{ $user->detailKaprodi->prodi->prodi_nama ?? 'Tidak Diketahui' }}
                         </p>
                     </div>
                 </div>
             </div>
         </div>
-    </div>  
-    
+    </div>
+
     <!-- Informasi Permintaan Tanda Tangan  Kaprodi -->
     <div class="row mb-4">
         <div class="col-12">
@@ -77,7 +77,7 @@
             </div>
         </div>
     </div>
-    
+
    <!-- Tambahkan Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>

@@ -55,21 +55,24 @@ Route::group(['prefix' => 'mahasiswa'], function () {
 });
 
 
-Route::group(['prefix' => 'pekerjaan'], function(){
-    Route::get('/',[PekerjaanController::class,'index']);
-    Route::post('/apply',[PekerjaanController::class,'apply']);
-    Route::get('/{id}/get-anggota',[PekerjaanController::class,'get_anggota']);
-    Route::post('/approve-pekerjaan',[PekerjaanController::class,'approvePekerjaan']);
 
-});
 
 
 Route::middleware(['auth:api'])->group(function () {
     Route::post('/updatePhoto', [ProfileController::class, 'updatePhoto']);
     Route::put('/updatePassword', [ProfileController::class, 'updatePassword']);
     Route::delete('/deleteAvatar', [ProfileController::class, 'deleteAvatar']);
-    
+
     Route::group(['prefix' => 'dosen'], function(){
         Route::get('/{id}/pelamaran',[PekerjaanController::class,'getPelamaran']);
+    });
+
+    Route::group(['prefix' => 'pekerjaan'], function(){
+        Route::get('/',[PekerjaanController::class,'index']);
+        Route::post('/apply',[PekerjaanController::class,'apply']);
+        Route::get('/{id}/get-anggota',[PekerjaanController::class,'get_anggota']);
+        Route::post('/approve-pekerjaan',[PekerjaanController::class,'approvePekerjaan']);
+        Route::post('/decline-pekerjaan',[PekerjaanController::class,'declinePekerjaan']);
+        Route::get('/{id}/getPekerjaanPengerjaan',[PekerjaanController::class,'getPekerjaanPengerjaan']);
     });
 });
