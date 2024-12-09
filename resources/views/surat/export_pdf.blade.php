@@ -35,7 +35,7 @@
         }
 
         .text-right {
-            text-align: right;
+            padding: 8px; text-align: right;
         }
 
         .text-nama {
@@ -59,6 +59,17 @@
         .text-center h3 {
             text-align: center;
             margin-top: 40px
+        }
+
+        
+        /* Align label (first column) consistently across all tables */
+        td:nth-child(1), th:nth-child(1) {
+            width: 35%; /* Set fixed width for label columns */
+            padding-right: 10px; /* Add space between label and value */
+        }
+
+        td:nth-child(2), th:nth-child(2) {
+            width: 110%; /* Set flexible width for the value columns */
         }
 
 
@@ -118,6 +129,14 @@
         .text-kanan{
             text-align: right
         }
+
+        .text-kiri{
+            text-align: left
+        }
+
+        .status-column {
+            width: 30%; /* Adjust width as needed */
+        }
     </style>
 </head>
 
@@ -127,69 +146,79 @@
             <td width="15%" class="text-center"><img class="image" id="image" src="{{ asset('logo_polinema.jpg') }}">
             </td>
             <td width="85%">
-                <span class="text-center d-block font-11 font-bold mb-1">KEMENTERIAN PENDIDIKAN, KEBUDAYAAN, RISET, DAN
-                    TEKNOLOGI</span>
-                <span class="text-center d-block font-13 font-bold mb-1">POLITEKNIK NEGERI MALANG</span>
+                <span class="text-center d-block font-11 font-bold mb-1">KEMENTERIAN PENDIDIKAN, KEBUDAYAAN, RISET, DAN TEKNOLOGI</span>
+                <span class="text-center d-block font-12 font-bold mb-1"><b>POLITEKNIK NEGERI MALANG</b></span>
+                <span class="text-center d-block font-13 font-bold mb-1"><b>JURUSAN TEKNOLOGI INFORMASI</b></span>
                 <span class="text-center d-block font-10">Jl. Soekarno-Hatta No. 9 Malang 65141</span>
-                <span class="text-center d-block font-10">Telepon (0341) 404424 Pes. 101-105, 0341-404420, Fax. (0341)
-                    404420</span>
-                <span class="text-center d-block font-10">Laman: www.polinema.ac.id</span>
+                <span class="text-center d-block font-10">Telepon (0341) 404424 Pes. 101-105, 0341-404420, Fax. (0341) 404420</span>
+                <span class="text-center d-block font-10">https://www.polinema.ac.id</span>
             </td>
         </tr>
     </table>
 
-    <h3 class="text-center">Surat Bukti Kompensasi Jurusan Teknologi Informasi</h3>
+    <h3 class="text-center" style="margin-bottom: 40px;"> BERITA ACARA KOMPENSASI PRESENSI </h3>
+
 
     <table>
         <tr>
-            <th class="text-right">Nama : </th>
-            <td>{{ $penerimaan->user->nama }}</td>
+            <th>Nama Pengajar</th>
+            <td>: {{ $penerimaan->pekerjaan->user->nama }}</td>
         </tr>
         <tr>
-            <th class="text-right">NIM : </th>
-            <td>{{ $penerimaan->user->username }}</td>
+            <th>NIP</th>
+            <td>: {{ $penerimaan->pekerjaan->user->username }}</td>
+        </tr>
+    </table>
+    
+
+    <p>Memberikan rekomendasi kompensasi kepada: </p>
+    <table>
+        <tr>
+            <th>Nama Mahasiswa</th>
+            <td>: {{ $penerimaan->user->nama }}</td>
         </tr>
         <tr>
-            <th class="text-right">Prodi : </th>
-            <td>{{ $penerimaan->user->detailMahasiswa->prodi->prodi_nama }}</td>
+            <th>NIM</th>
+            <td>: {{ $penerimaan->user->username }}</td>
         </tr>
         <tr>
-            <th class="text-right">Angkatan : </th>
-            <td>{{ $penerimaan->user->detailMahasiswa->angkatan }}</td>
+            <th>Program Studi</th>
+            <td>: {{ $penerimaan->user->detailMahasiswa->prodi->prodi_nama }}</td>
         </tr>
         <tr>
-            <th class="text-right">Periode : </th>
-            <td>{{ $penerimaan->user->detailMahasiswa->periode->periode_nama }}</td>
+            <th>Angkatan</th>
+            <td>: {{ $penerimaan->user->detailMahasiswa->angkatan }}</td>
+        </tr>
+        <tr>
+            <th>Periode</th>
+            <td>: {{ $penerimaan->user->detailMahasiswa->periode->periode_nama }}</td>
         </tr>
     </table>
 
-    <p class="text-center">Dengan adanya bukti surat kompensasi dengan pekerjaan kompen, sebagai berikut: </p>
+    <p>Dengan adanya bukti kompensasi dengan pekerjaan kompen, sebagai berikut: </p>
 
-    <table style="margin-bottom: 40px">
+    <table>
         <tr>
-            <th class="text-right">Nama Pekerjaan : </th>
-            <td>{{ $penerimaan->pekerjaan->pekerjaan_nama }}</td>
+            <th>Nama Pekerjaan</th>
+            <td>: {{ $penerimaan->pekerjaan->pekerjaan_nama }}</td>
         </tr>
         <tr>
-            <th class="text-right">Nama Dosen/Tendik : </th>
-            <td>{{ $penerimaan->pekerjaan->user->nama }}</td>
+            <th>Jenis Pekerjaan</th>
+            <td>: {{ $penerimaan->pekerjaan->jenis_pekerjaan }}</td>
         </tr>
         <tr>
-            <th class="text-right">Jenis Pekerjaan : </th>
-            <td>{{ $penerimaan->pekerjaan->jenis_pekerjaan }}</td>
-        </tr>
-        <tr>
-            <th class="text-right">Nilai Jam Kompen : </th>
-            <td>{{ $penerimaan->pekerjaan->jumlah_jam_kompen }}</td>
+            <th>Nilai Jam Kompen</th>
+            <td>: {{ $penerimaan->pekerjaan->jumlah_jam_kompen }}</td>
         </tr>
     </table>
 
+    <p>Detail Progress Pengerjaan: </p>
     <table class="border-all">
         <thead>
             <tr>
                 <th>Nama Progres</th>
                 <th>Nilai Jam per Progres</th>
-                <th>Status</th>
+                <th class="status-column">Status</th>
             </tr>
         </thead>
         <tbody>
@@ -197,7 +226,7 @@
                 <tr>
                     <td>{{ $progres->judul_progres }}</td>
                     <td>{{ $progres->jam_kompen }}</td>
-                    <td>
+                    <td class="status-column">
                         @php
                             // Cari pengumpulan yang terkait dengan progres ini
                             $status = $pengumpulan->firstWhere('progres_id', $progres->progres_id);
@@ -215,20 +244,35 @@
         </tbody>
     </table>
 
-    <p class="text-center-yang">Yang mengetahui, </p>
     <table style="margin-top: 40px">
         <tr>
-            <td>Dosen</td>
-            <td class="text-kanan" style="margin-bottom: 40px">Kaprodi</td>
+            <td></td>
+            <td class="text-kanan" style="margin-bottom: 40px">Malang, {{ $penerimaan->created_at->translatedFormat('d F Y') }} </td>
         </tr>
         <tr>
-            <td class="">{{$penerimaan->pekerjaan->user->nama}}</td>
-            <td class="text-kanan">{{$penerimaan->kaprodi->nama}}</td>
+            <td class="text-kiri" style="margin-bottom: 40px">Yang Memberikan Rekomendasi, </td>
+            <td class="text-kanan" style="margin-bottom: 40px">Kepala Program Studi</td>
         </tr>
     </table>
-    <div class="text-center mb-4" >
-        <img src="{{ asset('storage/qrcodes/' . $penerimaan->t_approve_cetak_id . '.png') }}" alt="QR Code">
-    </div>
+    <table style="width: 100%; margin-top: 20px;">
+        <tr>
+            <td style="width: 70%;"></td>
+            <td style="text-align: right; width: 30%;">
+                <img src="{{ asset('storage/qrcodes/' . $penerimaan->t_approve_cetak_id . '.png') }}" alt="QR Code" style="width: 100px; height: 100px;">
+            </td>
+        </tr>
+    </table>
+    <table style="margin-top: 10px">
+        <tr>
+            <td class="text-kiri">{{ $penerimaan->pekerjaan->user->nama }}</td>
+            <td class="text-kanan">{{ $penerimaan->kaprodi->nama }}</td>
+        </tr>
+        <tr>
+            <td class="text-kiri">NIP. {{ $penerimaan->pekerjaan->user->username }}</td>
+            <td class="text-kanan">NIP. {{ $penerimaan->kaprodi->username }}</td>
+        </tr>
+    </table>
+    
 </body>
 
 </html>
