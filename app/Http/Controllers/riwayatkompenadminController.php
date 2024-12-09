@@ -79,8 +79,8 @@ class riwayatkompenadminController extends Controller
                 // Gabungkan hasil ke dalam koleksi utama
                 $pengumpulan = $pengumpulan->merge($data);
             }
-
-            $url = url('riwayatkompen/download-pdf/' . $penerimaan->t_approve_cetak_id );
+            $hash = hash('sha256', $penerimaan->t_approve_cetak_id);
+            $url = url('riwayatkompen/download-pdf/' . $hash );
 
             $qrCodePath = public_path('storage/qrcodes/' . $penerimaan->t_approve_cetak_id . '.png');
 
@@ -97,6 +97,38 @@ class riwayatkompenadminController extends Controller
             // Stream atau download file PDF
             return $pdf->stream('Surat Bukti Kompen ' .$penerimaan->user->nama . ' ' . date('Y-m-d H:i:s') . '.pdf');
         } catch (\Exception $e) {
+            return response()->json(['error' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
+        }
+    }
+
+    public function export_pdf_scan($hash){
+        try{
+            $penerimaan = t_approve_cetak_model::all()->first(function ($item) use ($hash) {
+                return hash('sha256', $item->t_approve_cetak_id) === $hash;
+            });
+
+            if (!$penerimaan) {
+                return response()->json(['error' => 'Hash tidak valid'], 404);
+            }
+
+            $pengumpulan = collect();
+
+            foreach ($penerimaan->pekerjaan->progres as $progres) {
+                $data = PengumpulanModel::with('user', 'progres')
+                    ->where('progres_id', $progres->progres_id)
+                    ->get();
+
+                // Gabungkan hasil ke dalam koleksi utama
+                $pengumpulan = $pengumpulan->merge($data);
+            }
+
+            $pdf = Pdf::loadView('surat.export_pdf_scan', ['penerimaan' => $penerimaan, 'pengumpulan' => $pengumpulan,]);
+            $pdf->setPaper('a4', 'portrait');
+            $pdf->setOption("isRemoteEnabled", true);
+
+            // Stream atau download file PDF
+            return $pdf->stream('Surat Bukti Kompen ' .$penerimaan->user->nama . ' ' . date('Y-m-d H:i:s') . '.pdf');
+        } catch (\Exception $e){
             return response()->json(['error' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
         }
     }

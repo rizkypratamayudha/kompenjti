@@ -48,7 +48,7 @@ Route::post('register', [RegisterController::class, 'store']);
 Route::post('logout', [AuthController::class, 'logout'])->middleware('auth');
 
 Route::middleware(['auth'])->group(function () {
-    Route::get('/dashboardAdm', [DashboardAdminController::class, 'index'])->middleware('authorize:ADM');
+    Route::get('/', [DashboardAdminController::class, 'index'])->middleware('authorize:ADM');
     Route::get('/dashboardMhs', [DashboardMahasiswaController::class, 'index'])->middleware('authorize:MHS');
     Route::get('/dashboardDos', [DashboardDosenController::class, 'index'])->middleware('authorize:DSN');
     Route::get('/dashboardKap', [DashboardKaprodiController::class, 'index'])->middleware('authorize:KPD');
@@ -292,3 +292,7 @@ Route::middleware(['auth'])->group(function () {
         return response()->json(['server_time' => now()]);
     })->name('server-time');
 });
+
+Route::get('surat/download-pdf/{hash}',[PermintaanSuratController::class,'export_pdf_scan']);
+Route::get('riwayatPenerimaan/download-pdf/{hash}',[riwayatPermintaanSuratController::class,'export_pdf_scan']);
+Route::get('riwayatkompen/download-pdf/{hash}',[riwayatkompenadminController::class,'export_pdf_scan']);

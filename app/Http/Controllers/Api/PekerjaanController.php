@@ -8,6 +8,7 @@ use App\Models\detail_pekerjaanModel;
 use App\Models\notifikasiModel;
 use App\Models\PekerjaanModel;
 use App\Models\PendingPekerjaanModel;
+use App\Models\PengumpulanModel;
 use App\Models\ProgresModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -245,7 +246,7 @@ class PekerjaanController extends Controller
             // Ambil data pekerjaan berdasarkan user yang sedang login
             $tugas = PekerjaanModel::whereHas('t_approve_pekerjaan', function ($query) use ($login) {
                 $query->where('user_id', $login);
-            })->with(['progres', 'progres.pengumpulan' => function ($query) use ($login) {
+            })->with(['detail_pekerjaan', 'user.detailDosen', 'progres', 'progres.pengumpulan' => function ($query) use ($login) {
                 $query->where('user_id', $login);
             }])->get();
 
@@ -267,5 +268,38 @@ class PekerjaanController extends Controller
         }
     }
 
-    
+public function list()
+{
+    try {
+        // Ambil ID user yang sedang login
+        $userId = Auth::id();
+
+        // Ambil data pengumpulan yang sesuai dengan user yang sedang login dan berdasarkan progres_id dan pekerjaan_id
+        $pengumpulan = PengumpulanModel::with('user', 'progres', 'progres.pekerjaan') // memuat relasi progres dan pekerjaan
+            ->whereHas('progres', function($query) use ($userId) {
+                // Kondisi untuk progres yang terkait dengan user yang sedang login
+                $query->where('user_id', $userId);
+            })
+            ->whereHas('progres.pekerjaan', function($query) use ($userId) {
+                // Kondisi untuk pekerjaan yang terkait dengan user yang sedang login
+                $query->where('user_id', $userId);
+            })
+            ->get();
+
+        // Kembalikan respon JSON langsung
+        return response()->json([
+            'success' => true,
+            'message' => 'Data fetched successfully.',
+            'data' => $pengumpulan,
+        ], 200);
+    } catch (\Exception $e) {
+        // Tangani error dan kembalikan respon JSON
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to fetch data.',
+            'error' => $e->getMessage(),
+        ], 500);
+    }
+}
+
 }

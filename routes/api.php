@@ -8,8 +8,7 @@ use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\DetailMahasiswaController;
 use App\Http\Controllers\Api\DosenBuatPekerjaanController;
 use App\Http\Controllers\Api\DashboardMhsController;
-
-
+use App\Http\Controllers\Api\MahasiswaController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -57,9 +56,15 @@ Route::middleware(['auth:api'])->group(function () {
         Route::post('/approve-pekerjaan',[PekerjaanController::class,'approvePekerjaan']);
         Route::post('/decline-pekerjaan',[PekerjaanController::class,'declinePekerjaan']);
         Route::get('/{id}/getPekerjaanPengerjaan',[PekerjaanController::class,'getPekerjaanPengerjaan']);
+        Route::get('/getNilai',[PekerjaanController::class,'list']);
     });
 
     Route::group(['prefix' => 'mahasiswa'], function () {
         Route::get('/dashboard', [DashboardMhsController::class, 'index']);
+        Route::delete('/{id}/hapus',[MahasiswaController::class,'hapus']);
+        Route::post('/link',[MahasiswaController::class,'store_link']);
+        Route::post('/gambar',[MahasiswaController::class,'store_gambar']);
+        Route::post('/file',[MahasiswaController::class,'store_file']);
+
     });
 });
