@@ -49,15 +49,16 @@ Route::middleware(['auth:api'])->group(function () {
         Route::get('/{id}/pelamaran',[PekerjaanController::class,'getPelamaran']);
     });
 
-    Route::group(['prefix' => 'pekerjaan'], function(){
-        Route::get('/',[PekerjaanController::class,'index']);
-        Route::post('/apply',[PekerjaanController::class,'apply']);
-        Route::get('/{id}/get-anggota',[PekerjaanController::class,'get_anggota']);
-        Route::post('/approve-pekerjaan',[PekerjaanController::class,'approvePekerjaan']);
-        Route::post('/decline-pekerjaan',[PekerjaanController::class,'declinePekerjaan']);
-        Route::get('/{id}/getPekerjaanPengerjaan',[PekerjaanController::class,'getPekerjaanPengerjaan']);
-        Route::get('/getNilai',[PekerjaanController::class,'list']);
-    });
+        Route::group(['prefix' => 'pekerjaan'], function(){
+            Route::get('/',[PekerjaanController::class,'index']);
+            Route::post('/apply',[PekerjaanController::class,'apply']);
+            Route::get('/{id}/get-anggota',[PekerjaanController::class,'get_anggota']);
+            Route::post('/approve-pekerjaan',[PekerjaanController::class,'approvePekerjaan']);
+            Route::post('/decline-pekerjaan',[PekerjaanController::class,'declinePekerjaan']);
+            Route::get('/{id}/getPekerjaanPengerjaan',[PekerjaanController::class,'getPekerjaanPengerjaan']);
+            Route::get('/{id}/getNilai',[PekerjaanController::class,'list']);
+            Route::post('/{id}/approve-nilai',[PekerjaanController::class,'approve']);
+        });
 
     Route::group(['prefix' => 'mahasiswa'], function () {
         Route::get('/dashboard', [DashboardMhsController::class, 'index']);

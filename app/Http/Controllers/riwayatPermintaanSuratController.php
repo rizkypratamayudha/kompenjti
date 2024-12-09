@@ -122,6 +122,7 @@ class riwayatPermintaanSuratController extends Controller
 
             foreach ($penerimaan->pekerjaan->progres as $progres) {
                 $data = PengumpulanModel::with('user', 'progres')
+                    ->where('user_id', $penerimaan->user_id)
                     ->where('progres_id', $progres->progres_id)
                     ->get();
 

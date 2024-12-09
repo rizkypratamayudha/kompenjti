@@ -112,6 +112,7 @@ class PermintaanSuratController extends Controller
 
     public function export_pdf_scan($hash){
         try{
+            $user = Auth::id();
             $penerimaan = t_approve_cetak_model::all()->first(function ($item) use ($hash) {
                 return hash('sha256', $item->t_approve_cetak_id) === $hash;
             });
@@ -124,6 +125,7 @@ class PermintaanSuratController extends Controller
 
             foreach ($penerimaan->pekerjaan->progres as $progres) {
                 $data = PengumpulanModel::with('user', 'progres')
+                    ->where('user_id',$user)
                     ->where('progres_id', $progres->progres_id)
                     ->get();
 
