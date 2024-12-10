@@ -10,6 +10,7 @@ use App\Models\PekerjaanModel;
 use App\Models\PendingPekerjaanModel;
 use App\Models\PengumpulanModel;
 use App\Models\ProgresModel;
+use App\Models\UserModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -385,39 +386,67 @@ class PekerjaanController extends Controller
     }
 
     public function decline($id)
-{
-    // Mencari pengumpulan berdasarkan ID dan relasi user serta progres
-    $pengumpulan = PengumpulanModel::with('user', 'progres')->find($id);
+    {
+        // Mencari pengumpulan berdasarkan ID dan relasi user serta progres
+        $pengumpulan = PengumpulanModel::with('user', 'progres')->find($id);
 
-    // Jika data pengumpulan tidak ditemukan, kembalikan error 404
-    if (!$pengumpulan) {
+        // Jika data pengumpulan tidak ditemukan, kembalikan error 404
+        if (!$pengumpulan) {
+            return response()->json([
+                'message' => 'Pengumpulan tidak ditemukan.',
+            ], 404);
+        }
+
+        // Mengubah status pengumpulan menjadi 'decline'
+        $pengumpulan->status = 'decline';
+        $pengumpulan->save();
+
+        // Mendapatkan user_id dan pekerjaan_id dari relasi
+        $userId = $pengumpulan->user->user_id;
+        $pekerjaanId = $pengumpulan->progres->pekerjaan_id;
+
+        // Membuat notifikasi untuk user
+        notifikasiModel::create([
+            'user_id' => $userId,
+            'pekerjaan_id' => $pekerjaanId,
+            'pesan' => 'Mohon Maaf Pengumpulan Anda Ditolak, coba kumpulkan pekerjaan dengan baik.',
+            'status' => 'belum', // status belum dibaca
+            'user_id_kap' => null, // opsional jika ada kolom user_id_kap
+        ]);
+
+        // Mengembalikan response dengan status success
         return response()->json([
-            'message' => 'Pengumpulan tidak ditemukan.',
-        ], 404);
+            'message' => 'Pengumpulan tugas berhasil ditolak.',
+            'data' => $pengumpulan
+        ], 200); // Menggunakan kode status HTTP 200 OK
     }
 
-    // Mengubah status pengumpulan menjadi 'decline'
-    $pengumpulan->status = 'decline';
-    $pengumpulan->save();
+    public function getSelesai()
+{
+    try {
+        // Mengambil nama pengguna yang memiliki semua pengumpulan dengan status 'accept' untuk setiap progres
+        $data = DB::table('m_user as u')
+            ->join('pengumpulan as pg', 'u.user_id', '=', 'pg.user_id')
+            ->join('progres as pr', 'pg.progres_id', '=', 'pr.progres_id')
+            ->join('pekerjaan as p', 'pr.pekerjaan_id', '=', 'p.pekerjaan_id')
+            ->groupBy('u.user_id', 'p.pekerjaan_id')
+            ->havingRaw('COUNT(CASE WHEN pg.status != "accept" THEN 1 END) = 0')
+            ->havingRaw('COUNT(pr.progres_id) = (SELECT COUNT(*) FROM progres pr2 WHERE pr2.pekerjaan_id = p.pekerjaan_id)')
+            ->select('u.nama', 'u.username', 'p.pekerjaan_nama')
+            ->distinct() // Untuk menghindari duplikasi nama pengguna
+            ->where('p.user_id', Auth::id()) // Filter berdasarkan user yang sedang login
+            ->get();
 
-    // Mendapatkan user_id dan pekerjaan_id dari relasi
-    $userId = $pengumpulan->user->user_id;
-    $pekerjaanId = $pengumpulan->progres->pekerjaan_id;
-
-    // Membuat notifikasi untuk user
-    notifikasiModel::create([
-        'user_id' => $userId,
-        'pekerjaan_id' => $pekerjaanId,
-        'pesan' => 'Mohon Maaf Pengumpulan Anda Ditolak, coba kumpulkan pekerjaan dengan baik.',
-        'status' => 'belum', // status belum dibaca
-        'user_id_kap' => null, // opsional jika ada kolom user_id_kap
-    ]);
-
-    // Mengembalikan response dengan status success
-    return response()->json([
-        'message' => 'Pengumpulan tugas berhasil ditolak.',
-        'data' => $pengumpulan
-    ], 200); // Menggunakan kode status HTTP 200 OK
+        return response()->json([
+            'success' => true,
+            'data' => $data,
+        ], 200);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Error: ' . $e->getMessage(),
+        ], 500);
+    }
 }
 
 }

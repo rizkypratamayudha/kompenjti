@@ -11,7 +11,7 @@ class kompetensi_dosenModel extends Model
 
     protected $table = 'kompetensi_dosen';
     protected $primaryKey = 'kompetensi_dosen_id';
-    protected $fillable = ['detail_pekerjaan_id','kompetensi_admin_id'];
+    protected $fillable = ['detail_pekerjaan_id','kompetensi_admin_id','created_at','updated_at'];
 
     public function kompetensiAdmin(){
         return $this->belongsTo(kompetensi_adminModel::class,'kompetensi_admin_id','kompetensi_admin_id');

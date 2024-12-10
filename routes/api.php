@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\DetailMahasiswaController;
 use App\Http\Controllers\Api\DosenBuatPekerjaanController;
 use App\Http\Controllers\Api\DashboardMhsController;
+use App\Http\Controllers\Api\KaprodiController;
 use App\Http\Controllers\Api\MahasiswaController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -60,6 +61,7 @@ Route::middleware(['auth:api'])->group(function () {
             Route::get('/{id}/getNilai',[PekerjaanController::class,'list']);
             Route::post('/{id}/approve-nilai',[PekerjaanController::class,'approve']);
             Route::post('/{id}/decline-nilai',[PekerjaanController::class,'decline']);
+            Route::get('/getselesai',[PekerjaanController::class,'getSelesai']);
         });
 
     Route::group(['prefix' => 'mahasiswa'], function () {
@@ -68,9 +70,15 @@ Route::middleware(['auth:api'])->group(function () {
         Route::post('/link',[MahasiswaController::class,'store_link']);
         Route::post('/gambar',[MahasiswaController::class,'store_gambar']);
         Route::post('/file',[MahasiswaController::class,'store_file']);
+        Route::post('/{id}/request-cetak-surat',[MahasiswaController::class,'requestCetakSurat']);
 
     });
     Route::group(['prefix' => 'dosen'], function () {
         Route::get('/dashboard', [DashboardDsnController::class, 'index']);
+    });
+
+    Route::group(['prefix' => 'kaprodi'], function(){
+        Route::get('/',[KaprodiController::class,'index']);
+        route::post('/approvesurat',[KaprodiController::class,'approve']);
     });
 });
