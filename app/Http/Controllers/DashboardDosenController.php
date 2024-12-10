@@ -2,9 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\detail_pekerjaanModel;
-use App\Models\kompetensi_adminModel;
 use App\Models\UserModel;
 use App\Models\PekerjaanModel;
 use App\Models\ProgresModel;

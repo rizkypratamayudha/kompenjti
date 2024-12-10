@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\API\DashboardDsnController;
 use App\Http\Controllers\Api\PekerjaanController;
 use App\Http\Controllers\Api\RegisterController;
 use App\Http\Controllers\Api\LoginController;
@@ -68,5 +69,8 @@ Route::middleware(['auth:api'])->group(function () {
         Route::post('/gambar',[MahasiswaController::class,'store_gambar']);
         Route::post('/file',[MahasiswaController::class,'store_file']);
 
+    });
+    Route::group(['prefix' => 'dosen'], function () {
+        Route::get('/dashboard', [DashboardDsnController::class, 'index']);
     });
 });

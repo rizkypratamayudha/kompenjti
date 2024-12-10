@@ -141,7 +141,7 @@
                     @csrf
                     <div class="input-group mb-3">
                         <input type="text" id="username" name="username" class="form-control"
-                            placeholder="Username">
+                            placeholder="Username atau Nim">
                         <div class="input-group-append">
                             <div class="input-group-text">
                                 <span class="fas fa-envelope"></span>
@@ -151,7 +151,7 @@
                     </div>
                     <div class="input-group mb-3">
                         <input type="password" id="password" name="password" class="form-control"
-                            placeholder="Password">
+                            placeholder="Masukkan Password">
                         <div class="input-group-append">
                             <div class="input-group-text" onclick="togglePassword()">
                                 <span id="toggle-icon" class="fas fa-eye"></span>
