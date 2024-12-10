@@ -71,7 +71,8 @@ class MahasiswaController extends Controller
             ->with('matkul', $matkul)
             ;
     }
-    public function store_ajax(Request $request){
+    public function store_ajax(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'user_id' => 'required|integer',
             'periode_id' => 'required|integer',
@@ -80,7 +81,7 @@ class MahasiswaController extends Controller
             'jumlah_jam' => 'required|array|min:1',
             'jumlah_jam.*' => 'required|integer|min:1',
         ]);
-
+    
         if ($validator->fails()) {
             return response()->json([
                 'status' => false,
@@ -88,60 +89,63 @@ class MahasiswaController extends Controller
                 'errors' => $validator->errors()
             ], 422);
         }
-
+    
         DB::beginTransaction();
         try {
-            // Cek apakah user_id sudah ada di jam_kompen
-            $jamKompen = jamKompenModel::where('user_id', $request->user_id)->first();
-
-            if (!$jamKompen) {
-                // Buat record baru di jam_kompen
-                $akumulasi_jam = array_sum($request->jumlah_jam);
-                $jamKompen = jamKompenModel::create([
+            // Cek apakah kombinasi user_id dan periode_id sudah ada
+            $jamKompen = jamKompenModel::firstOrCreate(
+                [
                     'user_id' => $request->user_id,
                     'periode_id' => $request->periode_id,
-                    'akumulasi_jam' => $akumulasi_jam,
-                ]);
-            }
-
+                ],
+                [
+                    'akumulasi_jam' => 0, // Nilai awal jika record baru dibuat
+                ]
+            );
+    
             foreach ($request->matkul_id as $index => $matkul) {
+                $jumlahJam = $request->jumlah_jam[$index];
+    
+                // Cari apakah matkul_id sudah ada dalam detail_jamKompen untuk jam_kompen_id yang sama
                 $detailJamKompen = detail_jamKompenModel::where('jam_kompen_id', $jamKompen->jam_kompen_id)
                     ->where('matkul_id', $matkul)
                     ->first();
-
+    
                 if ($detailJamKompen) {
-                    // Update jumlah_jam pada matkul yang sama
-                    $detailJamKompen->update([
-                        'jumlah_jam' => $detailJamKompen->jumlah_jam + $request->jumlah_jam[$index]
-                    ]);
+                    // Jika ada, tambahkan jumlah jam
+                    $detailJamKompen->increment('jumlah_jam', $jumlahJam);
                 } else {
-                    // Tambahkan matkul baru ke detail_jamKompen
+                    // Jika tidak ada, tambahkan record baru
                     detail_jamKompenModel::create([
                         'jam_kompen_id' => $jamKompen->jam_kompen_id,
                         'matkul_id' => $matkul,
-                        'jumlah_jam' => $request->jumlah_jam[$index],
+                        'jumlah_jam' => $jumlahJam,
                     ]);
                 }
             }
-
-            // Update akumulasi_jam setelah semua operasi selesai
-            $jamKompen->update(['akumulasi_jam' => detail_jamKompenModel::where('jam_kompen_id', $jamKompen->jam_kompen_id)->sum('jumlah_jam')]);
-
+    
+            // Update akumulasi_jam di tabel jam_kompen
+            $jamKompen->update([
+                'akumulasi_jam' => detail_jamKompenModel::where('jam_kompen_id', $jamKompen->jam_kompen_id)->sum('jumlah_jam'),
+            ]);
+    
             DB::commit();
+    
             return response()->json([
                 'status' => true,
-                'message' => 'Data pekerjaan berhasil disimpan'
+                'message' => 'Data berhasil disimpan',
             ]);
-
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
                 'status' => false,
                 'message' => 'Terjadi kesalahan saat menyimpan data',
-                'errors' => $e->getMessage()
+                'errors' => $e->getMessage(),
             ], 500);
         }
     }
+    
+    
 
     public function edit_ajax($id)
     {
@@ -299,112 +303,119 @@ class MahasiswaController extends Controller
         return view('mahasiswa.import');
     }
 
-
     public function import_ajax(Request $request)
     {
-        if ($request->ajax() || $request->wantsJson()) {
-            $validator = Validator::make($request->all(), [
-                'file_mahasiswa' => ['required', 'mimes:xlsx', 'max:1024']
+        $validator = Validator::make($request->all(), [
+            'file_mahasiswa' => ['required', 'mimes:xlsx', 'max:1024']
+        ]);
+    
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Validasi gagal',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+    
+        $file = $request->file('file_mahasiswa');
+        $reader = \PhpOffice\PhpSpreadsheet\IOFactory::createReader('Xlsx');
+        $reader->setReadDataOnly(true);
+        $spreadsheet = $reader->load($file->getRealPath());
+        $data = $spreadsheet->getActiveSheet()->toArray(null, false, true, true);
+    
+        if (empty($data) || count($data) <= 1) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Tidak ada data yang dapat diimport atau format file salah',
             ]);
-
-            if ($validator->fails()) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Validasi gagal',
-                    'errors' => $validator->errors()
-                ], 422);
-            }
-
-            $file = $request->file('file_mahasiswa');
-            $reader = IOFactory::createReader('Xlsx');
-            $reader->setReadDataOnly(true);
-            $spreadsheet = $reader->load($file->getRealPath());
-            $data = $spreadsheet->getActiveSheet()->toArray(null, false, true, true);
-
-            if (empty($data) || count($data) <= 1) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Tidak ada data yang dapat diimport atau format file salah'
-                ]);
-            }
-
-            DB::beginTransaction();
-            try {
-                foreach ($data as $index => $row) {
-                    if ($index === 1) continue;
-
-                    if (empty($row['A']) || empty($row['B']) || empty($row['D']) || empty($row['E'])) {
-                        throw new \Exception("Data pada baris ke-" . ($index + 1) . " tidak lengkap");
+        }
+    
+        DB::beginTransaction();
+        try {
+            foreach ($data as $index => $row) {
+                if ($index === 1) continue; // Lewati header
+    
+                if (empty($row['A']) || empty($row['B']) || empty($row['D']) || empty($row['E'])) {
+                    throw new \Exception("Data pada baris ke-" . ($index + 1) . " tidak lengkap");
+                }
+    
+                $username = $row['A']; // Ganti dari username ke NIM
+                $periodeId = $row['B'];
+                $matkulKodes = explode(';', $row['D']);
+                $jumlahJams = explode(';', $row['E']);
+    
+                // Validasi data mahasiswa berdasarkan NIM
+                $user = DB::table('m_user')->where('username', $username)->first();
+                if (!$user) {
+                    throw new \Exception("NIM '{$username}' tidak ditemukan pada data mahasiswa");
+                }
+    
+                $userId = $user->user_id;
+    
+                // Cek apakah kombinasi user_id dan periode_id sudah ada
+                $jamKompen = jamKompenModel::where('user_id', $userId)
+                    ->where('periode_id', $periodeId)
+                    ->first();
+    
+                if (!$jamKompen) {
+                    // Jika tidak ada, buat data baru
+                    $jamKompen = jamKompenModel::create([
+                        'user_id' => $userId,
+                        'periode_id' => $periodeId,
+                        'akumulasi_jam' => 0, // Nilai awal
+                    ]);
+                }
+    
+                foreach ($matkulKodes as $key => $matkulKode) {
+                    $jumlahJam = isset($jumlahJams[$key]) ? (int)$jumlahJams[$key] : 0;
+    
+                    // Validasi mata kuliah berdasarkan kode
+                    $matkul = DB::table('matkul')->where('matkul_kode', $matkulKode)->first();
+                    if (!$matkul) {
+                        throw new \Exception("Kode mata kuliah '{$matkulKode}' tidak ditemukan pada data mata kuliah");
                     }
-
-                    $user = DB::table('m_user')->where('username', $row['A'])->first();
-                    if (!$user) {
-                        throw new \Exception("Username '{$row['A']}' tidak ditemukan pada data user");
-                    }
-
-                    $userId = $user->user_id;
-                    $matkulIds = explode(';', $row['D']);
-                    $jumlahJams = explode(';', $row['E']);
-
-                    if (count($matkulIds) !== count($jumlahJams)) {
-                        throw new \Exception("Jumlah matkul_id dan jumlah jam tidak sesuai pada baris ke-" . ($index + 1));
-                    }
-
-                    $jamKompen = jamKompenModel::where('user_id', $userId)->first();
-
-                    if ($jamKompen) {
-                        $akumulasi_jam = $jamKompen->akumulasi_jam + array_sum($jumlahJams);
-                        $jamKompen->update(['akumulasi_jam' => $akumulasi_jam]);
+    
+                    $detailJamKompen = detail_jamKompenModel::where('jam_kompen_id', $jamKompen->jam_kompen_id)
+                        ->where('matkul_id', $matkul->matkul_id)
+                        ->first();
+    
+                    if ($detailJamKompen) {
+                        // Update jumlah jam jika sudah ada
+                        $detailJamKompen->update([
+                            'jumlah_jam' => $detailJamKompen->jumlah_jam + $jumlahJam,
+                        ]);
                     } else {
-                        $akumulasi_jam = array_sum($jumlahJams);
-                        $jamKompen = jamKompenModel::create([
-                            'user_id' => $userId,
-                            'periode_id' => $row['B'],
-                            'akumulasi_jam' => $akumulasi_jam,
+                        // Tambahkan data baru jika belum ada
+                        detail_jamKompenModel::create([
+                            'jam_kompen_id' => $jamKompen->jam_kompen_id,
+                            'matkul_id' => $matkul->matkul_id,
+                            'jumlah_jam' => $jumlahJam,
                         ]);
                     }
-
-                    foreach ($matkulIds as $key => $matkulId) {
-                        $existingDetail = detail_jamKompenModel::where('jam_kompen_id', $jamKompen->jam_kompen_id)
-                            ->where('matkul_id', $matkulId)
-                            ->first();
-
-                        if ($existingDetail) {
-                            $existingDetail->update([
-                                'jumlah_jam' => $existingDetail->jumlah_jam + $jumlahJams[$key]
-                            ]);
-                        } else {
-                            detail_jamKompenModel::create([
-                                'jam_kompen_id' => $jamKompen->jam_kompen_id,
-                                'matkul_id' => $matkulId,
-                                'jumlah_jam' => $jumlahJams[$key],
-                                'created_at' => now(),
-                            ]);
-                        }
-                    }
                 }
-
-                DB::commit();
-                return response()->json([
-                    'status' => true,
-                    'message' => 'Data berhasil diimport'
+    
+                // Update akumulasi_jam untuk jamKompen
+                $jamKompen->update([
+                    'akumulasi_jam' => detail_jamKompenModel::where('jam_kompen_id', $jamKompen->jam_kompen_id)->sum('jumlah_jam'),
                 ]);
-
-            } catch (\Exception $e) {
-                DB::rollBack();
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Terjadi kesalahan saat mengimport data',
-                    'errors' => $e->getMessage()
-                ], 500);
             }
+    
+            DB::commit();
+            return response()->json([
+                'status' => true,
+                'message' => 'Data berhasil diimport',
+            ]);
+    
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'status' => false,
+                'message' => 'Terjadi kesalahan saat mengimpor data',
+                'errors' => $e->getMessage(),
+            ], 500);
         }
-
-        return response()->json([
-            'status' => false,
-            'message' => 'Request tidak valid'
-        ], 400);
     }
+    
 
     public function export_excel()
     {

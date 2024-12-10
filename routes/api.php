@@ -9,8 +9,7 @@ use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\DetailMahasiswaController;
 use App\Http\Controllers\Api\DosenBuatPekerjaanController;
 use App\Http\Controllers\Api\DashboardMhsController;
-
-
+use App\Http\Controllers\Api\MahasiswaController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -51,18 +50,24 @@ Route::middleware(['auth:api'])->group(function () {
         Route::get('/{id}/pelamaran',[PekerjaanController::class,'getPelamaran']);
     });
 
-    Route::group(['prefix' => 'pekerjaan'], function(){
-        Route::get('/',[PekerjaanController::class,'index']);
-        Route::post('/apply',[PekerjaanController::class,'apply']);
-        Route::get('/{id}/get-anggota',[PekerjaanController::class,'get_anggota']);
-        Route::post('/approve-pekerjaan',[PekerjaanController::class,'approvePekerjaan']);
-        Route::post('/decline-pekerjaan',[PekerjaanController::class,'declinePekerjaan']);
-        Route::get('/{id}/getPekerjaanPengerjaan',[PekerjaanController::class,'getPekerjaanPengerjaan']);
-        Route::get('{id}/getProgres',[PekerjaanController::class,'getProgres']);
-    });
+        Route::group(['prefix' => 'pekerjaan'], function(){
+            Route::get('/',[PekerjaanController::class,'index']);
+            Route::post('/apply',[PekerjaanController::class,'apply']);
+            Route::get('/{id}/get-anggota',[PekerjaanController::class,'get_anggota']);
+            Route::post('/approve-pekerjaan',[PekerjaanController::class,'approvePekerjaan']);
+            Route::post('/decline-pekerjaan',[PekerjaanController::class,'declinePekerjaan']);
+            Route::get('/{id}/getPekerjaanPengerjaan',[PekerjaanController::class,'getPekerjaanPengerjaan']);
+            Route::get('/{id}/getNilai',[PekerjaanController::class,'list']);
+            Route::post('/{id}/approve-nilai',[PekerjaanController::class,'approve']);
+        });
 
     Route::group(['prefix' => 'mahasiswa'], function () {
         Route::get('/dashboard', [DashboardMhsController::class, 'index']);
+        Route::delete('/{id}/hapus',[MahasiswaController::class,'hapus']);
+        Route::post('/link',[MahasiswaController::class,'store_link']);
+        Route::post('/gambar',[MahasiswaController::class,'store_gambar']);
+        Route::post('/file',[MahasiswaController::class,'store_file']);
+
     });
     Route::group(['prefix' => 'dosen'], function () {
         Route::get('/dashboard', [DashboardDsnController::class, 'index']);

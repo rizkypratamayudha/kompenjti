@@ -3,6 +3,35 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <style>
+        .info-box {
+            background-color: #002f6c; /* Warna biru gelap */
+            color: white; /* Warna teks putih */
+            padding: 10px;
+            border-radius: 5px;
+            font-family: Arial, sans-serif;
+            width: 100%; /* Lebar tabel */
+            margin: 10px auto; /* Memusatkan tabel */
+            line-height: 1; /* Spasi antarbaris */
+            font-size: 9pt;
+        }
+
+        .info-box table {
+            width: 100%; /* Lebar penuh di dalam kotak */
+            border-collapse: collapse;
+        }
+
+        .info-box th {
+            text-align: left;
+            padding-right: 5px;
+        }
+
+        .info-box td {
+            text-align: left;
+        }
+
+        .info-box b {
+            font-weight: bold;
+        }
         body {
             font-family: "Times New Roman", Times, serif;
             margin: 6px 20px 5px 20px;
@@ -35,7 +64,7 @@
         }
 
         .text-right {
-            padding: 8px; text-align: right;
+            text-align: right;
         }
 
         .text-nama {
@@ -61,9 +90,8 @@
             margin-top: 40px
         }
 
-        
-        /* Align label (first column) consistently across all tables */
-        td:nth-child(1), th:nth-child(1) {
+         /* Align label (first column) consistently across all tables */
+         td:nth-child(1), th:nth-child(1) {
             width: 35%; /* Set fixed width for label columns */
             padding-right: 10px; /* Add space between label and value */
         }
@@ -71,7 +99,6 @@
         td:nth-child(2), th:nth-child(2) {
             width: 110%; /* Set flexible width for the value columns */
         }
-
 
         .p-1 {
             padding: 5px 1px 5px 1px;
@@ -133,7 +160,7 @@
         .text-kiri{
             text-align: left
         }
-
+        
         .status-column {
             width: 30%; /* Adjust width as needed */
         }
@@ -141,6 +168,33 @@
 </head>
 
 <body>
+    <div class="info-box">
+        <p>Keterangan:</p>
+        <p style="margin-bottom: 5px;">Tanda Tangan Elektronik berupa QRCode ini dikeluarkan oleh Jurusan Teknologi Informasi Politeknik Negeri Malang </p>
+        <table>
+            <tr>
+                <th>Penandatanganan oleh</th>
+                <td>: {{$penerimaan->kaprodi->nama}}</td>
+            </tr>
+            <tr>
+                <th>Kepala Program Studi</th>
+                <td>: {{ $penerimaan->user->detailMahasiswa->prodi->prodi_nama }}</td>
+            </tr>
+            <tr>
+                <th>Tanggal</th>
+                <td>: {{ $penerimaan->created_at->format('M j Y h:i:s:000A') }}</td>
+            </tr>
+            <tr>
+                <th>Isi Dokumen</th>
+                <td>: Berita Acara Kompensasi Presensi Mahasiswa atas nama <b>{{ $penerimaan->user->nama }}</b></td>
+            </tr>
+            <tr>
+                <th>Periode</th>
+                <td>: {{ $penerimaan->user->detailMahasiswa->periode->periode_nama }}</td>
+            </tr>
+        </table>
+    </div>
+
     <table class="border-bottom-header">
         <tr>
             <td width="15%" class="text-center"><img class="image" id="image" src="{{ asset('logo_polinema.jpg') }}">
@@ -156,8 +210,7 @@
         </tr>
     </table>
 
-    <h3 class="text-center" style="margin-bottom: 40px;"> BERITA ACARA KOMPENSASI PRESENSI </h3>
-
+    <h3 class="text-center" style="margin-bottom: 30px;"> BERITA ACARA KOMPENSASI PRESENSI </h3>
 
     <table>
         <tr>
@@ -244,25 +297,17 @@
         </tbody>
     </table>
 
-    <table style="margin-top: 40px">
+    <table style="margin-top: 20px">
         <tr>
             <td></td>
-            <td class="text-kanan" style="margin-bottom: 40px">Malang, {{ $penerimaan->created_at->translatedFormat('d F Y') }} </td>
+            <td class="text-kanan" >Malang, {{ $penerimaan->created_at->translatedFormat('d F Y') }} </td>
         </tr>
         <tr>
-            <td class="text-kiri" style="margin-bottom: 40px">Yang Memberikan Rekomendasi, </td>
-            <td class="text-kanan" style="margin-bottom: 40px">Kepala Program Studi</td>
+            <td class="text-kiri" >Yang Memberikan Rekomendasi, </td>
+            <td class="text-kanan" >Kepala Program Studi</td>
         </tr>
     </table>
-    <table style="width: 100%; margin-top: 20px;">
-        <tr>
-            <td style="width: 70%;"></td>
-            <td style="text-align: right; width: 30%;">
-                <img src="{{ asset('storage/qrcodes/' . $penerimaan->t_approve_cetak_id . '.png') }}" alt="QR Code" style="width: 100px; height: 100px;">
-            </td>
-        </tr>
-    </table>
-    <table style="margin-top: 10px">
+    <table style="margin-top: 50px">
         <tr>
             <td class="text-kiri">{{ $penerimaan->pekerjaan->user->nama }}</td>
             <td class="text-kanan">{{ $penerimaan->kaprodi->nama }}</td>
@@ -272,7 +317,7 @@
             <td class="text-kanan">NIP. {{ $penerimaan->kaprodi->username }}</td>
         </tr>
     </table>
-    
+
 </body>
 
 </html>

@@ -15,7 +15,7 @@ class AuthController extends Controller
 
             // Redirect based on user's level
             $redirectUrl = match ($user->level->kode_level) {
-                'ADM' => '/dashboardAdm',
+                'ADM' => '/',
                 'MHS' => '/dashboardMhs',
                 'DSN' => '/dashboardDos',
                 'KPD' => '/dashboardKap',
@@ -38,7 +38,7 @@ class AuthController extends Controller
                 $user = Auth::user();
 
                 $redirectUrl = match ($user->level->kode_level) {
-                    'ADM' => url('/dashboardAdm'),
+                    'ADM' => url('/'),
                     'MHS' => url('/dashboardMhs'),
                     'DSN' => url('/dashboardDos'),
                     'KPD' => url('/dashboardKap')

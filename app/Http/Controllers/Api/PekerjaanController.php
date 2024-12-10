@@ -8,6 +8,7 @@ use App\Models\detail_pekerjaanModel;
 use App\Models\notifikasiModel;
 use App\Models\PekerjaanModel;
 use App\Models\PendingPekerjaanModel;
+use App\Models\PengumpulanModel;
 use App\Models\ProgresModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -245,7 +246,7 @@ class PekerjaanController extends Controller
             // Ambil data pekerjaan berdasarkan user yang sedang login
             $tugas = PekerjaanModel::whereHas('t_approve_pekerjaan', function ($query) use ($login) {
                 $query->where('user_id', $login);
-            })->with(['progres', 'progres.pengumpulan' => function ($query) use ($login) {
+            })->with(['detail_pekerjaan', 'user.detailDosen', 'progres', 'progres.pengumpulan' => function ($query) use ($login) {
                 $query->where('user_id', $login);
             }])->get();
 
@@ -267,30 +268,118 @@ class PekerjaanController extends Controller
         }
     }
 
-    public function getProgres($pekerjaanId){
-        try{
-            $pekerjaan = PekerjaanModel::findOrFail($pekerjaanId);
+    public function list($login)
+    {
+        try {
+            // Ambil ID user yang sedang login
+            $userId = Auth::id();
 
-            $progres = ProgresModel::where('pekerjaan_id',$pekerjaanId)->orderBy('progres_id','asc')
-            ->get();
+            if ($login != $userId) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Unauthorized',
+                ], 403);
+            }
 
+            // Ambil data pengumpulan yang sesuai dengan user yang sedang login dan berdasarkan progres_id dan pekerjaan_id
+            $pengumpulan = PengumpulanModel::with('user', 'progres', 'progres.pekerjaan')
+                ->where('status', 'pending')
+                ->whereHas('progres.pekerjaan', function ($query) use ($login) {
+                    // Kondisi untuk pekerjaan yang terkait dengan user yang sedang login
+                    $query->where('user_id', $login);
+                })
+                ->get();
+
+            // Kembalikan respon JSON langsung
             return response()->json([
-                'status' => 'success',
-                'message' => 'Progress data retrieved successfully',
-                'data' => $progres
+                'success' => true,
+                'message' => 'Data fetched successfully.',
+                'data' => $pengumpulan,
             ], 200);
-
-
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+        } catch (\Exception $e) {
+            // Tangani error dan kembalikan respon JSON
             return response()->json([
-                'status' => 'error',
-                'message' => 'Pekerjaan not found'
-            ], 404);
-        } catch (\Throwable $e) {
+                'success' => false,
+                'message' => 'Failed to fetch data.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function approve($id)
+    {
+        DB::beginTransaction(); // Start transaction
+
+        try {
+            // Retrieve the related 'pengumpulan' data with its 'user' and 'progres'
+            $pengumpulan = PengumpulanModel::with('user', 'progres')->find($id);
+
+            // Check if 'pengumpulan' exists
+            if (!$pengumpulan) {
+                DB::rollBack(); // Rollback if 'pengumpulan' not found
+                return response()->json(['error' => 'Pengumpulan not found.'], 404);
+            }
+
+            // Check if related 'user' and 'progres' exist
+            if (!$pengumpulan->progres || !$pengumpulan->user) {
+                DB::rollBack(); // Rollback if no related 'progres' or 'user'
+                return response()->json(['error' => 'Data progres or user not found.'], 404);
+            }
+
+            // Update the 'status' to 'accept'
+            $pengumpulan->status = 'accept';
+            $pengumpulan->save();
+
+            // Access the related 'user' data
+            $user = $pengumpulan->user;
+            $userId = $user->user_id;
+            $pekerjaanId = $pengumpulan->progres->pekerjaan_id;
+
+            // Access the 'jamKompen' related to the user
+            $jamKompen = $user->jamKompen;
+
+            // Check if 'jamKompen' exists
+            if ($jamKompen) {
+                $currentAkumulasiJam = $jamKompen->akumulasi_jam;
+                $jamKompenProgres = $pengumpulan->progres->jam_kompen; // 'jam_kompen' from 'progres'
+
+                // Check if there are enough hours to deduct
+                if ($currentAkumulasiJam >= $jamKompenProgres) {
+                    // Deduct the 'jam_kompen' value
+                    $jamKompen->akumulasi_jam -= $jamKompenProgres;
+                    $jamKompen->save(); // Save the changes
+                } else {
+                    // If not enough, set 'akumulasi_jam' to 0
+                    $jamKompen->akumulasi_jam = 0;
+                    $jamKompen->save();
+                }
+
+                // Create a notification for the user
+                notifikasiModel::create([
+                    'user_id' => $userId,
+                    'pekerjaan_id' => $pekerjaanId,
+                    'pesan' => 'Jam Kompen Anda Berkurang!!, pengumpulan anda telah dinilai',
+                    'status' => 'belum',
+                    'user_id_kap' => null
+                ]);
+
+                DB::commit(); // Commit transaction if successful
+
+                // Return success response
+                return response()->json([
+                    'message' => 'Tugas berhasil disetujui.',
+                    'data' => $pengumpulan
+                ], 200);
+            } else {
+                DB::rollBack(); // Rollback if 'jamKompen' is not found
+                return response()->json(['error' => 'Jam Kompen not found for this user.'], 404);
+            }
+        } catch (\Exception $e) {
+            DB::rollBack(); // Rollback if any error occurs
+
+            // Return error response
             return response()->json([
-                'status' => 'error',
-                'message' => 'An error occurred while retrieving progress data',
-                'error' => $e->getMessage()
+                'error' => 'An error occurred while approving the task: ' . $e->getMessage()
             ], 500);
         }
     }

@@ -119,12 +119,17 @@
                                 @endif
 
                                 @if ($pengumpulan != null)
-                                    <div class="mt-5 mb-2">
-                                        <button class="btn btn-danger w-100"
-                                            onclick="modalAction('{{ url('/riwayat/' . $progres->progres_id . '/hapus_ajax') }}')">Batalkan
-                                            pengiriman</button>
-                                    </div>
-                                @endif
+                                <div class="mt-5 mb-2">
+                                    <button class="btn btn-danger w-100"
+                                        @if ($pengumpulan->status == 'accept')
+                                            disabled
+                                        @endif
+                                        onclick="modalAction('{{ url('/riwayat/' . $progres->progres_id . '/hapus_ajax') }}')">
+                                        Batalkan pengiriman
+                                    </button>
+                                </div>
+                            @endif
+
                             </div>
                         </div>
 
