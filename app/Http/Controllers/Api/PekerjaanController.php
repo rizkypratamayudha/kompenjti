@@ -383,4 +383,41 @@ class PekerjaanController extends Controller
             ], 500);
         }
     }
+
+    public function decline($id)
+{
+    // Mencari pengumpulan berdasarkan ID dan relasi user serta progres
+    $pengumpulan = PengumpulanModel::with('user', 'progres')->find($id);
+
+    // Jika data pengumpulan tidak ditemukan, kembalikan error 404
+    if (!$pengumpulan) {
+        return response()->json([
+            'message' => 'Pengumpulan tidak ditemukan.',
+        ], 404);
+    }
+
+    // Mengubah status pengumpulan menjadi 'decline'
+    $pengumpulan->status = 'decline';
+    $pengumpulan->save();
+
+    // Mendapatkan user_id dan pekerjaan_id dari relasi
+    $userId = $pengumpulan->user->user_id;
+    $pekerjaanId = $pengumpulan->progres->pekerjaan_id;
+
+    // Membuat notifikasi untuk user
+    notifikasiModel::create([
+        'user_id' => $userId,
+        'pekerjaan_id' => $pekerjaanId,
+        'pesan' => 'Mohon Maaf Pengumpulan Anda Ditolak, coba kumpulkan pekerjaan dengan baik.',
+        'status' => 'belum', // status belum dibaca
+        'user_id_kap' => null, // opsional jika ada kolom user_id_kap
+    ]);
+
+    // Mengembalikan response dengan status success
+    return response()->json([
+        'message' => 'Pengumpulan tugas berhasil ditolak.',
+        'data' => $pengumpulan
+    ], 200); // Menggunakan kode status HTTP 200 OK
+}
+
 }
