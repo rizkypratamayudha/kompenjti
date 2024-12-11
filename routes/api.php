@@ -36,8 +36,18 @@ Route::get('detail-mahasiswa/user/{user_id}', [DetailMahasiswaController::class,
 Route::put('kompetensi/update/{id}', [KompetensiController::class, 'update']);
 Route::delete('kompetensi/delete/{id}', [KompetensiController::class, 'destroy']);
 Route::get('kompetensi/show/{id}', [KompetensiController::class, 'getKompetensiDetail']);
+Route::get('kompetensi-admin', [KompetensiController::class, 'getKompetensiAdmin']);
 Route::get('/dosen/pekerjaan/{user_id}', [DosenBuatPekerjaanController::class, 'index']);
 Route::post('/dosen/pekerjaan/create', [DosenBuatPekerjaanController::class, 'store']);
+Route::get('/kompetensi-admin-pekerjaan', [DosenBuatPekerjaanController::class, 'getAllKompetensiAdmin']);
+Route::post('/pekerjaan/{pekerjaan_id}/start-deadline', [DosenBuatPekerjaanController::class, 'startDeadline']);
+Route::post('/pekerjaan/{pekerjaan_id}/update-deadline', [DosenBuatPekerjaanController::class, 'updateDeadline']);
+Route::get('/pekerjaan/{pekerjaan_id}/progress', [DosenBuatPekerjaanController::class, 'getProgressByPekerjaan']);
+Route::put('/pekerjaan/{id}', [DosenBuatPekerjaanController::class, 'update']);
+Route::get('/pekerjaan/{id}', [DosenBuatPekerjaanController::class, 'getPekerjaanDetail']);
+Route::delete('/pekerjaan/{pekerjaanId}/persyaratan/{persyaratanId}', [DosenBuatPekerjaanController::class, 'deletePersyaratan']);
+Route::delete('/pekerjaan/{pekerjaanId}/progres/{progresId}', [DosenBuatPekerjaanController::class, 'deleteProgres']);
+Route::delete('/pekerjaan/{pekerjaanId}/kompetensi/{kompetensiDosenId}', [DosenBuatPekerjaanController::class, 'deleteKompetensi']);
 
 
 Route::middleware(['auth:api'])->group(function () {

@@ -15,6 +15,6 @@ class PersyaratanModel extends Model
     protected $fillable = ['persyaratan_id','detail_pekerjaan_id','persyaratan_nama'];
 
     public function detail_pekerjaan():BelongsTo{
-        return $this->belongsTo(PekerjaanModel::class,'detail_pekerjaan_id','detail_pekerjaan_id');
+        return $this->belongsTo(detail_pekerjaanModel::class,'detail_pekerjaan_id','detail_pekerjaan_id');
     }
 }
