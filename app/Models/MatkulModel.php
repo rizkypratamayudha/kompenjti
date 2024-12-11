@@ -13,6 +13,6 @@ class MatkulModel extends Model
 
     protected $primaryKey = 'matkul_id';
 
-    protected $fillable = ['matkul_nama', 'created_at','updated_at'];
+    protected $fillable = ['matkul_kode','matkul_nama', 'created_at','updated_at'];
 
 }

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\acceptMailJob;
+use App\Jobs\declineMailJob;
 use App\Mail\declineMail;
 use App\Mail\kirimEmail;
 use App\Models\detail_dosenModel;
@@ -119,8 +121,14 @@ class ValidasiController extends Controller
 
         $prodiNama = ProdiModel::getProdiNama($pendingUser->prodi_id);
         $periodeNama = PeriodeModel::getPeriodeNama( $pendingUser->periode_id );
-
-        Mail::to($pendingUser->email)->send(new kirimEmail(['nama' => $pendingUser->nama, 'prodi_id' => $prodiNama, 'angkatan' => $pendingUser->angkatan, 'nim' => $pendingUser->username, 'periode' => $periodeNama]));
+        acceptMailJob::dispatch([
+            'nama' => $pendingUser->nama,
+            'prodi_id' => $prodiNama,
+            'angkatan' => $pendingUser->angkatan,
+            'nim' => $pendingUser->username,
+            'periode' => $periodeNama,
+            'email' => $pendingUser->email,
+        ]);
         $pendingUser->delete();
 
         return response()->json(['status' => true, 'message' => 'User approved and moved to respective detail table.']);
@@ -139,7 +147,15 @@ class ValidasiController extends Controller
         $prodiNama = ProdiModel::getProdiNama($pendingUser->prodi_id);
         $periodeNama = PeriodeModel::getPeriodeNama( $pendingUser->periode_id );
         $alasan = $request->input('reason');
-        Mail::to($pendingUser->email)->send(new declineMail(['nama' => $pendingUser->nama, 'prodi_id' => $prodiNama, 'angkatan' => $pendingUser->angkatan, 'nim' => $pendingUser->username,'alasan'=> $alasan, 'periode'=>$periodeNama]));
+        declineMailJob::dispatch([
+            'nama' => $pendingUser->nama,
+            'prodi_id' => $prodiNama,
+            'angkatan' => $pendingUser->angkatan,
+            'nim' => $pendingUser->username,
+            'periode' => $periodeNama,
+            'email' => $pendingUser->email,
+            'alasan' => $alasan,
+        ]);
         $pendingUser->delete();
 
         return response()->json(['status' => true, 'message' => 'User registration declined and removed from pending list.']);
@@ -150,8 +166,19 @@ class ValidasiController extends Controller
         return ['jumlah' => $jumlah];
     }
 
-    public function hitung_notif_pelamar(){
-        $jumlah = PendingPekerjaanModel::count();
+    public function hitung_notif_pelamar() {
+        $jumlah = PendingPekerjaanModel::whereHas('pekerjaan.user.level', function($query) {
+            $query->where('level_id', 2);
+        })->count();
+
         return ['jumlah' => $jumlah];
     }
+    public function hitung_notif_pelamar_admin() {
+        $jumlah = PendingPekerjaanModel::whereHas('pekerjaan.user.level', function($query) {
+            $query->where('level_id', 1);
+        })->count();
+
+        return ['jumlah' => $jumlah];
+    }
+
 }

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Auth;
 
 class PekerjaanModel extends Model
 {
@@ -20,7 +21,7 @@ class PekerjaanModel extends Model
         return $this->belongsTo(UserModel::class, 'user_id', 'user_id');
     }
 
-    public function detail_pekerjaan(): BelongsTo
+    public function detail_pekerjaan()
     {
         return $this->belongsTo(detail_pekerjaanModel::class, 'pekerjaan_id', 'pekerjaan_id');
     }
@@ -39,7 +40,33 @@ class PekerjaanModel extends Model
         return $this->hasManyThrough(kompetensi_dosenModel::class, detail_pekerjaanModel::class);
     }
 
-    public function approve(){
-        return $this->belongsTo(ApprovePekerjaanModel::class,'pekerjaan_id', 'pekerjaan_id');
+    public function approve()
+    {
+        return $this->belongsTo(ApprovePekerjaanModel::class, 'pekerjaan_id', 'pekerjaan_id');
+    }
+
+    public function getCanRequestSuratAttribute()
+{
+    // Periksa apakah semua progres pekerjaan ini sudah dikumpulkan dengan status bukan 'pending'
+    $progresSelesai = $this->progres->every(function ($progres) {
+        return $progres->pengumpulan->isNotEmpty() &&
+            $progres->pengumpulan->first()->status !== 'pending';
+    });
+
+    // Periksa apakah akumulasi_deadline sudah melewati tanggal saat ini
+    $deadlineTerlewati = $this->akumulasi_deadline < now();
+
+    // Request Cetak Surat diperbolehkan jika salah satu kondisi terpenuhi
+    return $progresSelesai || $deadlineTerlewati;
+}
+
+
+    public function t_approve_pekerjaan()
+    {
+        return $this->hasMany(ApprovePekerjaanModel::class, 'pekerjaan_id');
+    }
+    public function t_pending_pekerjaan()
+    {
+        return $this->hasMany(PendingPekerjaanModel::class, 'pekerjaan_id');
     }
 }

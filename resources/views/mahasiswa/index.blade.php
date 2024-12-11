@@ -42,7 +42,7 @@
                             <th>NIM</th>
                             <th>Nama</th>
                             <th>Periode</th>
-                            <th>Jam Kompen</th>
+                            <th>Akumulasi Jam Kompen</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>

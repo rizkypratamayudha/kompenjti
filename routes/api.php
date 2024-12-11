@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\API\DashboardDsnController;
 use App\Http\Controllers\Api\PekerjaanController;
 use App\Http\Controllers\Api\RegisterController;
 use App\Http\Controllers\Api\LoginController;
@@ -7,8 +8,9 @@ use App\Http\Controllers\Api\KompetensiController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\DetailMahasiswaController;
 use App\Http\Controllers\Api\DosenBuatPekerjaanController;
-
-
+use App\Http\Controllers\Api\DashboardMhsController;
+use App\Http\Controllers\Api\KaprodiController;
+use App\Http\Controllers\Api\MahasiswaController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -55,9 +57,38 @@ Route::middleware(['auth:api'])->group(function () {
     Route::put('/updatePassword', [ProfileController::class, 'updatePassword']);
     Route::delete('/deleteAvatar', [ProfileController::class, 'deleteAvatar']);
 
+    Route::group(['prefix' => 'dosen'], function(){
+        Route::get('/{id}/pelamaran',[PekerjaanController::class,'getPelamaran']);
+    });
 
-    Route::group(['prefix' => 'pekerjaan'], function(){
-        Route::get('/',[PekerjaanController::class,'index']);
-        Route::post('/store',[PekerjaanController::class,'store']);
+        Route::group(['prefix' => 'pekerjaan'], function(){
+            Route::get('/',[PekerjaanController::class,'index']);
+            Route::post('/apply',[PekerjaanController::class,'apply']);
+            Route::get('/{id}/get-anggota',[PekerjaanController::class,'get_anggota']);
+            Route::post('/approve-pekerjaan',[PekerjaanController::class,'approvePekerjaan']);
+            Route::post('/decline-pekerjaan',[PekerjaanController::class,'declinePekerjaan']);
+            Route::get('/{id}/getPekerjaanPengerjaan',[PekerjaanController::class,'getPekerjaanPengerjaan']);
+            Route::get('/{id}/getNilai',[PekerjaanController::class,'list']);
+            Route::post('/{id}/approve-nilai',[PekerjaanController::class,'approve']);
+            Route::post('/{id}/decline-nilai',[PekerjaanController::class,'decline']);
+            Route::get('/getselesai',[PekerjaanController::class,'getSelesai']);
+        });
+
+    Route::group(['prefix' => 'mahasiswa'], function () {
+        Route::get('/dashboard', [DashboardMhsController::class, 'index']);
+        Route::delete('/{id}/hapus',[MahasiswaController::class,'hapus']);
+        Route::post('/link',[MahasiswaController::class,'store_link']);
+        Route::post('/gambar',[MahasiswaController::class,'store_gambar']);
+        Route::post('/file',[MahasiswaController::class,'store_file']);
+        Route::post('/{id}/request-cetak-surat',[MahasiswaController::class,'requestCetakSurat']);
+
+    });
+    Route::group(['prefix' => 'dosen'], function () {
+        Route::get('/dashboard', [DashboardDsnController::class, 'index']);
+    });
+
+    Route::group(['prefix' => 'kaprodi'], function(){
+        Route::get('/',[KaprodiController::class,'index']);
+        route::post('/approvesurat',[KaprodiController::class,'approve']);
     });
 });

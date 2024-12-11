@@ -24,7 +24,8 @@
                 <thead>
                     <tr>
                         <th>No</th>
-                        <th>Nama</th>
+                        <th>Kode Mata Kuliah</th>
+                        <th>Nama Mata Kuliah</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
@@ -59,11 +60,16 @@
                     orderable: false,
                     searchable: false
                 },{
+                    data: "matkul_kode",
+                    className: "",
+                    orderable: true,
+                    searchable: true
+                },{
                     data: "matkul_nama",
                     className: "",
                     orderable: true,
                     searchable: true
-                }, {
+                },{
                     data: "aksi",
                     className: "",
                     orderable: false,

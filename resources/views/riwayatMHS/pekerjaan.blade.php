@@ -40,6 +40,7 @@
             <div class="alert alert-danger">{{ session('error') }}</div>
         @endif
 
+
         <div class="card text-center">
             <div class="card-header">
                 <ul class="nav nav-tabs card-header-tabs">
@@ -120,6 +121,9 @@
                 </div>
             `;
 
+            dayjs.extend(dayjs_plugin_relativeTime);
+            dayjs.locale('id');
+
             fetch(`{{ url('dosen') }}/${pekerjaanId}/get-progres`)
                 .then(response => response.json())
                 .then(data => {
@@ -133,7 +137,7 @@
                                     </div>
                                     <div class="flex-grow-1">
                                     <div class="task-title">${progres.judul_progres}</div>
-                                        <div class="progress-detail">Nilai jam: ${progres.jam_kompen} - Deadline: ${progres.hari} Hari</div>
+                                        <div class="progress-detail">Nilai jam: ${progres.jam_kompen} - Deadline berakhir ${dayjs(progres.deadline).fromNow()} </div>
                                     </div>
                                         <div class="ellipsis">
                                             <a class="btn btn-outline-primary btn-sm" href="{{ url('/riwayat/riwayatmhs') }}/${progres.progres_id}/enter-progres">Info</a>

@@ -8,17 +8,22 @@ use App\Models\detail_pekerjaanModel;
 use App\Models\kompetensi_adminModel;
 use App\Models\kompetensi_dosenModel;
 use App\Models\kompetensiModel;
+use App\Models\notifikasiModel;
 use App\Models\PekerjaanModel;
 use App\Models\PendingPekerjaanController;
 use App\Models\PendingPekerjaanModel;
+use App\Models\PengumpulanModel;
 use App\Models\PeriodeModel;
 use App\Models\PersyaratanModel;
 use App\Models\ProgresModel;
 use App\Models\UserModel;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Yajra\DataTables\Facades\DataTables;
 
 class PekerjanController extends Controller
 {
@@ -33,8 +38,8 @@ class PekerjanController extends Controller
             'title' => 'Page Buat Pekerjaan'
         ];
 
-        $activeMenu = 'dosen';
-        $activeTab = 'progres'; // Menetapkan tab aktif default ke 'progres'
+        $activeMenu = ['dosen' || 'admintambah'];
+        $activeTab = 'progres';
 
         $pekerjaan = PekerjaanModel::with('detail_pekerjaan', 'progres')->where('user_id', Auth::id())->get();
 
@@ -211,6 +216,50 @@ class PekerjanController extends Controller
         ]);
     }
 
+    public function delete_ajax(Request $request, string $pekerjaan_id)
+    {
+        if ($request->ajax() || $request->wantsJson()) {
+            $pekerjaan = PekerjaanModel::find($pekerjaan_id);
+
+            if (!$pekerjaan) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Data Pekerjaan tidak ditemukan'
+                ]);
+            }
+
+            try {
+                // Hapus semua data terkait secara bertahap
+                $pekerjaan->detail_pekerjaan->each(function ($detail) {
+                    // Hapus persyaratan dan kompetensi dosen terkait
+                    $detail->persyaratan()->delete();
+                    $detail->kompetensiDosen()->delete();
+                });
+
+                // Hapus data detail pekerjaan
+                $pekerjaan->detail_pekerjaan()->delete();
+                $pekerjaan->t_approve_pekerjaan()->delete();
+                $pekerjaan->t_pending_pekerjaan()->delete();
+                $pekerjaan->progres()->delete();
+                // Hapus data pekerjaan itu sendiri
+                $pekerjaan->delete();
+
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Data Pekerjaan berhasil dihapus'
+                ]);
+            } catch (\Exception $e) {
+                // Tangani error lainnya
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Data gagal dihapus: ' . $e->getMessage()
+                ]);
+            }
+        }
+
+        return redirect('/');
+    }
+
     public function approvePekerjaan(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -239,6 +288,13 @@ class PekerjanController extends Controller
         ]);
 
         PendingPekerjaanModel::where('user_id', $request->user_id)->where('pekerjaan_id', $request->pekerjaan_id)->delete();
+        notifikasiModel::create([
+            'user_id' => $request->user_id,
+            'pekerjaan_id' => $request->pekerjaan_id,
+            'pesan' => 'Selamat!!, anda telah diterima pada pekerjaan',
+            'status' => 'belum',
+            'user_id_kap' => null
+        ]);
 
         return response()->json(['status' => true, 'message' => 'Pekerjaan berhasil disetujui']);
     }
@@ -259,6 +315,13 @@ class PekerjanController extends Controller
         }
 
         PendingPekerjaanModel::where('user_id', $request->user_id)->where('pekerjaan_id', $request->pekerjaan_id)->delete();
+        notifikasiModel::create([
+            'user_id' => $request->user_id,
+            'pekerjaan_id' => $request->pekerjaan_id,
+            'pesan' => 'Mohon maaf, anda tidak diterima pada pekerjaan',
+            'status' => 'belum',
+            'user_id_kap' => null
+        ]);
         return response()->json(['status' => true, 'message' => 'Pelamar berhasil ditolak']);
     }
 
@@ -278,14 +341,36 @@ class PekerjanController extends Controller
         }
 
         ApprovePekerjaanModel::where('user_id', $request->user_id)->where('pekerjaan_id', $request->pekerjaan_id)->delete();
+        notifikasiModel::create([
+            'user_id' => $request->user_id,
+            'pekerjaan_id' => $request->pekerjaan_id,
+            'pesan' => 'Coba apply di pekerjaan lain, anda telah ditolak di pekerjaan',
+            'status' => 'belum',
+            'user_id_kap' => null
+        ]);
         return response()->json(['status' => true, 'message' => 'Anggota berhasil dikick']);
     }
 
     public function edit_ajax($id)
     {
         $kompetensi = kompetensi_adminModel::all();
-        $pekerjaan = PekerjaanModel::with('detail_pekerjaan', 'progres', 'detail_pekerjaan.persyaratan', 'detail_pekerjaan.kompetensiDosen')->find($id);
-        return view('dosen.setting', ['pekerjaan' => $pekerjaan, 'kompetensi' => $kompetensi]);
+        $pekerjaan = PekerjaanModel::with([
+            'detail_pekerjaan',
+            'progres',
+            'detail_pekerjaan.persyaratan',
+            'detail_pekerjaan.kompetensiDosen'
+        ])->find($id);
+
+        // Get kompetensi IDs directly from the kompetensiDosen relationship
+        $selectedKompetensiIds = $pekerjaan->detail_pekerjaan->kompetensiDosen
+            ->pluck('kompetensi_admin_id')
+            ->toArray();
+
+        return view('dosen.setting', [
+            'pekerjaan' => $pekerjaan,
+            'kompetensi' => $kompetensi,
+            'selectedKompetensiIds' => $selectedKompetensiIds
+        ]);
     }
 
     public function update_ajax(Request $request, $id)
@@ -302,7 +387,7 @@ class PekerjanController extends Controller
             'judul_progres' => 'required|array|min:1',
             'judul_progres.*' => 'required|string|max:255',
             'hari' => 'required|array|min:1',
-            'hari.*' => 'required|string|max:20',
+            'hari.*' => 'required|integer|min:1',
             'jam_kompen' => 'required|array|min:1',
             'jam_kompen.*' => 'required|integer|min:1',
             'status' => 'sometimes|in:open,close,done'
@@ -317,11 +402,18 @@ class PekerjanController extends Controller
         }
 
         $pekerjaan = PekerjaanModel::find($id);
-        $user_id = Auth::id();
+        if (!$pekerjaan) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Pekerjaan tidak ditemukan'
+            ], 404);
+        }
+
         $jumlah_jam_kompen = array_sum($request->jam_kompen);
 
         DB::beginTransaction();
         try {
+            // Update data pekerjaan
             $pekerjaan->update([
                 'jenis_pekerjaan' => $request->jenis_pekerjaan,
                 'pekerjaan_nama' => $request->pekerjaan_nama,
@@ -336,6 +428,7 @@ class PekerjanController extends Controller
                 ]);
             }
 
+            // Update persyaratan jika ada
             if (!empty($request->persyaratan)) {
                 DB::table('persyaratan')
                     ->where('detail_pekerjaan_id', $pekerjaan->detail_pekerjaan->detail_pekerjaan_id)
@@ -350,6 +443,7 @@ class PekerjanController extends Controller
                 }
             }
 
+            // Update kompetensi jika ada
             if (!empty($request->kompetensi_id)) {
                 foreach ($request->kompetensi_id as $kompetensiId) {
                     DB::table('kompetensi_dosen')->updateOrInsert([
@@ -359,14 +453,51 @@ class PekerjanController extends Controller
                 }
             }
 
+            // Update progres
+            $existingProgres = $pekerjaan->progres()->orderBy('deadline', 'asc')->get();
+
             foreach ($request->judul_progres as $index => $judul) {
-                ProgresModel::updateOrCreate(
-                    ['pekerjaan_id' => $pekerjaan->pekerjaan_id, 'judul_progres' => $judul],
-                    [
-                        'hari' => $request->hari[$index],
-                        'jam_kompen' => $request->jam_kompen[$index]
-                    ]
-                );
+                $hari = $request->hari[$index];
+                $jamKompen = $request->jam_kompen[$index];
+
+                if (isset($existingProgres[$index])) {
+                    $previousDeadline = $index > 0
+                        ? Carbon::parse($existingProgres[$index - 1]->deadline)
+                        : Carbon::now();
+
+                    $newDeadline = $previousDeadline->copy()->addDays($hari);
+
+                    // Update progres yang relevan
+                    $existingProgres[$index]->update([
+                        'judul_progres' => $judul,
+                        'hari' => $hari,
+                        'jam_kompen' => $jamKompen,
+                        'deadline' => $newDeadline,
+                    ]);
+                } else {
+                    $lastDeadline = $index > 0
+                        ? Carbon::parse($existingProgres[$index - 1]->deadline)
+                        : Carbon::now();
+
+                    $newDeadline = $lastDeadline->copy()->addDays($hari);
+
+                    // Tambahkan progres baru
+                    ProgresModel::create([
+                        'pekerjaan_id' => $pekerjaan->pekerjaan_id,
+                        'judul_progres' => $judul,
+                        'hari' => $hari,
+                        'jam_kompen' => $jamKompen,
+                        'deadline' => $newDeadline,
+                    ]);
+                }
+            }
+
+            // Update akumulasi_deadline
+            $latestProgres = $pekerjaan->progres()->orderBy('deadline', 'desc')->first();
+            if ($latestProgres) {
+                $pekerjaan->update([
+                    'akumulasi_deadline' => $latestProgres->deadline,
+                ]);
             }
 
             DB::commit();
@@ -383,7 +514,6 @@ class PekerjanController extends Controller
             ], 500);
         }
     }
-
     public function get_anggota($id)
     {
         $anggotaJumlah = ApprovePekerjaanModel::where('pekerjaan_id', $id)->count();
@@ -405,5 +535,217 @@ class PekerjanController extends Controller
     {
         $jumlah = PendingPekerjaanModel::where('pekerjaan_id', $id)->count();
         return response()->json(['jumlah' => $jumlah]);
+    }
+
+    public function mulai($id)
+    {
+        // Ambil data pekerjaan berdasarkan ID
+        $pekerjaan = PekerjaanModel::find($id);
+
+        if (!$pekerjaan) {
+            return redirect()->route('dosen.index')->with('error', 'Pekerjaan tidak ditemukan.');
+        }
+
+        // Ambil data progres berdasarkan pekerjaan_id dan urutkan
+        $progresList = ProgresModel::where('pekerjaan_id', $id)->orderBy('progres_id')->get();
+
+        if ($progresList->isEmpty()) {
+            return redirect()->route('dosen.index')->with('error', 'Tidak ada progres untuk pekerjaan ini.');
+        }
+
+        // Inisialisasi deadline pertama dari waktu saat ini
+        $deadlinepertama = Carbon::now();
+
+        // Iterasi setiap progres untuk memperbarui deadline dan menghitung akumulasi deadline
+        foreach ($progresList as $progres) {
+            // Mengambil jumlah hari dari setiap progres
+            $hari = $progres->hari;
+
+            // Menambahkan hari ke deadline
+            $deadlineBaru = $deadlinepertama->copy()->addDays($hari);
+
+            // Update deadline untuk progres ini
+            $progres->update([
+                'deadline' => $deadlineBaru,
+            ]);
+
+            // Set deadline pertama untuk progres berikutnya
+            $deadlinepertama = $deadlineBaru;
+        }
+
+        // Update akumulasi_deadline pada tabel pekerjaan (berisi deadline terakhir)
+        $pekerjaan->update([
+            'akumulasi_deadline' => $deadlinepertama,  // Menggunakan deadline terakhir
+        ]);
+
+        // Kirimkan pesan sukses melalui session
+        return redirect()->route('dosen.index')->with('success', 'Pekerjaan telah dimulai, semua progres sudah diperbarui!');
+    }
+
+    public function enter_progres($id)
+    {
+        $breadcrumg = (object) [
+            'title' => 'Progres',
+            'list' => ['Home', 'Tambah Pekerjaan', 'Progres']
+        ];
+
+        $page = (object)[
+            'title' => 'Page Progres',
+        ];
+
+        $activeMenu = 'dosen';
+        $pengumpulan = PengumpulanModel::with('user', 'progres')->where('progres_id', $id)->first();
+        $progres = ProgresModel::where('progres_id', $id)->first();
+        return view('dosen.progres', ['breadcrumb' => $breadcrumg, 'page' => $page, 'activeMenu' => $activeMenu, 'pengumpulan' => $pengumpulan, 'progres' => $progres]);
+    }
+
+    public function list(Request $request, $id)
+    {
+        $pengumpulan = PengumpulanModel::with('user', 'progres') // Ambil relasi user dan progres
+            ->where('progres_id', $id);
+
+        return DataTables::of($pengumpulan)
+            ->addIndexColumn()
+            ->addColumn('username', function ($pengumpulan) {
+                return $pengumpulan->user->username ?? '-';
+            })
+            ->addColumn('nama', function ($pengumpulan) {
+                return $pengumpulan->user->nama ?? '-';
+            })
+            ->addColumn('status', function ($pengumpulan) {
+                if ($pengumpulan->status === 'pending') {
+                    return 'Sudah Diserahkan';
+                } elseif ($pengumpulan->status === 'accept') {
+                    // Jika status 'accept', tampilkan 'Sudah Dinilai' dan jumlah 'jam_kompen'
+                    return 'Sudah Dinilai : ' . ($pengumpulan->progres->jam_kompen ?? 0);
+                } else {
+                    // Jika status selain 'pending' dan 'accept', tampilkan 0
+                    return 'Sudah Dinilai : 0';
+                }
+            })
+
+            ->addColumn('aksi', function ($pengumpulan) {
+                $btn  = '<button onclick="modalAction(\'' . url('/dosen/' . $pengumpulan->pengumpulan_id .
+                    '/detail-progres') . '\')" class="btn btn-info btn-sm">Detail</button> ';
+                return $btn;
+            })
+            ->rawColumns(['aksi'])
+            ->make(true);
+    }
+
+    public function detail_progres($id)
+    {
+        $pengumpulan = PengumpulanModel::with('user', 'progres')->where('pengumpulan_id', $id)->find($id);
+        return view('dosen.detail_progres', ['pengumpulan' => $pengumpulan]);
+    }
+
+    public function approve($id)
+    {
+        DB::beginTransaction(); // Mulai transaksi
+        try {
+            // Ambil data pengumpulan yang terkait dengan progres dan user
+            $pengumpulan = PengumpulanModel::with('user', 'progres')->findOrFail($id);
+
+            if (!$pengumpulan->progres || !$pengumpulan->user) {
+                DB::rollBack(); // Rollback jika ada kesalahan
+                return response()->json(['error' => 'Data progres atau user tidak ditemukan.'], 404);
+            }
+
+            // Mengubah status pengumpulan menjadi 'accept'
+            $pengumpulan->status = 'accept';
+            $pengumpulan->save();
+
+            // Mengakses user yang terkait dengan pengumpulan
+            $user = $pengumpulan->user;
+
+            $userId = $user->user_id;
+            $pekerjaanId = $pengumpulan->progres->pekerjaan_id;
+            // Mengakses jam_kompen yang terkait dengan user
+            $jamKompen = $user->jamKompen;
+
+
+            if ($jamKompen) {
+                // Mengambil nilai akumulasi_jam
+                $currentAkumulasiJam = $jamKompen->akumulasi_jam;
+                $jamKompenProgres = $pengumpulan->progres->jam_kompen; // Jam kompen yang diambil dari progres
+                // Mengecek apakah cukup untuk mengurangi
+                if ($currentAkumulasiJam >= $jamKompenProgres) {
+                    // Kurangi akumulasi_jam
+                    $jamKompen->akumulasi_jam -= $jamKompenProgres;
+                    $jamKompen->save(); // Simpan perubahan
+                } else {
+                    // Set akumulasi_jam menjadi 0 jika tidak cukup
+                    $jamKompen->akumulasi_jam = 0;
+                    $jamKompen->save();
+                }
+
+                notifikasiModel::create([
+                    'user_id' => $userId,
+                    'pekerjaan_id' => $pekerjaanId,
+                    'pesan' => 'Jam Kompen Anda Berkurang!!, pengumpulan anda telah dinilai',
+                    'status' => 'belum',
+                    'user_id_kap' => null
+                ]);
+
+                DB::commit(); // Commit jika berhasil
+                return response()->json(['message' => 'Tugas berhasil disetujui.']);
+            } else {
+                DB::rollBack(); // Rollback jika jamKompen tidak ditemukan
+                return response()->json(['error' => 'Jam Kompen tidak ditemukan untuk user tersebut.'], 404);
+            }
+        } catch (\Exception $e) {
+            DB::rollBack(); // Rollback transaksi jika terjadi error
+            return response()->json(['error' => 'Terjadi kesalahan saat menyetujui tugas: ' . $e->getMessage()], 500);
+        }
+    }
+
+    public function decline($id)
+    {
+        $pengumpulan = PengumpulanModel::with('user', 'progres')->findOrFail($id);
+        $pengumpulan->status = 'decline';
+        $pengumpulan->save();
+
+        $userId = $pengumpulan->user->user_id;
+        $pekerjaanId = $pengumpulan->progres->pekerjaan_id;
+        notifikasiModel::create([
+            'user_id' => $userId,
+            'pekerjaan_id' => $pekerjaanId,
+            'pesan' => 'Mohon Maaf Pengumpulan anda ditolak, coba kumpulkan pekerjaan dengan baik',
+            'status' => 'belum',
+            'user_id_kap' => null
+        ]);
+
+        return response()->json(['message' => 'Tugas berhasil disetujui.']);
+    }
+
+    public function checkProgressAndShowButton($id)
+    {
+        $userId = Auth::id();
+
+        // Mengambil semua progres yang terkait dengan pekerjaan dan pengguna yang login
+        $progres = ProgresModel::where('pekerjaan_id', $id)
+            ->where('user_id', $userId)
+            ->get();
+
+        // Mengecek apakah semua progres memiliki status selain 'pending'
+        $allCompleted = $progres->every(function ($item) {
+            return $item->status !== 'pending'; // Memastikan status bukan pending
+        });
+
+        // Mengecek apakah semua pengumpulan (tugas) sudah diterima dan bukan 'pending'
+        $pengumpulan = PengumpulanModel::where('user_id', $userId)
+            ->where('pekerjaan_id', $id)
+            ->get();
+
+        $allPengumpulanAccepted = $pengumpulan->every(function ($item) {
+            return $item->status !== 'pending'; // Memastikan status bukan pending
+        });
+
+        // Debugging untuk memastikan data dikirim
+        Log::debug('Progres Status: ' . $allCompleted . ', Pengumpulan Status: ' . $allPengumpulanAccepted);
+
+        return response()->json([
+            'status' => $allCompleted && $allPengumpulanAccepted
+        ]);
     }
 }

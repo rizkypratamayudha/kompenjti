@@ -1,4 +1,4 @@
-<aside class="main-sidebar sidebar-dark-primary elevation-4">
+<aside class="main-sidebar sidebar-dark-primary elevation-4 posti">
     <!-- Brand Logo -->
     <a href="{{ url('/') }}" class="brand-link">
         <img src="{{ asset('logo.png') }}" alt="AdminLTE Logo" class="brand-image" style="opacity: .8">
@@ -33,9 +33,24 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="{{ url('/riwayat') }}" class="nav-link {{ $activeMenu == 'riwayat' ? 'active' : '' }}">
+                        <a href="{{ url('/lihat') }}" class="nav-link {{ $activeMenu == 'riwayat' ? 'active' : '' }}">
                             <i class="nav-icon fas fa-history"></i>
-                            <p>Riwayat Kompensasi</p>
+                            <p>Lihat Kompensasi</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url('/admintambah') }}" class="nav-link {{ $activeMenu == 'admintambah' ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-plus"></i>
+                            <p>Tambah Kompensasi
+                                <span class="badge badge-danger badge-pelamar-admin position-absolute top-0 start-100 translate-middle rounded-pill">
+                                </span>
+                            </p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url('/riwayatkompen') }}" class="nav-link {{ $activeMenu == 'riwayatkompen' ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-envelope"></i>
+                            <p>Riwayat Cetak Surat</p>
                         </a>
                     </li>
                     <li class="nav-header">Validasi Registrasi</li>
@@ -111,17 +126,22 @@
                             <i class="nav-icon fas fa-plus"></i>
                             <p>
                                 Tambah Pekerjaan
-                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                <span class="badge badge-danger badge-pelamar position-absolute top-0 start-100 translate-middle rounded-pill">
                                 </span>
                             </p>
                         </a>
                     </li>
-
                     <li class="nav-item">
-                        <a href="{{ url('/riwayatPekerjaan') }}"
-                            class="nav-link {{ $activeMenu == 'riwayatPek' ? 'active' : '' }}">
+                        <a href="{{ url('/alphadosen') }}"
+                            class="nav-link {{ $activeMenu == 'alphadosen' ? 'active' : '' }}">
                             <i class="nav-icon fas fa-history"></i>
-                            <p>Riwayat</p>
+                            <p>Data Alpha Mahasiswa</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url('/riwayatkompen') }}" class="nav-link {{ $activeMenu == 'riwayatkompen' ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-envelope"></i>
+                            <p>Riwayat Cetak Surat</p>
                         </a>
                     </li>
                 @elseif (Auth::user()->level_id == 3)
@@ -149,10 +169,19 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a href="{{ url('/surat') }}"
+                            class="nav-link {{ $activeMenu == 'surat' ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-envelope"></i>
+                            <p>Permintaan Surat</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a href="{{ url('/notifikasi') }}"
                             class="nav-link {{ $activeMenu == 'notifikasi' ? 'active' : '' }}">
                             <i class="nav-icon fas fa-bell"></i>
                             <p>Notifikasi</p>
+                            <span class="badge badge-danger badge-notifikasi position-absolute top-0 start-100 translate-middle rounded-pill">
+                            </span>
                         </a>
                     </li>
                     <li class="nav-header">Manage Kompetensi</li>
@@ -193,42 +222,44 @@
     </div>
     <!-- /.sidebar -->
 </aside>
-
-
 @push('js')
-    <script>
-        $(document).ready(function() {
+<script>
+    $(document).ready(function () {
+        // Fungsi untuk memperbarui badge
+        function updateBadge(url, selector) {
             $.ajax({
-                url: '{{ url('/hitung-notif') }}',
+                url: url,
                 method: 'GET',
-                success: function(response) {
-                    var jumlahNotif = response.jumlah;
-                    if (jumlahNotif > 99) {
-                        $('.badge').text('99+');
-                    } else if (jumlahNotif == 0) {
-                        $('.badge').remove(); // Menghapus elemen span badge
-                    } else {
-                        $('.badge').text(jumlahNotif);
-                    }
-                }
-            });
-        });
+                success: function (response) {
+                    const jumlahNotif = response.jumlah;
+                    const badge = $(selector);
 
-        $(document).ready(function() {
-            $.ajax({
-                url: '{{ url('/hitung-notif-pelamar') }}', // Sesuaikan URL di sini
-                method: 'GET',
-                success: function(response) {
-                    var jumlahNotif = response.jumlah;
-                    if (jumlahNotif > 99) {
-                        $('.badge').text('99+');
-                    } else if (jumlahNotif == 0) {
-                        $('.badge').remove(); // Menghapus elemen span badge
-                    } else {
-                        $('.badge').text(jumlahNotif);
+                    if (badge.length === 0) {
+                        console.warn("Elemen badge tidak ditemukan:", selector);
+                        return;
                     }
+
+                    // Tampilkan atau sembunyikan badge berdasarkan jumlah notifikasi
+                    if (jumlahNotif > 99) {
+                        badge.text('99+').show();
+                    } else if (jumlahNotif > 0) {
+                        badge.text(jumlahNotif).show();
+                    } else {
+                        badge.hide();
+                    }
+                },
+                error: function () {
+                    console.error("Gagal memuat data dari URL:", url);
                 }
             });
-        });
-    </script>
+        }
+
+        // Panggil fungsi untuk badge pelamar pekerjaan
+        updateBadge('{{ url('/hitung-notif-pelamar') }}', '.badge-pelamar');
+        updateBadge('{{ url('/hitung-notif-pelamar-admin') }}', '.badge-pelamar-admin');
+        updateBadge('{{ url('/hitung-notif') }}', '.badge');
+        updateBadge('{{ url('/hitung-notif-notifikasi') }}', '.badge-notifikasi');
+    });
+</script>
+
 @endpush

@@ -23,62 +23,163 @@
                                 <i class="fa-regular fa-file"></i>
                             </div>
                             <div class="flex-grow-1">
-                                <h4 class="mb-0">Progres : {{$progres->judul_progres}}</h4>
+                                <h4 class="mb-0">Progres : {{ $progres->judul_progres }}</h4>
                                 <div class="text-secondary">
-                                    <small>{{$progres->pekerjaan->user->nama}} • {{$progres->pekerjaan->created_at->locale('in_id')->diffForHumans()}}</small>
+                                    <small>{{ $progres->pekerjaan->user->nama }} •
+                                        {{ $progres->pekerjaan->created_at->locale('in_ID')->diffForHumans() }}</small>
                                 </div>
                             </div>
                             <div class="ms-auto px-4">
                                 <p class="mb-0">Deadline : @if ($progres->deadline)
-                                    {{$progres->deadline}}
-                                @endif - </p>
+                                        {{ \Carbon\Carbon::parse($progres->deadline)->format('d M Y, H:i') }}
+                                    @endif
+                                </p>
                             </div>
+
                         </div>
 
                         <!-- Comments Section -->
                         <div class="mt-4">
                             <div class="d-flex align-items-center gap-2">
                                 <i class="fa-solid fa-hourglass mr-2" style="color: #1a73e8"></i>
-                                <span class="text-secondary">Nilai Progres : {{$progres->jam_kompen}}</span>
+                                <span class="text-secondary">Nilai Progres : {{ $progres->jam_kompen }}</span>
                             </div>
                         </div>
                     </div>
 
                     <!-- Right Sidebar -->
                     <div class="col-md-4">
+                        <!-- Dropdown Section -->
                         <div class="card mb-3">
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-center mb-3">
                                     <h6 class="mb-0">Pekerjaan</h6>
-                                    <span class="text-secondary">Belum diserahkan</span>
+                                    @if ($pengumpulan == null)
+                                        <span class="text-secondary">
+                                            Belum diserahkan
+                                        </span>
+                                    @else
+                                        <span class="text-secondary">
+                                            Telah dinilai :
+                                            @if ($pengumpulan->status == 'pending')
+                                                -
+                                            @elseif ($pengumpulan->status == 'accept')
+                                                {{ $progres->jam_kompen }}
+                                            @elseif ($pengumpulan->status == 'decline')
+                                                0
+                                            @endif
+                                        </span>
+                                    @endif
                                 </div>
-                                <div class="text-center"> <!-- Added container for centering -->
-                                    <a href="#" class="text-decoration-none text-blue">
-                                        <div class="d-flex align-items-center justify-content-center border rounded p-2 hover-effect">
-                                            <i class="fa-solid fa-plus me-2"></i>
-                                            <span class="fs-6"> Tambah / Buat</span>
+                                <div class="text-center">
+                                    @if ($pengumpulan == null)
+                                        <!-- Dropdown -->
+                                        <div class="dropdown">
+                                            {{-- @php
+                                                $isExpired =
+                                                    $progres->deadline &&
+                                                    \Carbon\Carbon::now()->greaterThan(
+                                                        \Carbon\Carbon::parse($progres->deadline),
+                                                    );
+                                            @endphp --}}
+
+                                            <button class="btn btn-primary dropdown-toggle w-100" type="button"
+                                                id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                                {{-- {{ $isExpired ? 'disabled' : '' }}> --}}
+                                                <i class="fa-solid fa-plus me-2"></i> Tambah atau Buat
+                                            </button>
+
+
+                                            <ul class="dropdown-menu w-100" aria-labelledby="dropdownMenuButton">
+                                                <li>
+                                                    <a class="dropdown-item d-flex align-items-center gap-4"
+                                                        onclick="modalAction('{{ url('/riwayat/' . $progres->progres_id . '/link_ajax') }}')"
+                                                        href="#">
+                                                        <i class="fa-solid fa-link"></i>
+                                                        Link
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item d-flex align-items-center gap-4" href="#"
+                                                        onclick="modalAction('{{ url('/riwayat/' . $progres->progres_id . '/gambar_ajax') }}')">
+                                                        <i class="fa-regular fa-image"></i>
+                                                        Gambar
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item d-flex align-items-center gap-4" href="#"
+                                                        onclick="modalAction('{{ url('/riwayat/' . $progres->progres_id . '/file_ajax') }}')">
+                                                        <i class="fa-solid fa-paperclip"></i>
+                                                        File
+                                                    </a>
+                                                </li>
+                                            </ul>
                                         </div>
-                                    </a>
                                 </div>
-                                <div class="mt-3">
-                                    <button class="btn btn-link text-danger w-100">Batalkan pengiriman</button>
+                                @endif
+
+                                @if ($pengumpulan != null)
+                                <div class="mt-5 mb-2">
+                                    <button class="btn btn-danger w-100"
+                                        @if ($pengumpulan->status == 'accept')
+                                            disabled
+                                        @endif
+                                        onclick="modalAction('{{ url('/riwayat/' . $progres->progres_id . '/hapus_ajax') }}')">
+                                        Batalkan pengiriman
+                                    </button>
                                 </div>
+                            @endif
+
                             </div>
                         </div>
 
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="d-flex align-items-center gap-2">
-                                    <i class="bi bi-person-circle"></i>
-                                    <span>Komentar pribadi</span>
-                                </div>
-                                <a href="#" class="text-decoration-none">Tambahkan komentar untuk {{$progres->pekerjaan->user->nama}}</a>
+                        <div class="card-body">
+                            <div class="d-flex align-items-center gap-2">
+                                <span>Bukti pekerjaan yang dikumpulkan : </span>
                             </div>
+
+                            @if ($pengumpulan && $pengumpulan->bukti_pengumpulan)
+                            @if (str_starts_with($pengumpulan->bukti_pengumpulan, 'https://'))
+                                <!-- If the bukti_pengumpulan is a URL that starts with 'https://' -->
+                                <a class="text-decoration-none" href="{{ $pengumpulan->bukti_pengumpulan }}">
+                                    {{ $pengumpulan->bukti_pengumpulan }}
+                                </a>
+                            @elseif(str_starts_with($pengumpulan->bukti_pengumpulan, 'pengumpulan_gambar/'))
+                                <!-- If bukti_pengumpulan is an image stored in 'pengumpulan_gambar/' -->
+                                <img class="text-decoration-none mt-3"
+                                    src="{{ asset('storage/' . $pengumpulan->bukti_pengumpulan) }}"
+                                    style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px;">
+                            @elseif(str_starts_with($pengumpulan->bukti_pengumpulan, 'pengumpulan_file/'))
+                                <!-- If bukti_pengumpulan is a file stored in 'pengumpulan_file/' -->
+                                @php
+                                    // Extract the original file name by getting the last part of the path
+                                    $filePath = storage_path('app/public/' . $pengumpulan->bukti_pengumpulan);
+                                    $fileName = $pengumpulan->namaoriginal
+                                @endphp
+                                <i class="fa fa-file-pdf" style="color: red"></i>
+                                <a class="text-decoration-none mt-3"
+                                    href="{{ asset('storage/' . $pengumpulan->bukti_pengumpulan) }}"
+                                    download="{{ $fileName }}">
+                                    {{ $fileName }}
+
+                                </a>
+                            @else
+                                <!-- If bukti_pengumpulan does not match any of the conditions above, display '-' -->
+                                <span>-</span>
+                            @endif
+                        @else
+                            <!-- If $pengumpulan or bukti_pengumpulan is not found -->
+                            <span>-</span>
+                        @endif
                         </div>
+
                     </div>
                 </div>
             </div>
+            <div id="myModal" class="modal fade animate shake" tabindex="-1" role="dialog" data-backdrop="static"
+                data-keyboard="false" data-width="75%" aria-hidden="true"></div>
 
+            <!-- Styles -->
             <style>
                 .assignment-icon {
                     width: 40px;
@@ -91,11 +192,61 @@
                     border-radius: 50%;
                 }
 
+                .dropdown-menu {
+                    text-align: center;
+                }
+
+                .dropdown-item {
+                    padding: 10px 15px;
+                    transition: background-color 0.3s ease;
+                }
+
+                .dropdown-item:hover {
+                    background-color: #f8f9fa;
+                }
+
                 .hover-effect:hover {
                     background-color: #f8f9fa;
                     cursor: pointer;
                 }
+
+                .dropdown-item i {
+                    margin-right: 15px;
+                    /* Atur jarak ikon dengan teks */
+                }
             </style>
         </div>
     </div>
+
+    <!-- Include Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
 @endsection
+
+@push('js')
+    <script>
+        function modalAction(url = '') {
+            $('#myModal').load(url, function() {
+                $('#myModal').modal('show');
+            });
+        }
+
+        const serverTimeUrl = "{{ route('server-time') }}";
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const button = document.getElementById('dropdownMenuButton');
+            const deadline = new Date("{{ $progres->deadline }}"); // Ambil deadline dari backend
+
+            fetch(serverTimeUrl)
+                .then(response => response.json())
+                .then(data => {
+                    const serverTime = new Date(data.server_time); // Waktu server dari API
+                    if (serverTime > deadline) {
+                        button.disabled = true; // Nonaktifkan tombol jika waktu server melebihi deadline
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching server time:', error);
+                });
+        });
+    </script>
+@endpush

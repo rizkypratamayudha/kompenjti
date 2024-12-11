@@ -77,6 +77,7 @@
         <thead> 
             <tr> 
                 <th class="text-center">No</th> 
+                <th>Kode Mata Kuliah</th> 
                 <th>Nama Mata Kuliah</th> 
             </tr> 
         </thead>  
@@ -84,6 +85,7 @@
             @foreach($matkul as $l) 
             <tr> 
                 <td class="text-center">{{ $loop->iteration }}</td> 
+                <td>{{ $l->matkul_kode }}</td> 
                 <td>{{ $l->matkul_nama }}</td> 
             </tr> 
             @endforeach 
