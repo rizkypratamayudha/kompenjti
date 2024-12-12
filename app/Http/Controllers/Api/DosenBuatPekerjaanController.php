@@ -27,6 +27,8 @@ class DosenBuatPekerjaanController extends Controller
                 'pekerjaan_id' => $item->pekerjaan_id,
                 'pekerjaan_nama' => $item->pekerjaan_nama,
                 'jumlah_anggota' => $detailPekerjaan ? $detailPekerjaan->jumlah_anggota : 0, // Nilai default 0 jika tidak ada data
+                'akumulasi_deadline' => $item->akumulasi_deadline,
+                'status' => $item->status,
             ];
         });
 
@@ -488,6 +490,76 @@ class DosenBuatPekerjaanController extends Controller
                 'error' => $e->getMessage(),
                 'line' => $e->getLine(),
                 'file' => $e->getFile(),
+            ], 500);
+        }
+    }
+
+    public function updateStatus(Request $request, $pekerjaanId)
+    {
+        $status = $request->input('status'); // Status baru (open atau closed)
+
+        // Validasi input
+        if (!in_array($status, ['open', 'close'])) {
+            return response()->json(['message' => 'Status tidak valid'], 400);
+        }
+
+        // Cari pekerjaan berdasarkan ID
+        $pekerjaan = PekerjaanModel::find($pekerjaanId);
+
+        if (!$pekerjaan) {
+            return response()->json(['message' => 'Pekerjaan tidak ditemukan'], 404);
+        }
+
+        // Update status pekerjaan
+        $pekerjaan->status = $status;
+        $pekerjaan->save();
+
+        return response()->json([
+            'message' => 'Status pekerjaan berhasil diperbarui',
+            'status' => $status,
+        ]);
+    }
+
+    public function delete($id)
+    {
+        try {
+            // Mulai transaksi
+            DB::beginTransaction();
+
+            // Cari pekerjaan berdasarkan ID
+            $pekerjaan = PekerjaanModel::findOrFail($id);
+
+            // Hapus data terkait di tabel kompetensi_dosen
+            $detailPekerjaan = detail_pekerjaanModel::where('pekerjaan_id', $pekerjaan->pekerjaan_id)->first();
+            if ($detailPekerjaan) {
+                kompetensi_dosenModel::where('detail_pekerjaan_id', $detailPekerjaan->detail_pekerjaan_id)->delete();
+
+                // Hapus data terkait di tabel persyaratan
+                PersyaratanModel::where('detail_pekerjaan_id', $detailPekerjaan->detail_pekerjaan_id)->delete();
+
+                // Hapus data detail pekerjaan
+                $detailPekerjaan->delete();
+            }
+
+            // Hapus data terkait di tabel progress
+            ProgresModel::where('pekerjaan_id', $pekerjaan->pekerjaan_id)->delete();
+
+            // Hapus pekerjaan
+            $pekerjaan->delete();
+
+            // Commit transaksi
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Pekerjaan berhasil dihapus',
+            ], 200);
+        } catch (\Exception $e) {
+            // Rollback jika terjadi error
+            DB::rollBack();
+
+            return response()->json([
+                'message' => 'Terjadi kesalahan saat menghapus pekerjaan',
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
