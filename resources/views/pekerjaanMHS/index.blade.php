@@ -58,14 +58,22 @@
                                         {{ $item->detail_pekerjaan->jumlah_anggota }}
                                     </small>
 
-
-                                    <a href="javascript:void(0)"
-                                        onclick="checkIfAppliedAndOpenModal({{ $item->pekerjaan_id }})"
-                                        class="btn btn-outline-success btn-sm" id="apply-btn-{{ $item->pekerjaan_id }}"
-                                        data-max-anggota="{{ $item->detail_pekerjaan->jumlah_anggota }}">
-                                        Apply
-                                    </a>
-
+                                    @if ($item->t_pending_pekerjaan->contains('user_id', auth()->id()))
+                                        <!-- Tombol untuk membatalkan pelamaran -->
+                                        <a href="javascript:void(0)" onclick="cancelApply({{ $item->pekerjaan_id }})"
+                                            class="btn btn-outline-danger btn-sm"
+                                            id="cancel-btn-{{ $item->pekerjaan_id }}">
+                                            Batalkan Pelamaran
+                                        </a>
+                                    @else
+                                        <!-- Tombol untuk melamar pekerjaan -->
+                                        <a href="javascript:void(0)"
+                                            onclick="checkIfAppliedAndOpenModal({{ $item->pekerjaan_id }})"
+                                            class="btn btn-outline-success btn-sm" id="apply-btn-{{ $item->pekerjaan_id }}"
+                                            data-max-anggota="{{ $item->detail_pekerjaan->jumlah_anggota }}">
+                                            Apply
+                                        </a>
+                                    @endif
                                 </div>
                                 <div class="d-flex justify-content-between align-items-center">
                                     <small class="text-muted">Jumlah Nilai Jam Kompen :
@@ -124,11 +132,11 @@
                         confirmButtonText: 'OK'
                     });
                 } else if (response.isApprove) {
-                    applyBtn.prop('disabled', true).text('Diterima');
+                    applyBtn.prop('disabled', true).text('diterima');
                     Swal.fire({
                         icon: 'success',
                         title: 'Sudah Disetujui',
-                        text: 'Anda sudah diterima oleh dosen pada pekerjaan ini.',
+                        text: 'Anda sudah diterima pada pekerjaan, harap selesaikan pekerjaan anda',
                         confirmButtonText: 'OK'
                     });
                 } else {
@@ -158,6 +166,62 @@
                 });
             });
         }
+
+        function cancelApply(pekerjaanId) {
+            Swal.fire({
+                title: 'Apakah Anda yakin?',
+                text: "Anda akan membatalkan lamaran untuk pekerjaan ini!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Ya, batalkan!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '{{ route('cancelApply') }}', // Route untuk membatalkan apply
+                        method: 'POST',
+                        data: {
+                            pekerjaan_id: pekerjaanId,
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success: function(response) {
+                            if (response.status) {
+                                Swal.fire(
+                                    'Dibatalkan!',
+                                    'Lamaran Anda telah dibatalkan.',
+                                    'success'
+                                );
+                                // Ganti tombol menjadi "Apply" kembali
+                                $('#cancel-btn-' + pekerjaanId).replaceWith(`
+                            <a href="javascript:void(0)"
+                               onclick="checkIfAppliedAndOpenModal(${pekerjaanId})"
+                               class="btn btn-outline-success btn-sm" id="apply-btn-${pekerjaanId}"
+                               data-max-anggota="">
+                               Apply
+                            </a>
+                        `);
+                                loadAnggota(pekerjaanId);
+                            } else {
+                                Swal.fire(
+                                    'Gagal!',
+                                    'Gagal membatalkan lamaran. Silakan coba lagi.',
+                                    'error'
+                                );
+                            }
+                        },
+                        error: function() {
+                            Swal.fire(
+                                'Error!',
+                                'Terjadi kesalahan. Silakan coba lagi.',
+                                'error'
+                            );
+                        }
+                    });
+                }
+            });
+        }
+
 
 
         // Fungsi untuk memuat jumlah anggota

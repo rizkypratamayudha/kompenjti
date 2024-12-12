@@ -24,7 +24,7 @@ class ListPekerjaanMHSController extends Controller
         ];
 
         $activeMenu = 'pekerjaan';
-        $pekerjaan = PekerjaanModel::with('detail_pekerjaan', 'progres')->where('status', 'open')->get();
+        $pekerjaan = PekerjaanModel::with('detail_pekerjaan', 'progres', 't_pending_pekerjaan')->where('status', 'open')->get();
 
         return  view('pekerjaanMHS.index', ['breadcrumb' => $breadcrumb, 'page' => $page, 'activeMenu' => $activeMenu, 'tugas' => $pekerjaan]);
     }
@@ -71,6 +71,40 @@ class ListPekerjaanMHSController extends Controller
         return back()->with('success', 'Anda Telah Berhasil Melamar Pekerjaan');
     }
 
+    public function cancelApply(Request $request)
+    {
+        $userId = Auth::id(); // Mendapatkan ID pengguna yang sedang login
+
+        // Validasi inputan
+        $validator = Validator::make($request->all(), [
+            'pekerjaan_id' => 'required|exists:pekerjaan,pekerjaan_id', // Validasi pekerjaan ID
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Validasi gagal',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        // Menghapus data lamaran berdasarkan user_id dan pekerjaan_id
+        $deleted = PendingPekerjaanModel::where('user_id', $userId)
+            ->where('pekerjaan_id', $request->pekerjaan_id)
+            ->delete();
+
+        if ($deleted) {
+            return response()->json([
+                'status' => true,
+                'message' => 'Lamaran berhasil dibatalkan.'
+            ]);
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => 'Gagal membatalkan lamaran. Data tidak ditemukan.'
+            ], 404);
+        }
+    }
     public function checkIfApplied(Request $request)
     {
         $userId = Auth::id();
@@ -80,8 +114,7 @@ class ListPekerjaanMHSController extends Controller
             ->where('user_id', $userId)
             ->exists();
 
-        $isApprove = ApprovePekerjaanModel::where('pekerjaan_id', $pekerjaanId)
-            ->where('user_id', $userId)
+        $isApprove = ApprovePekerjaanModel::where('user_id', $userId)
             ->exists();
 
         // Mengembalikan status apply dan approve
@@ -94,8 +127,9 @@ class ListPekerjaanMHSController extends Controller
         return response()->json(['isApplied' => false, 'isApprove' => false]);
     }
 
-    public function get_anggota($id){
-        $anggotaJumlah = ApprovePekerjaanModel::where('pekerjaan_id',$id)->count();
+    public function get_anggota($id)
+    {
+        $anggotaJumlah = ApprovePekerjaanModel::where('pekerjaan_id', $id)->count();
 
         return response()->json([
             'status' => true,

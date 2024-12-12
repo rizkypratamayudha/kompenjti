@@ -287,7 +287,7 @@ class PekerjanController extends Controller
             'user_id' => $request->user_id,
         ]);
 
-        PendingPekerjaanModel::where('user_id', $request->user_id)->where('pekerjaan_id', $request->pekerjaan_id)->delete();
+        PendingPekerjaanModel::where('user_id', $request->user_id)->delete();
         notifikasiModel::create([
             'user_id' => $request->user_id,
             'pekerjaan_id' => $request->pekerjaan_id,

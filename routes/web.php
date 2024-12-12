@@ -212,6 +212,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/{id}/show_ajax', [ListPekerjaanMHSController::class, 'show_ajax']);
         Route::post('/apply',[ListPekerjaanMHSController::class,'apply']);
         Route::get('/check-if-applied', [ListPekerjaanMHSController::class, 'checkIfApplied'])->name('checkIfApplied');
+        Route::post('/cancel-apply', [ListPekerjaanMHSController::class, 'cancelApply'])->name('cancelApply');
+
 
     });
     Route::group(['prefix' => 'kompetensi','middleware' => 'authorize:MHS'],function(){
