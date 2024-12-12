@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\PekerjaanModel;
 use App\Models\PengumpulanModel;
 use App\Models\ProgresModel;
+use App\Models\t_approve_cetak_model;
+use App\Models\t_pending_cetak_model;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -127,51 +130,119 @@ class MahasiswaController extends Controller
     }
 
     public function store_file(Request $request)
+    {
+        // Validate the incoming request
+        $request->validate([
+            'progres_id' => 'required|exists:progres,progres_id',
+            'file' => 'required|mimes:pdf,xlsx,docx|max:2048'
+        ]);
+
+        // Find the corresponding progress entry
+        $progres = ProgresModel::findOrFail($request->progres_id);
+
+        // Check if there's already a submission for this progress
+        if ($progres->pengumpulan_id) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Pengumpulan sudah ada untuk progres ini.'
+            ], 400); // Bad Request
+        }
+
+        // Check if the deadline has passed
+        if ($progres->deadline && Carbon::now()->greaterThan(Carbon::parse($progres->deadline))) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Aksi tidak diperbolehkan, deadline sudah terlewati.'
+            ], 403); // Forbidden
+        }
+
+        // Store the uploaded file
+        $file = $request->file('file');
+        $fileName = $file->getClientOriginalName();
+        $filePath = $file->store('pengumpulan_file', 'public'); // Store file in public storage
+
+        // Create a new submission record
+        $pengumpulan = new PengumpulanModel();
+        $pengumpulan->progres_id = $request->progres_id;
+        $pengumpulan->user_id = Auth::id(); // Get the currently authenticated user
+        $pengumpulan->bukti_pengumpulan = $filePath;
+        $pengumpulan->namaoriginal = $fileName;
+        $pengumpulan->status = 'pending'; // Set the initial status to pending
+        $pengumpulan->save();
+
+        // Return a JSON response indicating success
+        return response()->json([
+            'status' => true,
+            'message' => 'Pengumpulan berhasil disimpan.',
+            'data' => $pengumpulan // Optionally return the saved submission data
+        ], 201); // HTTP Status Code for Created
+    }
+
+    public function requestCetakSurat($pekerjaan_id)
 {
-    // Validate the incoming request
-    $request->validate([
-        'progres_id' => 'required|exists:progres,progres_id',
-        'file' => 'required|mimes:pdf,xlsx,docx|max:2048'
-    ]);
+    try {
+        $userId = Auth::id();
 
-    // Find the corresponding progress entry
-    $progres = ProgresModel::findOrFail($request->progres_id);
+        // Cek apakah pekerjaan sudah melewati akumulasi_deadline
+        $isDeadlineTerlewati = PekerjaanModel::where('pekerjaan_id', $pekerjaan_id)
+            ->where('akumulasi_deadline', '<', now())
+            ->exists();
 
-    // Check if there's already a submission for this progress
-    if ($progres->pengumpulan_id) {
+        // Validasi apakah user memiliki hak untuk mencetak surat
+        $isValid = PekerjaanModel::where('pekerjaan_id', $pekerjaan_id)
+            ->whereHas('progres.pengumpulan', function ($query) use ($userId) {
+                $query->where('user_id', $userId)
+                    ->whereIn('status', ['accept', 'decline']);
+            })
+            ->exists();
+
+        // Jika deadline terlewati dan validasi status sudah terpenuhi
+        if (!$isValid && !$isDeadlineTerlewati) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Anda tidak memiliki hak untuk membuat permintaan surat ini.'
+            ], 403);
+        }
+
+        // Cek apakah kombinasi pekerjaan_id dan user_id sudah ada
+        $isExists = t_pending_cetak_model::where('user_id', $userId)
+            ->where('pekerjaan_id', $pekerjaan_id)
+            ->exists();
+
+        if ($isExists) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Permintaan cetak surat sudah pernah dibuat.'
+            ], 400);
+        }
+
+        $isExistsapprove = t_approve_cetak_model::where('user_id', $userId)
+            ->where('pekerjaan_id', $pekerjaan_id)
+            ->exists();
+
+        if ($isExistsapprove) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Permintaan cetak surat sudah pernah dibuat dan telah disetujui Kaprodi.'
+            ], 400);
+        }
+
+        // Buat data baru jika belum ada
+        t_pending_cetak_model::create([
+            'user_id' => $userId,
+            'pekerjaan_id' => $pekerjaan_id,
+        ]);
+
         return response()->json([
-            'status' => false,
-            'message' => 'Pengumpulan sudah ada untuk progres ini.'
-        ], 400); // Bad Request
-    }
-
-    // Check if the deadline has passed
-    if ($progres->deadline && Carbon::now()->greaterThan(Carbon::parse($progres->deadline))) {
+            'status' => 'success',
+            'message' => 'Permintaan cetak surat berhasil dibuat.'
+        ], 201);
+    } catch (\Exception $e) {
         return response()->json([
-            'status' => false,
-            'message' => 'Aksi tidak diperbolehkan, deadline sudah terlewati.'
-        ], 403); // Forbidden
+            'status' => 'error',
+            'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+        ], 500);
     }
-
-    // Store the uploaded file
-    $file = $request->file('file');
-    $fileName = $file->getClientOriginalName();
-    $filePath = $file->store('pengumpulan_file', 'public'); // Store file in public storage
-
-    // Create a new submission record
-    $pengumpulan = new PengumpulanModel();
-    $pengumpulan->progres_id = $request->progres_id;
-    $pengumpulan->user_id = Auth::id(); // Get the currently authenticated user
-    $pengumpulan->bukti_pengumpulan = $filePath;
-    $pengumpulan->namaoriginal = $fileName;
-    $pengumpulan->status = 'pending'; // Set the initial status to pending
-    $pengumpulan->save();
-
-    // Return a JSON response indicating success
-    return response()->json([
-        'status' => true,
-        'message' => 'Pengumpulan berhasil disimpan.',
-        'data' => $pengumpulan // Optionally return the saved submission data
-    ], 201); // HTTP Status Code for Created
 }
+
 }
