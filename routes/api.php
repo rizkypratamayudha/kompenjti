@@ -50,6 +50,8 @@ Route::get('/pekerjaan/{id}', [DosenBuatPekerjaanController::class, 'getPekerjaa
 Route::delete('/pekerjaan/{pekerjaanId}/persyaratan/{persyaratanId}', [DosenBuatPekerjaanController::class, 'deletePersyaratan']);
 Route::delete('/pekerjaan/{pekerjaanId}/progres/{progresId}', [DosenBuatPekerjaanController::class, 'deleteProgres']);
 Route::delete('/pekerjaan/{pekerjaanId}/kompetensi/{kompetensiDosenId}', [DosenBuatPekerjaanController::class, 'deleteKompetensi']);
+Route::post('/pekerjaan/{pekerjaanId}/update-status', [DosenBuatPekerjaanController::class, 'updateStatus']);
+Route::delete('/dosen/pekerjaan/delete/{id}', [DosenBuatPekerjaanController::class, 'delete']);
 
 
 Route::middleware(['auth:api'])->group(function () {
