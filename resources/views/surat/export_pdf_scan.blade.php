@@ -160,7 +160,7 @@
         .text-kiri{
             text-align: left
         }
-        
+
         .status-column {
             width: 30%; /* Adjust width as needed */
         }
@@ -222,7 +222,7 @@
             <td>: {{ $penerimaan->pekerjaan->user->username }}</td>
         </tr>
     </table>
-    
+
 
     <p>Memberikan rekomendasi kompensasi kepada: </p>
     <table>
@@ -276,24 +276,28 @@
         </thead>
         <tbody>
             @foreach ($penerimaan->pekerjaan->progres as $progres)
-                <tr>
-                    <td>{{ $progres->judul_progres }}</td>
-                    <td>{{ $progres->jam_kompen }}</td>
-                    <td class="status-column">
-                        @php
-                            // Cari pengumpulan yang terkait dengan progres ini
-                            $status = $pengumpulan->firstWhere('progres_id', $progres->progres_id);
-                        @endphp
-                        @if ($status && $status->status == 'accept')
-                            Selesai
-                        @elseif ($status && $status->status == 'decline')
-                            Tidak selesai
-                        @else
-                            Belum Ada
-                        @endif
-                    </td>
-                </tr>
-            @endforeach
+    <tr>
+        <td>{{ $progres->judul_progres }}</td>
+        <td>{{ $progres->jam_kompen }}</td>
+        <td class="status-column">
+            @php
+                // Cari pengumpulan yang terkait dengan progres ini
+                $status = $pengumpulan->where('progres_id', $progres->progres_id)->first();
+            @endphp
+            @if ($status)
+                @if ($status->status == 'accept')
+                    Selesai
+                @elseif ($status->status == 'decline')
+                    Tidak selesai
+                @else
+                    Belum Ada
+                @endif
+            @else
+                Belum Ada
+            @endif
+        </td>
+    </tr>
+@endforeach
         </tbody>
     </table>
 

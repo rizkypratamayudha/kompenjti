@@ -421,9 +421,17 @@ class PekerjaanController extends Controller
         ], 200); // Menggunakan kode status HTTP 200 OK
     }
 
-    public function getSelesai()
+    public function getSelesai($login)
 {
     try {
+
+        $user = Auth::id();
+        if ($login!=$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'unauthorize',
+            ]);
+        }
         // Mengambil nama pengguna yang memiliki semua pengumpulan dengan status 'accept' untuk setiap progres
         $data = DB::table('m_user as u')
             ->join('pengumpulan as pg', 'u.user_id', '=', 'pg.user_id')
@@ -434,13 +442,21 @@ class PekerjaanController extends Controller
             ->havingRaw('COUNT(pr.progres_id) = (SELECT COUNT(*) FROM progres pr2 WHERE pr2.pekerjaan_id = p.pekerjaan_id)')
             ->select('u.nama', 'u.username', 'p.pekerjaan_nama')
             ->distinct() // Untuk menghindari duplikasi nama pengguna
-            ->where('p.user_id', Auth::id()) // Filter berdasarkan user yang sedang login
+            ->where('p.user_id', $login) // Filter berdasarkan user yang sedang login
             ->get();
 
-        return response()->json([
-            'success' => true,
-            'data' => $data,
-        ], 200);
+            if ($data->isEmpty()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Tidak ada data pekerjaan yang selesai.',
+                    'data' => [],
+                ], 200);
+            }else {
+                return response()->json([
+                    'success' => true,
+                    'data' => $data,
+                ], 200);
+            }
     } catch (\Exception $e) {
         return response()->json([
             'success' => false,

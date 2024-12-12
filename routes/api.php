@@ -72,7 +72,7 @@ Route::middleware(['auth:api'])->group(function () {
             Route::get('/{id}/getNilai',[PekerjaanController::class,'list']);
             Route::post('/{id}/approve-nilai',[PekerjaanController::class,'approve']);
             Route::post('/{id}/decline-nilai',[PekerjaanController::class,'decline']);
-            Route::get('/getselesai',[PekerjaanController::class,'getSelesai']);
+            Route::get('/{id}/getselesai',[PekerjaanController::class,'getSelesai']);
         });
 
     Route::group(['prefix' => 'mahasiswa'], function () {
