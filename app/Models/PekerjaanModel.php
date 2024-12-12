@@ -32,7 +32,7 @@ class PekerjaanModel extends Model
 
     public function persyaratan()
     {
-        return $this->hasManyThrough(PersyaratanModel::class, detail_pekerjaanModel::class, 'pekerjaan_id', 'detail_pekerjaan_id', 'id', 'id');
+        return $this->hasManyThrough(PersyaratanModel::class, detail_pekerjaanModel::class, 'pekerjaan_id', 'detail_pekerjaan_id', 'pekerjaan_id', 'detail_pekerjaan_id');
     }
 
     public function kompetensiDosen()
