@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\API\DashboardDsnController;
+use App\Http\Controllers\API\DashboardKapController;
 use App\Http\Controllers\Api\PekerjaanController;
 use App\Http\Controllers\Api\RegisterController;
 use App\Http\Controllers\Api\LoginController;
@@ -88,9 +89,13 @@ Route::middleware(['auth:api'])->group(function () {
     Route::group(['prefix' => 'dosen'], function () {
         Route::get('/dashboard', [DashboardDsnController::class, 'index']);
     });
-
-    Route::group(['prefix' => 'kaprodi'], function(){
+    Route::group(['prefix' => 'kaprodi'], function () {
+        Route::get('/dashboard', [DashboardKapController::class, 'index']);
         Route::get('/',[KaprodiController::class,'index']);
+        Route::get('/{id}/mhs',[KaprodiController::class,'indexmhs']);
+        Route::get('/{id}/mhssurat',[KaprodiController::class,'indexmhssurat']);
         route::post('/approvesurat',[KaprodiController::class,'approve']);
     });
+
+    Route::get('/geturl/{id}', [KaprodiController::class, 'getQrUrl']);
 });
