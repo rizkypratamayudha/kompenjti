@@ -79,6 +79,10 @@ Route::middleware(['auth:api'])->group(function () {
 
     Route::group(['prefix' => 'kaprodi'], function(){
         Route::get('/',[KaprodiController::class,'index']);
+        Route::get('/{id}/mhs',[KaprodiController::class,'indexmhs']);
+        Route::get('/{id}/mhssurat',[KaprodiController::class,'indexmhssurat']);
         route::post('/approvesurat',[KaprodiController::class,'approve']);
     });
+
+    Route::get('/geturl/{id}', [KaprodiController::class, 'getQrUrl']);
 });
