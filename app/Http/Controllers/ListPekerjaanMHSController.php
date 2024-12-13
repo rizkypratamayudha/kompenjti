@@ -6,9 +6,12 @@ use App\Models\ApprovePekerjaanModel;
 use App\Models\PekerjaanModel;
 use App\Models\PendingPekerjaanController;
 use App\Models\PendingPekerjaanModel;
+use App\Models\PengumpulanModel;
+use App\Models\ProgresModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Laravel\Prompts\Progress;
 
 class ListPekerjaanMHSController extends Controller
 {
@@ -114,7 +117,8 @@ class ListPekerjaanMHSController extends Controller
             ->where('user_id', $userId)
             ->exists();
 
-        $isApprove = ApprovePekerjaanModel::where('user_id', $userId)
+        $isApprove = ApprovePekerjaanModel::where('pekerjaan_id', $pekerjaanId)
+            ->where('user_id', $userId)
             ->exists();
 
         // Mengembalikan status apply dan approve
@@ -126,6 +130,9 @@ class ListPekerjaanMHSController extends Controller
 
         return response()->json(['isApplied' => false, 'isApprove' => false]);
     }
+
+
+
 
     public function get_anggota($id)
     {

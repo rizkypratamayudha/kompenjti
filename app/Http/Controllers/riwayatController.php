@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ApprovePekerjaanModel;
 use App\Models\PekerjaanModel;
 use App\Models\PengumpulanModel;
 use App\Models\ProgresModel;
@@ -321,6 +322,10 @@ class riwayatController extends Controller
             'user_id' => $userId,
             'pekerjaan_id' => $pekerjaan_id,
         ]);
+
+        // ApprovePekerjaanModel::where('user_id', $userId)
+        // ->where('pekerjaan_id', $pekerjaan_id)
+        // ->delete();
 
         return redirect()->back()->with('success', 'Permintaan cetak surat berhasil dibuat.');
     } catch (\Exception $e) {

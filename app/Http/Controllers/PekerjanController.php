@@ -285,6 +285,7 @@ class PekerjanController extends Controller
         ApprovePekerjaanModel::create([
             'pekerjaan_id' => $request->pekerjaan_id,
             'user_id' => $request->user_id,
+
         ]);
 
         PendingPekerjaanModel::where('user_id', $request->user_id)->delete();
