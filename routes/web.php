@@ -41,10 +41,11 @@ use App\Http\Controllers\DashboardAdminController;
 */
 
 Route::pattern('id', '[0-9]+');
+
 Route::get('login', [AuthController::class, 'login'])->name('login');
 Route::post('login', [AuthController::class, 'postlogin']);
-Route::get('register', [RegisterController::class, 'register']);
-Route::post('register', [RegisterController::class, 'store']);
+Route::get('register', [AuthController::class, 'register'])->name('register');
+Route::post('register', [AuthController::class, 'store']);
 Route::post('logout', [AuthController::class, 'logout'])->middleware('auth');
 
 Route::middleware(['auth'])->group(function () {
