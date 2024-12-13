@@ -52,7 +52,7 @@ class KaprodiController extends Controller
                 ], 403);
             }
             // Query data t_pending_cetak_model dengan filter prodi_id sesuai Kaprodi
-            $penerimaan = t_pending_cetak_model::with('user','pekerjaan')->where('user_id',$login)->get();
+            $penerimaan = t_pending_cetak_model::with('user', 'pekerjaan')->where('user_id', $login)->get();
 
             // Jika data ditemukan atau tidak ditemukan, kembalikan dengan response sukses
             return response()->json([
@@ -78,7 +78,7 @@ class KaprodiController extends Controller
                 ], 403);
             }
             // Query data t_pending_cetak_model dengan filter prodi_id sesuai Kaprodi
-            $penerimaan = t_approve_cetak_model::with('user.detailMahasiswa.prodi','user.detailMahasiswa.periode','pekerjaan.user','kaprodi')->where('user_id',$login)->get();
+            $penerimaan = t_approve_cetak_model::with('user.detailMahasiswa.prodi', 'user.detailMahasiswa.periode', 'pekerjaan.user', 'kaprodi')->where('user_id', $login)->get();
 
             // Jika data ditemukan atau tidak ditemukan, kembalikan dengan response sukses
             return response()->json([
@@ -146,15 +146,15 @@ class KaprodiController extends Controller
     }
 
     public function getQrUrl($id)
-{
-    try {
-        $user = Auth::id();
+    {
+        try {
+            $user = Auth::id();
 
-        // Retrieve the relevant data
-        $penerimaan = t_approve_cetak_model::with('pekerjaan.progres', 'user', 'kaprodi')
-            ->where('user_id', $user)
-            ->where('t_approve_cetak_id', $id)
-            ->firstOrFail();
+            // Retrieve the relevant data
+            $penerimaan = t_approve_cetak_model::with('pekerjaan.progres', 'user', 'kaprodi')
+                ->where('user_id', $user)
+                ->where('t_approve_cetak_id', $id)
+                ->firstOrFail();
 
             $pengumpulan = collect();
 
@@ -168,28 +168,55 @@ class KaprodiController extends Controller
                 $pengumpulan = $pengumpulan->merge($data);
             }
 
-        // Generate the URL for the QR code
-        $hash = hash('sha256', $penerimaan->t_approve_cetak_id);
-        $url = URL::to('surat/download-pdf/' . $hash);
+            // Generate the URL for the QR code
+            $hash = hash('sha256', $penerimaan->t_approve_cetak_id);
+            $url = URL::to('surat/download-pdf/' . $hash);
 
-        // Define the path for saving the QR code
-        $qrCodePath = public_path('storage/qrcodes/' . $penerimaan->t_approve_cetak_id . '.png');
+            // Define the path for saving the QR code
+            $qrCodePath = public_path('storage/qrcodes/' . $penerimaan->t_approve_cetak_id . '.png');
 
-        // Ensure the directory exists
-        if (!file_exists(public_path('storage/qrcodes'))) {
-            mkdir(public_path('storage/qrcodes'), 0777, true);
+            // Ensure the directory exists
+            if (!file_exists(public_path('storage/qrcodes'))) {
+                mkdir(public_path('storage/qrcodes'), 0777, true);
+            }
+
+            // Generate and save the QR code as a file
+            $qrCodeBase = QrCode::size(150)->generate($url, $qrCodePath);
+
+            // Return the public URL of the QR code
+            $qrCodeUrl = asset('storage/qrcodes/' . $penerimaan->t_approve_cetak_id . '.png');
+
+            return response()->json(['qrCodeUrl' => $url, 'pengumpulan' => $pengumpulan, 'penerimaan' => $penerimaan], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
         }
-
-        // Generate and save the QR code as a file
-        $qrCodeBase = QrCode::size(150)->generate($url, $qrCodePath);
-
-        // Return the public URL of the QR code
-        $qrCodeUrl = asset('storage/qrcodes/' . $penerimaan->t_approve_cetak_id . '.png');
-
-        return response()->json(['qrCodeUrl' => $url, 'pengumpulan'=>$pengumpulan, 'penerimaan'=>$penerimaan], 200);
-    } catch (\Exception $e) {
-        return response()->json(['error' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
     }
-}
+
+
+    public function riwayat(){
+        try{
+            $userId = Auth::id();
+
+            // Mendapatkan prodi_id dari Kaprodi yang sedang login
+            $kaprodiProdiId = Auth::user()->detailKaprodi->prodi->prodi_id;
+
+            // Query data t_pending_cetak_model dengan filter prodi_id sesuai Kaprodi
+            $penerimaan = t_approve_cetak_model::with('user','pekerjaan','kaprodi')
+            ->whereHas('user.detailMahasiswa.prodi', function ($query) use ($kaprodiProdiId) {
+                $query->where('prodi_id', $kaprodiProdiId);
+            })->get();
+
+
+            return response()->json([
+                'success' => true,
+                'data' => $penerimaan // Jika tidak ada data, data akan kosong, tapi tetap sukses
+            ], 200);
+        } catch (\Exception $e){
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 
 }
