@@ -23,9 +23,9 @@
         :root {
             --primary-blue: #024CAA;
             /* Prioritized blue */
-            --light-blue: #82C4F3;
+            --light-blue: #008DDA;
             /* Light blue */
-            --medium-blue: #008DDA;
+            --medium-blue: #82C4F3;
             /* Medium blue */
             --dark-blue: #0C356A;
             /* Dark blue */
@@ -92,7 +92,7 @@
             border-radius: 20px;
             border: 1px solid var(--medium-blue);
             /* Medium blue border */
-            background-color: var(--medium-blue);
+            background-color: var(--dark-blue);
             /* Medium blue for button background */
             color: #FFFFFF;
             font-size: 12px;
@@ -128,7 +128,7 @@
         }
 
         input {
-            background-color: var(--light-blue);
+            background-color: var(--medium-blue);
             /* Light blue for inputs */
             border: none;
             padding: 12px 15px;
@@ -359,12 +359,14 @@
                 @csrf
                 <h1 class="mb-3">Sign in</h1>
 
-                <input class="input-group mb-3" type="text" id="username" name="username"
-                    placeholder="Username atau Nim">
+                <div class="input-group mb-3">
+                <input class="input-group mb-3" type="text" id="username" name="username" placeholder="Username atau Nim">
                 <small id="error-username" class="error-text text-danger"></small>
+                </div>
+                <div class="input-group mb-3">
                 <input type="password" id="password" name="password" placeholder="Password">
                 <small id="error-password" class="error-text text-danger"></small>
-
+                </div>
                 <button type="submit" class="mt-4">Sign In</button>
             </form>
         </div>
@@ -409,7 +411,7 @@
                             style="margin-left: -40px; z-index: 100;"></span>
                     </div>
                 </div>
-                <div id="additional-fields">
+                
                     <div class="input-group mb-3" id="email-field" style="display: none;">
                         <input id="email" name="email" type="email" class="form-control" placeholder="Email"
                             required>
@@ -451,7 +453,6 @@
                         </select>
                     </div>
 
-                </div>
 
                 <button type="submit">Sign Up</button>
             </form>
@@ -465,7 +466,7 @@
 
                 </div>
                 <div class="overlay-panel overlay-right">
-                    <h1>Hello, Friend!</h1>
+                    <h1>Hello!</h1>
                     <p>Enter your personal details and start journey with us</p>
                     <button class="ghost" id="signUp">Sign Up</button>
 
