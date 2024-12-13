@@ -16,24 +16,26 @@ use Illuminate\Support\Facades\Validator;
 class AuthController extends Controller
 {
     public function login()
-    {
-        if (Auth::check()) {
-            $user = Auth::user();
+{
+    if (Auth::check()) {
+        $user = Auth::user();
 
-            // Redirect based on user's level
-            $redirectUrl = match ($user->level->kode_level) {
-                'ADM' => '/',
-                'MHS' => '/dashboardMhs',
-                'DSN' => '/dashboardDos',
-                'KPD' => '/dashboardKap',
-                default => '/',
-            };
+        // Redirect based on user's level
+        $redirectUrl = match ($user->level->kode_level) {
+            'ADM' => '/',
+            'MHS' => '/dashboardMhs',
+            'DSN' => '/dashboardDos',
+            'KPD' => '/dashboardKap',
+            default => '/register',
+        };
 
-            return redirect($redirectUrl);
-        }
-
-        return view('auth.auth');
+        return redirect($redirectUrl);
     }
+
+    // Redirect to register if not logged in
+    return redirect()->route('register');
+}
+
 
 
     public function postlogin(Request $request)
@@ -75,11 +77,11 @@ class AuthController extends Controller
         if ($level->isEmpty()) {
             return redirect()->back()->with('error', 'Data level tidak ditemukan.');
         }
-    
+
         $user = UserModel::all();
         $prodi = ProdiModel::all();
         $periode = PeriodeModel::all();
-    
+
         return view('auth.auth', [
             'level' => $level,
             'user' => $user,
@@ -87,7 +89,7 @@ class AuthController extends Controller
             'periode' => $periode,
         ]);
     }
-    
+
 
     public function store(Request $request)
     {
@@ -119,7 +121,7 @@ class AuthController extends Controller
             return response()->json([
                 'status' => true,
                 'message' => 'Data user berhasil disimpan',
-                'redirect' => url('login')
+                'redirect' => url('/')
             ]);
         }
         return redirect('auth.auth');

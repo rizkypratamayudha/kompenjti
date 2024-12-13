@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,11 +19,16 @@
     <link rel="stylesheet" href="{{ asset('adminlte/dist/css/adminlte.min.css') }}">
     <style>
         @import url('https://fonts.googleapis.com/css?family=Montserrat:400,800');
+
         :root {
-            --primary-blue: #024CAA;  /* Prioritized blue */
-            --light-blue: #82C4F3;    /* Light blue */
-            --medium-blue: #008DDA;   /* Medium blue */
-            --dark-blue: #0C356A;     /* Dark blue */
+            --primary-blue: #024CAA;
+            /* Prioritized blue */
+            --light-blue: #82C4F3;
+            /* Light blue */
+            --medium-blue: #008DDA;
+            /* Medium blue */
+            --dark-blue: #0C356A;
+            /* Dark blue */
         }
 
         /* Menggunakan warna biru yang telah didefinisikan di :root */
@@ -33,7 +39,8 @@
         }
 
         body {
-            background: var(--light-blue); /* Background light blue */
+            background: var(--light-blue);
+            /* Background light blue */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -46,13 +53,15 @@
         h1 {
             font-weight: bold;
             margin: 0;
-            color: var(--dark-blue); /* Dark blue for headers */
+            color: var(--dark-blue);
+            /* Dark blue for headers */
         }
 
         h2 {
             text-align: center;
             margin-bottom: 20px;
-            color: var(--medium-blue); /* Medium blue for sub-headers */
+            color: var(--medium-blue);
+            /* Medium blue for sub-headers */
         }
 
         p {
@@ -61,16 +70,19 @@
             line-height: 20px;
             letter-spacing: 0.5px;
             margin: 20px 0 30px;
-            color: var(--medium-blue); /* Medium blue for text */
+            color: var(--medium-blue);
+            /* Medium blue for text */
         }
 
         span {
             font-size: 12px;
-            color: var(--primary-blue); /* Primary blue for smaller text */
+            color: var(--primary-blue);
+            /* Primary blue for smaller text */
         }
 
         a {
-            color: var(--medium-blue); /* Medium blue for links */
+            color: var(--medium-blue);
+            /* Medium blue for links */
             font-size: 14px;
             text-decoration: none;
             margin: 15px 0;
@@ -78,8 +90,10 @@
 
         button {
             border-radius: 20px;
-            border: 1px solid var(--medium-blue); /* Medium blue border */
-            background-color: var(--medium-blue); /* Medium blue for button background */
+            border: 1px solid var(--medium-blue);
+            /* Medium blue border */
+            background-color: var(--medium-blue);
+            /* Medium blue for button background */
             color: #FFFFFF;
             font-size: 12px;
             font-weight: bold;
@@ -114,7 +128,8 @@
         }
 
         input {
-            background-color: var(--light-blue); /* Light blue for inputs */
+            background-color: var(--light-blue);
+            /* Light blue for inputs */
             border: none;
             padding: 12px 15px;
             margin: 8px 0;
@@ -136,7 +151,8 @@
         .form-control {
             padding: 10px;
             border-radius: 4px;
-            border: 1px solid var(--medium-blue); /* Medium blue border for form controls */
+            border: 1px solid var(--medium-blue);
+            /* Medium blue border for form controls */
             font-size: 14px;
             width: 100%;
         }
@@ -148,7 +164,8 @@
             border: 1px solid var(--medium-blue);
         }
 
-        #additional-fields .input-group input, #additional-fields select {
+        #additional-fields .input-group input,
+        #additional-fields select {
             padding: 10px;
             margin-top: 5px;
         }
@@ -156,30 +173,47 @@
         .container {
             background-color: #fff;
             border-radius: 10px;
-            box-shadow: 0 14px 28px rgba(0,0,0,0.25), 
-                0 10px 10px rgba(0,0,0,0.22);
+            box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25),
+                0 10px 10px rgba(0, 0, 0, 0.22);
             position: relative;
             width: 100%;
             max-width: 1000px;
-            min-height: 500px;
+            height: 600px;
+            /* Fixed height */
             display: flex;
             flex-direction: row;
             overflow: hidden;
         }
 
         .form-container {
-            max-height: 150vh;
             position: absolute;
-            overflow-y: auto;
-            height: 100%;
             width: 50%;
+            height: 100%;
             transition: all 0.6s ease-in-out;
-            box-sizing: border-box;
         }
 
         .form-container form {
+            height: 100%;
+            overflow-y: auto;
+            padding: 30px 50px;
+            box-sizing: border-box;
             display: flex;
             flex-direction: column;
+            align-items: center;
+        }
+
+        .form-container form::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .form-container form::-webkit-scrollbar-thumb {
+            background: var(--medium-blue);
+            border-radius: 4px;
+        }
+
+        .form-container form::-webkit-scrollbar-thumb:hover {
+            background: var(--dark-blue);
         }
 
         .sign-in-container {
@@ -205,12 +239,15 @@
         }
 
         @keyframes show {
-            0%, 49.99% {
+
+            0%,
+            49.99% {
                 opacity: 0;
                 z-index: 1;
             }
 
-            50%, 100% {
+            50%,
+            100% {
                 opacity: 1;
                 z-index: 5;
             }
@@ -232,7 +269,8 @@
         }
 
         .overlay {
-            background: var(--medium-blue); /* Medium blue background for overlay */
+            background: var(--medium-blue);
+            /* Medium blue background for overlay */
             background: -webkit-linear-gradient(to right, var(--medium-blue), var(--dark-blue));
             background: linear-gradient(to right, var(--medium-blue), var(--dark-blue));
             background-repeat: no-repeat;
@@ -298,103 +336,122 @@
             width: 40px;
         }
 
+        /* Add some spacing between form elements */
+        .input-group {
+            margin-bottom: 15px;
+            width: 100%;
+        }
 
+        .form-container form input,
+        .form-container form select,
+        .form-container form button {
+            width: 100%;
+            margin-bottom: 10px;
+        }
     </style>
 </head>
+
 <body>
-    <h2>KOMPEN JTI</h2>
+    <h2 class="mt-5">KOMPEN JTI</h2><br><br>
     <div class="container" id="container">
         <div class="form-container sign-in-container">
             <form action="{{ url('login') }}" method="POST" id="form-login">
                 @csrf
-                <h1>Sign in</h1>
-  
-                <input type="text" id="username" name="username" placeholder="Username atau Nim">
+                <h1 class="mb-3">Sign in</h1>
+
+                <input class="input-group mb-3" type="text" id="username" name="username"
+                    placeholder="Username atau Nim">
                 <small id="error-username" class="error-text text-danger"></small>
-                <input type="password" id="password" name="password"  placeholder="Password">
+                <input type="password" id="password" name="password" placeholder="Password">
                 <small id="error-password" class="error-text text-danger"></small>
 
-                <button type="submit">Sign In</button>
+                <button type="submit" class="mt-4">Sign In</button>
             </form>
         </div>
         <div class="form-container sign-up-container">
             <form action="{{ url('register') }}" method="POST" id="form-register">
                 @csrf
-                <h1>Sign up</h1>
-                    <div class="input-group mb-3">
-                        <select class="form-control" id="level_id" name="level_id" required>
-                            <option value="">- Pilih Role -</option>
-                            @if(isset($level) && $level->isNotEmpty())
-                                @foreach($level as $lvl)
-                                    <option value="{{ $lvl->level_id }}">{{ $lvl->level_nama }}</option>
+                <h1>Sign up</h1><br><br>
+                <div class="input-group mb-3">
+                    <select class="form-control" id="level_id" name="level_id" required>
+                        <option value="">- Pilih Role -</option>
+                        @if (isset($level) && $level->isNotEmpty())
+                            @foreach ($level as $lvl)
+                                <option value="{{ $lvl->level_id }}">{{ $lvl->level_nama }}</option>
+                            @endforeach
+                        @else
+                            <option value="">Level tidak tersedia</option>
+                        @endif
+                    </select>
+                </div>
+                <div class="input-group mb-3">
+                    <input id="nama" name="nama" type="text" class="form-control" placeholder="Full Name"
+                        required>
+                </div>
+                <div class="input-group mb-3">
+                    <input id="username" name="username" type="number" class="form-control" placeholder="NIM/NIP"
+                        required>
+                </div>
+                <div class="input-group mb-3">
+                    <input id="password" name="password" type="password" class="form-control" placeholder="Password"
+                        required>
+                    <div class="input-group-append">
+                        <span class="input-group-text border-0 bg-transparent"
+                            style="margin-left: -40px; z-index: 100;"></span>
+                    </div>
+                </div>
+
+                <div class="input-group mb-3">
+                    <input id="password_confirmation" type="password" class="form-control" name="password_confirmation"
+                        placeholder="Ulang Password" required>
+                    <div class="input-group-append">
+                        <span class="input-group-text border-0 bg-transparent"
+                            style="margin-left: -40px; z-index: 100;"></span>
+                    </div>
+                </div>
+                <div id="additional-fields">
+                    <div class="input-group mb-3" id="email-field" style="display: none;">
+                        <input id="email" name="email" type="email" class="form-control" placeholder="Email"
+                            required>
+                    </div>
+
+                    <div class="input-group mb-3" id="no-hp-field" style="display: none;">
+                        <input id="no_hp" name="no_hp" type="number" class="form-control" placeholder="No HP"
+                            required>
+                    </div>
+
+                    <div class="input-group mb-3" id="prodi-field" style="display: none;">
+                        <select class="form-control" id="prodi_id" name="prodi_id" required>
+                            <option value="">- Pilih Prodi -</option>
+                            @if (isset($prodi) && $prodi->isNotEmpty())
+                                @foreach ($prodi as $p)
+                                    <option value="{{ $p->prodi_id }}">{{ $p->prodi_nama }}</option>
                                 @endforeach
                             @else
-                                <option value="">Level tidak tersedia</option>
+                                <option value="">Prodi tidak tersedia</option>
                             @endif
                         </select>
                     </div>
-                    <div class="input-group mb-3">
-                        <input id="nama" name="nama" type="text" class="form-control" placeholder="Full Name" required>
-                    </div>
-                    <div class="input-group mb-3">
-                        <input id="username" name="username" type="number" class="form-control" placeholder="NIM/NIP" required>
-                    </div>
-                    <div class="input-group mb-3">
-                        <input id="password" name="password" type="password" class="form-control"
-                            placeholder="Password" required>
-                        <div class="input-group-append">
-                            <span class="input-group-text border-0 bg-transparent" style="margin-left: -40px; z-index: 100;"></span>
-                        </div>
+
+                    <div class="input-group mb-3" id="angkatan-field" style="display: none;">
+                        <input id="angkatan" name="angkatan" type="number" min="2018" max="2024"
+                            class="form-control" placeholder="Angkatan" required>
                     </div>
 
-                    <div class="input-group mb-3">
-                        <input id="password_confirmation" type="password" class="form-control"
-                            name="password_confirmation" placeholder="Ulang Password" required>
-                        <div class="input-group-append">
-                            <span class="input-group-text border-0 bg-transparent" style="margin-left: -40px; z-index: 100;"></span>
-                        </div>
+                    <div class="input-group mb-3" id="periode-field" style="display: none;">
+                        <select class="form-control" id="periode_id" name="periode_id" required>
+                            <option value="">- Pilih Periode -</option>
+                            @if (isset($periode) && $periode->isNotEmpty())
+                                @foreach ($periode as $per)
+                                    <option value="{{ $per->periode_id }}">{{ $per->periode_nama }}</option>
+                                @endforeach
+                            @else
+                                <option value="">Periode tidak tersedia</option>
+                            @endif
+                        </select>
                     </div>
-                    <div id="additional-fields">
-                        <div class="input-group mb-3" id="email-field" style="display: none;">
-                            <input id="email" name="email" type="email" class="form-control" placeholder="Email" required>
-                        </div>
 
-                        <div class="input-group mb-3" id="no-hp-field" style="display: none;">
-                            <input id="no_hp" name="no_hp" type="number" class="form-control" placeholder="No HP" required>
-                        </div>
-
-                        <div class="input-group mb-3" id="prodi-field" style="display: none;">
-                            <select class="form-control" id="prodi_id" name="prodi_id" required>
-                                <option value="">- Pilih Prodi -</option>
-                                @if(isset($prodi) && $prodi->isNotEmpty())
-                                    @foreach($prodi as $p)
-                                        <option value="{{ $p->prodi_id }}">{{ $p->prodi_nama }}</option>
-                                    @endforeach
-                                @else
-                                    <option value="">Prodi tidak tersedia</option>
-                                @endif
-                            </select>
-                        </div>
-
-                        <div class="input-group mb-3" id="angkatan-field" style="display: none;">
-                            <input id="angkatan" name="angkatan" type="number" min="2018" max="2024"
-                                class="form-control" placeholder="Angkatan" required>
-                        </div>
-
-                        <div class="input-group mb-3" id="periode-field" style="display: none;">
-                            <select class="form-control" id="periode_id" name="periode_id" required>
-                                <option value="">- Pilih Periode -</option>
-                                @if(isset($periode) && $periode->isNotEmpty())
-                                    @foreach($periode as $per)
-                                        <option value="{{ $per->periode_id }}">{{ $per->periode_nama }}</option>
-                                    @endforeach
-                                @else
-                                    <option value="">Periode tidak tersedia</option>
-                                @endif
-                            </select>
-                        </div>
-
-                    </div>
+                </div>
 
                 <button type="submit">Sign Up</button>
             </form>
@@ -403,7 +460,7 @@
             <div class="overlay">
                 <div class="overlay-panel overlay-left">
                     <h1>Welcome Back!</h1>
-                    <p>To keep connected with us please login with your personal info</p>
+                    <p style="color: white">To keep connected with us please login with your personal info</p>
                     <button class="ghost" id="signIn">Sign In</button>
 
                 </div>
@@ -417,17 +474,17 @@
         </div>
     </div>
 
-        <!-- jQuery -->
-        <script src="{{ asset('adminlte/plugins/jquery/jquery.min.js') }}"></script>
-        <!-- Bootstrap 4 -->
-        <script src="{{ asset('adminlte/plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-        <!-- jquery-validation -->
-        <script src="{{ asset('adminlte/plugins/jquery-validation/jquery.validate.min.js') }}"></script>
-        <script src="{{ asset('adminlte/plugins/jquery-validation/additional-methods.min.js') }}"></script>
-        <!-- SweetAlert2 -->
-        <script src="{{ asset('adminlte/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
-        <!-- AdminLTE App -->
-        <script src="{{ asset('adminlte/dist/js/adminlte.min.js') }}"></script>
+    <!-- jQuery -->
+    <script src="{{ asset('adminlte/plugins/jquery/jquery.min.js') }}"></script>
+    <!-- Bootstrap 4 -->
+    <script src="{{ asset('adminlte/plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <!-- jquery-validation -->
+    <script src="{{ asset('adminlte/plugins/jquery-validation/jquery.validate.min.js') }}"></script>
+    <script src="{{ asset('adminlte/plugins/jquery-validation/additional-methods.min.js') }}"></script>
+    <!-- SweetAlert2 -->
+    <script src="{{ asset('adminlte/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
+    <!-- AdminLTE App -->
+    <script src="{{ asset('adminlte/dist/js/adminlte.min.js') }}"></script>
 
     <script>
         const signUpButton = document.getElementById('signUp');
@@ -623,7 +680,7 @@
                 }
             });
         });
-
     </script>
 </body>
+
 </html>
