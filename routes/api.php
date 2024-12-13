@@ -95,6 +95,7 @@ Route::middleware(['auth:api'])->group(function () {
         Route::get('/{id}/mhs',[KaprodiController::class,'indexmhs']);
         Route::get('/{id}/mhssurat',[KaprodiController::class,'indexmhssurat']);
         route::post('/approvesurat',[KaprodiController::class,'approve']);
+        route::get('/getriwayat',[KaprodiController::class,'riwayat']);
     });
 
     Route::get('/geturl/{id}', [KaprodiController::class, 'getQrUrl']);

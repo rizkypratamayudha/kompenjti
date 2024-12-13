@@ -54,8 +54,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboardDos', [DashboardDosenController::class, 'index'])->middleware('authorize:DSN');
     Route::get('/dashboardKap', [DashboardKaprodiController::class, 'index'])->middleware('authorize:KPD');
 
-
-
     Route::group(['prefix'=>'profile'], function(){
         Route::get('/edit', [UserController::class, 'profile']);
         Route::post('/update_profile', [UserController::class, 'update_profile']);

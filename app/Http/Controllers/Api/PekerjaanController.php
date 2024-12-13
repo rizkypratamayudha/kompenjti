@@ -20,7 +20,7 @@ class PekerjaanController extends Controller
 {
     public function index()
     {
-        $pekerjaan = PekerjaanModel::with('detail_pekerjaan.persyaratan', 'progres', 'user.detailDosen', 'detail_pekerjaan.kompetensiDosen.kompetensiAdmin')->where('status', 'open')->get();
+        $pekerjaan = PekerjaanModel::with('detail_pekerjaan.persyaratan', 'progres', 'user.detailDosen', 'detail_pekerjaan.kompetensiDosen.kompetensiAdmin')->where('status', 'open')->orderby('created_at','desc')->get();
 
         return response()->json($pekerjaan);
     }
