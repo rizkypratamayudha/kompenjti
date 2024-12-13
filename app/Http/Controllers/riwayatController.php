@@ -323,9 +323,9 @@ class riwayatController extends Controller
             'pekerjaan_id' => $pekerjaan_id,
         ]);
 
-        // ApprovePekerjaanModel::where('user_id', $userId)
-        // ->where('pekerjaan_id', $pekerjaan_id)
-        // ->delete();
+        ApprovePekerjaanModel::where('user_id', $userId)
+        ->where('pekerjaan_id', $pekerjaan_id)
+        ->update(['status' => 'selesai']);
 
         return redirect()->back()->with('success', 'Permintaan cetak surat berhasil dibuat.');
     } catch (\Exception $e) {

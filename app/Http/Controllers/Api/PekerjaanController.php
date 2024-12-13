@@ -54,14 +54,14 @@ class PekerjaanController extends Controller
         }
 
         // Cek apakah user sudah melamar pekerjaan ini sebelumnya di approve pekerjaan
-        $existingApplyapprove = ApprovePekerjaanModel::where('pekerjaan_id', $request->pekerjaan_id)
-            ->where('user_id', $request->user_id)
+        $existingApplyapprove = ApprovePekerjaanModel::
+            where('user_id', $request->user_id)->where('status', 'belum')
             ->exists();
 
         if ($existingApplyapprove) {
             return response()->json([
                 'status' => false,
-                'message' => 'Anda sudah melamar pekerjaan ini sebelumnya dan sudah diterima.',
+                'message' => 'Anda sudah diterima pada pekerjaan, harap selesaikan pekerjaan anda.',
             ], 409);
         }
 
@@ -154,11 +154,11 @@ class PekerjaanController extends Controller
             ApprovePekerjaanModel::create([
                 'pekerjaan_id' => $request->pekerjaan_id,
                 'user_id' => $request->user_id,
+                'status' => 'belum'
             ]);
 
             // Hapus pekerjaan yang masih dalam status pending
             PendingPekerjaanModel::where('user_id', $request->user_id)
-                ->where('pekerjaan_id', $request->pekerjaan_id)
                 ->delete();
 
             // Kirimkan notifikasi kepada pelamar

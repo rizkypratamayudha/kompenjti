@@ -69,6 +69,7 @@ class ListPekerjaanMHSController extends Controller
         PendingPekerjaanModel::create([
             'pekerjaan_id' => $request->pekerjaan_id,
             'user_id' => $request->user_id,
+            'status' => 'belum',
         ]);
 
         return back()->with('success', 'Anda Telah Berhasil Melamar Pekerjaan');
@@ -117,8 +118,8 @@ class ListPekerjaanMHSController extends Controller
             ->where('user_id', $userId)
             ->exists();
 
-        $isApprove = ApprovePekerjaanModel::where('pekerjaan_id', $pekerjaanId)
-            ->where('user_id', $userId)
+        $isApprove = ApprovePekerjaanModel::
+            where('user_id', $userId)->where('status','belum')
             ->exists();
 
         // Mengembalikan status apply dan approve

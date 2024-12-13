@@ -13,7 +13,7 @@ class t_approve_cetak_model extends Model
 
     protected $primaryKey = 't_approve_cetak_id';
 
-    protected $fillable = ['t_approve_cetak_id', 'user_id', 'pekerjaan_id', 'user_id_kap', 'created_at', 'updated_at'];
+    protected $fillable = ['t_approve_cetak_id', 'user_id', 'pekerjaan_id', 'user_id_kap','created_at', 'updated_at'];
 
     public function user()
     {

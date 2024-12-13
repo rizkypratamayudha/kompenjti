@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\ApprovePekerjaanModel;
 use App\Models\PekerjaanModel;
 use App\Models\PengumpulanModel;
 use App\Models\ProgresModel;
@@ -232,6 +233,10 @@ class MahasiswaController extends Controller
             'user_id' => $userId,
             'pekerjaan_id' => $pekerjaan_id,
         ]);
+
+        ApprovePekerjaanModel::where('user_id', $userId)
+        ->where('pekerjaan_id', $pekerjaan_id)
+        ->update(['status' => 'selesai']);
 
         return response()->json([
             'status' => 'success',
