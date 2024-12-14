@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\API\DashboardDsnController;
 use App\Http\Controllers\API\DashboardKapController;
+use App\Http\Controllers\Api\NotifikasiController;
 use App\Http\Controllers\Api\PekerjaanController;
 use App\Http\Controllers\Api\RegisterController;
 use App\Http\Controllers\Api\LoginController;
@@ -84,7 +85,9 @@ Route::middleware(['auth:api'])->group(function () {
         Route::post('/gambar',[MahasiswaController::class,'store_gambar']);
         Route::post('/file',[MahasiswaController::class,'store_file']);
         Route::post('/{id}/request-cetak-surat',[MahasiswaController::class,'requestCetakSurat']);
-
+        Route::get('/{id}/notifikasi',[NotifikasiController::class,'index']);
+        Route::delete('/{id}/notifikasihapus',[NotifikasiController::class,'dibaca']);
+        Route::get('/{id}/notifikasijumlah',[NotifikasiController::class,'hitung_notif_notifikasi']);
     });
     Route::group(['prefix' => 'dosen'], function () {
         Route::get('/dashboard', [DashboardDsnController::class, 'index']);
