@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>E-Kompen</title>
+    <link rel="icon" href="{{asset('icon.png')}}"></link>
     <link href="https://fonts.googleapis.com/css?family=Montserrat:400,800" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet"
@@ -411,7 +412,7 @@
                             style="margin-left: -40px; z-index: 100;"></span>
                     </div>
                 </div>
-                
+
                     <div class="input-group mb-3" id="email-field" style="display: none;">
                         <input id="email" name="email" type="email" class="form-control" placeholder="Email"
                             required>

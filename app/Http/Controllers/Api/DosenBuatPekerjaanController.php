@@ -18,7 +18,7 @@ class DosenBuatPekerjaanController extends Controller
     public function index($user_id)
     {
         // Mengambil data pekerjaan berdasarkan user_id
-        $pekerjaan = PekerjaanModel::where('user_id', $user_id)->get();
+        $pekerjaan = PekerjaanModel::where('user_id', $user_id)->orderBy('created_at','desc')->get();
 
         // Menambahkan jumlah anggota dari tabel detail_pekerjaan
         $pekerjaanData = $pekerjaan->map(function ($item) {
