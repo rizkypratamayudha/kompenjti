@@ -32,7 +32,7 @@
 
             @if ($pekerjaan->isEmpty())
                 <div class="text-center">
-                    <img src="{{asset('pekerjaan_kososng')}}" alt="tidakadapekerjaan" style="max-width: 200px; margin-bottom: 15px;">
+                    <img src="{{asset('pekerjaan_kosong.png')}}" alt="tidakadapekerjaan" style="max-width: 200px; margin-bottom: 15px;">
                     <p class="mt-3">Tidak ada Pekerjaan</p>
                 </div>
             @endif
