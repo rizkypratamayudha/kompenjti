@@ -170,7 +170,7 @@ class KaprodiController extends Controller
 
             // Generate the URL for the QR code
             $hash = hash('sha256', $penerimaan->t_approve_cetak_id);
-            $url = URL::to('surat/download-pdf/' . $hash);
+            $url = URL::to('riwayatPenerimaan/download-pdf/' . $hash);
 
             // Define the path for saving the QR code
             $qrCodePath = public_path('storage/qrcodes/' . $penerimaan->t_approve_cetak_id . '.png');

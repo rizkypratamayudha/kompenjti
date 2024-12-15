@@ -228,6 +228,34 @@ class PekerjanController extends Controller
                 ]);
             }
 
+            // Cek apakah terdapat data di relasi t_approve_pekerjaan
+            if ($pekerjaan->t_approve_pekerjaan()->exists()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Pekerjaan tidak dapat dihapus karena adanya anggota dalam pekerjaan ini'
+                ]);
+            }
+
+            // Cek apakah terdapat data di relasi t_pending_pekerjaan
+            if ($pekerjaan->t_pending_pekerjaan()->exists()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Pekerjaan tidak dapat dihapus karena adanya Pelamar dalam pekerjaan ini'
+                ]);
+            }
+
+            // Cek apakah ada progres yang memiliki pengumpulan
+            $progresDenganPengumpulan = $pekerjaan->progres->filter(function ($progres) {
+                return $progres->pengumpulan()->exists();
+            });
+
+            if ($progresDenganPengumpulan->isNotEmpty()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Pekerjaan tidak dapat dihapus karena memiliki Progres dengan data Pengumpulan'
+                ]);
+            }
+
             try {
                 // Hapus semua data terkait secara bertahap
                 $pekerjaan->detail_pekerjaan->each(function ($detail) {
@@ -238,9 +266,9 @@ class PekerjanController extends Controller
 
                 // Hapus data detail pekerjaan
                 $pekerjaan->detail_pekerjaan()->delete();
-                $pekerjaan->t_approve_pekerjaan()->delete();
-                $pekerjaan->t_pending_pekerjaan()->delete();
                 $pekerjaan->progres()->delete();
+                $pekerjaan->notifikasi()->delete();
+
                 // Hapus data pekerjaan itu sendiri
                 $pekerjaan->delete();
 
@@ -259,6 +287,8 @@ class PekerjanController extends Controller
 
         return redirect('/');
     }
+
+
 
     public function approvePekerjaan(Request $request)
     {
