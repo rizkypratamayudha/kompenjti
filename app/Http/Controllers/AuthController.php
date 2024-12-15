@@ -103,7 +103,7 @@ class AuthController extends Controller
                 'no_hp' => 'required|string',
                 'prodi_id' => 'required_if:level_id,3,4',
                 'angkatan' => 'required_if:level_id,3',
-                'periode_id' => 'required|integer',
+                'periode_id' => 'required_if:level_id,3',
             ];
             $validator = Validator::make($request->all(), $rules);
             if ($validator->fails()) {
