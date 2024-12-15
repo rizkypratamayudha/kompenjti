@@ -7,56 +7,115 @@
         <div class="col-lg-3 col-md-6">
             <div class="card shadow-sm border-0 text-center">
                 <div class="card-body">
-                    <h5>Total Mahasiswa</h5>
-                    <h3 class="text-primary">{{ $totalMahasiswa }}</h3>
+                    <div class="d-flex justify-content-center align-items-center">
+                        <div class="icon-circle bg-primary text-white mr-3">
+                            <i class="fas fa-users fa-2x"></i>
+                        </div>
+                        <div>
+                            <h5>Total Mahasiswa</h5>
+                            <h3 class="text-primary font-weight-bold">{{ $totalMahasiswa }}</h3>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
         <div class="col-lg-3 col-md-6">
             <div class="card shadow-sm border-0 text-center">
                 <div class="card-body">
-                    <h5>Total Dosen/Tendik</h5>
-                    <h3 class="text-primary">{{ $totalDosenTendik }}</h3>
+                    <div class="d-flex justify-content-center align-items-center">
+                        <div class="icon-circle bg-success text-white mr-3">
+                            <i class="fas fa-chalkboard-teacher fa-2x"></i>
+                        </div>
+                        <div>
+                            <h5>Total Dosen/Tendik</h5>
+                            <h3 class="text-success font-weight-bold">{{ $totalDosenTendik }}</h3>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
         <div class="col-lg-3 col-md-6">
             <div class="card shadow-sm border-0 text-center">
                 <div class="card-body">
-                    <h5>Total Kaprodi</h5>
-                    <h3 class="text-primary">{{ $totalKaprodi }}</h3>
+                    <div class="d-flex justify-content-center align-items-center">
+                        <div class="icon-circle bg-warning text-white mr-3">
+                            <i class="fas fa-user-tie fa-2x"></i>
+                        </div>
+                        <div>
+                            <h5>Total Kaprodi</h5>
+                            <h3 class="text-warning font-weight-bold">{{ $totalKaprodi }}</h3>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
         <div class="col-lg-3 col-md-6">
             <div class="card shadow-sm border-0 text-center">
                 <div class="card-body">
-                    <h5>Total Pekerjaan</h5>
-                    <h3 class="text-primary">{{ $totalPekerjaan }}</h3>
+                    <div class="d-flex justify-content-center align-items-center">
+                        <div class="icon-circle bg-danger text-white mr-3">
+                            <i class="fas fa-briefcase fa-2x"></i>
+                        </div>
+                        <div>
+                            <h5>Total Pekerjaan</h5>
+                            <h3 class="text-danger font-weight-bold">{{ $totalPekerjaan }}</h3>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-        <!-- Statistik Kompen -->
-<div class="row mb-4">
-    <div class="col-lg-6">
-        <div class="card shadow-sm border-0">
-            <div class="card-body text-center">
-                <h5>Mahasiswa Belum Kompen</h5>
-                <h3 class="text-danger">{{ $mahasiswaBelumKompen }}</h3>
+    <!-- Statistik Kompen -->
+    <div class="row mb-4">
+        <div class="col-lg-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-body d-flex justify-content-center align-items-center">
+                    <div class="icon-circle bg-danger text-white mr-3">
+                        <i class="fas fa-times-circle fa-2x"></i>
+                    </div>
+                    <div>
+                        <h5>Mahasiswa Belum Kompen</h5>
+                        <h3 class="text-danger font-weight-bold">{{ $mahasiswaBelumKompen }}</h3>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="col-lg-6">
-        <div class="card shadow-sm border-0">
-            <div class="card-body text-center">
-                <h5>Mahasiswa Sudah Kompen</h5>
-                <h3 class="text-success">{{ $mahasiswaSudahKompen }}</h3>
+        <div class="col-lg-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-body d-flex justify-content-center align-items-center">
+                    <div class="icon-circle bg-success text-white mr-3">
+                        <i class="fas fa-check-circle fa-2x"></i>
+                    </div>
+                    <div>
+                        <h5>Mahasiswa Sudah Kompen</h5>
+                        <h3 class="text-success font-weight-bold">{{ $mahasiswaSudahKompen }}</h3>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+    .icon-circle {
+        width: 60px;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+    }
+    .card-body h5 {
+        margin-bottom: 5px;
+        font-size: 16px;
+        font-weight: 600;
+    }
+    .card-body h3 {
+        margin-top: 0;
+        font-size: 28px;
+    }
+</style>
 
 <!-- Pie Chart in a Full Card with Yellow Header -->
 <div class="row mb-4">
