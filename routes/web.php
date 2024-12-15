@@ -12,7 +12,7 @@ use App\Http\Controllers\KompetensiController;
 use App\Http\Controllers\LevelController;
 use App\Http\Controllers\ListPekerjaanMHSController;
 use App\Http\Controllers\MahasiswaController;
-use App\Http\Controllers\matkulController;
+use App\Http\Controllers\MatkulController;
 use App\Http\Controllers\notifikasiController;
 use App\Http\Controllers\PekerjanController;
 use App\Http\Controllers\PenerimaanSuratController;
