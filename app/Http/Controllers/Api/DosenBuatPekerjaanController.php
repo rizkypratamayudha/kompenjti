@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\ApprovePekerjaanModel;
 use App\Models\PekerjaanModel;
 use App\Models\detail_pekerjaanModel;
 use Illuminate\Http\Request;
@@ -10,8 +11,10 @@ use App\Models\ProgresModel;
 use App\Models\PersyaratanModel;
 use App\Models\kompetensi_dosenModel;
 use App\Models\kompetensi_adminModel;
+use App\Models\notifikasiModel;
 use carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class DosenBuatPekerjaanController extends Controller
 {
@@ -529,6 +532,9 @@ class DosenBuatPekerjaanController extends Controller
             // Cari pekerjaan berdasarkan ID
             $pekerjaan = PekerjaanModel::findOrFail($id);
 
+            // Hapus data terkait di tabel notifikasi
+            NotifikasiModel::where('pekerjaan_id', $pekerjaan->pekerjaan_id)->delete();
+
             // Hapus data terkait di tabel kompetensi_dosen
             $detailPekerjaan = detail_pekerjaanModel::where('pekerjaan_id', $pekerjaan->pekerjaan_id)->first();
             if ($detailPekerjaan) {
@@ -563,4 +569,108 @@ class DosenBuatPekerjaanController extends Controller
             ], 500);
         }
     }
+
+    public function getAnggota($id)
+    {
+        try {
+            $anggota = ApprovePekerjaanModel::with('user.detailMahasiswa.prodi', 'user.detailMahasiswa.periode')
+                ->where('pekerjaan_id', $id)
+                ->get();
+
+            if ($anggota->isEmpty()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Data anggota tidak ditemukan',
+                ], 404);
+            }
+
+            return response()->json([
+                'status' => true,
+                'data' => $anggota,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function kickPekerjaan($pekerjaanId, $userId)
+    {
+        // Validasi pekerjaan_id dari URL
+        $pekerjaanExists = ApprovePekerjaanModel::where('pekerjaan_id', $pekerjaanId)
+            ->where('user_id', $userId)
+            ->exists();
+
+        if (!$pekerjaanExists) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Pekerjaan atau user tidak ditemukan',
+            ], 404);
+        }
+
+        // Hapus data persetujuan pekerjaan
+        ApprovePekerjaanModel::where('pekerjaan_id', $pekerjaanId)
+            ->where('user_id', $userId)
+            ->delete();
+
+        // Buat notifikasi untuk user
+        notifikasiModel::create([
+            'user_id' => $userId,
+            'pekerjaan_id' => $pekerjaanId,
+            'pesan' => 'Coba apply di pekerjaan lain, anda telah ditolak di pekerjaan',
+            'status' => 'belum',
+            'user_id_kap' => null,
+        ]);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Anggota berhasil dikick',
+        ]);
+    }
+
+    public function getPendingApplicants($pekerjaanId)
+{
+    try {
+        // Query untuk mendapatkan data pelamar pending
+        $pendingApplicants = DB::table('t_pending_pekerjaan')
+            ->where('pekerjaan_id', $pekerjaanId)
+            ->get();
+
+        // Periksa apakah ada data pada tabel t_approve_cetak
+        $approveCetakExists = DB::table('t_approve_cetak')
+            ->where('pekerjaan_id', $pekerjaanId)
+            ->exists();
+
+        // Periksa apakah ada data pada tabel pengumpulan
+        $pengumpulanExists = DB::table('pengumpulan')
+            ->join('progres', 'pengumpulan.progres_id', '=', 'progres.progres_id')
+            ->where('progres.pekerjaan_id', $pekerjaanId)
+            ->exists();
+
+        // Jika ada data pada t_approve_cetak atau pengumpulan, kembalikan pesan kesalahan
+        if ($approveCetakExists || $pengumpulanExists) {
+            return response()->json([
+                'error' => 'Tidak bisa menghapus pekerjaan.',
+                'message' => 'Tidak bisa menghapus pekerjaan karena terdapat mahasiswa yang telah mengumpulkan progres pekerjaan.',
+            ], 400); // HTTP 400 Bad Request
+        }
+
+        // Jika tidak ada data pending dan tidak ada pengumpulan/approve cetak
+        if ($pendingApplicants->isEmpty()) {
+            return response()->json([], 200); // Kembalikan array kosong
+        }
+
+        // Kembalikan data pelamar pending
+        return response()->json($pendingApplicants, 200);
+    } catch (\Exception $e) {
+        // Tangani error
+        return response()->json([
+            'error' => 'Gagal mendapatkan data pelamar pending.',
+            'message' => $e->getMessage(),
+        ], 500);
+    }
+}
+
 }

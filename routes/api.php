@@ -39,6 +39,7 @@ Route::get('detail-mahasiswa/user/{user_id}', [DetailMahasiswaController::class,
 Route::put('kompetensi/update/{id}', [KompetensiController::class, 'update']);
 Route::delete('kompetensi/delete/{id}', [KompetensiController::class, 'destroy']);
 Route::get('kompetensi/show/{id}', [KompetensiController::class, 'getKompetensiDetail']);
+Route::get('mahasiswa/user/{userId}', [KompetensiController::class, 'getDetailMahasiswaIdByUserId']);
 Route::get('kompetensi-admin', [KompetensiController::class, 'getKompetensiAdmin']);
 Route::get('/dosen/pekerjaan/{user_id}', [DosenBuatPekerjaanController::class, 'index']);
 Route::post('/dosen/pekerjaan/create', [DosenBuatPekerjaanController::class, 'store']);
@@ -53,6 +54,9 @@ Route::delete('/pekerjaan/{pekerjaanId}/progres/{progresId}', [DosenBuatPekerjaa
 Route::delete('/pekerjaan/{pekerjaanId}/kompetensi/{kompetensiDosenId}', [DosenBuatPekerjaanController::class, 'deleteKompetensi']);
 Route::post('/pekerjaan/{pekerjaanId}/update-status', [DosenBuatPekerjaanController::class, 'updateStatus']);
 Route::delete('/dosen/pekerjaan/delete/{id}', [DosenBuatPekerjaanController::class, 'delete']);
+Route::get('/dosen/lihat-daftar-mahasiswa/{id}', [DosenBuatPekerjaanController::class, 'getAnggota']);
+Route::delete('/dosen/{pekerjaanId}/kick-mahasiswa/{userId}', [DosenBuatPekerjaanController::class, 'kickPekerjaan']);
+Route::get('/dosen/pending-pekerjaan/{pekerjaanId}', [DosenBuatPekerjaanController::class, 'getPendingApplicants']);
 
 
 Route::middleware(['auth:api'])->group(function () {

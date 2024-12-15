@@ -8,6 +8,7 @@ use App\Models\KompetensiModel;
 use App\Models\detail_mahasiswaModel;
 use App\Models\PeriodeModel;
 use App\Models\kompetensi_adminModel;
+use Illuminate\Support\Facades\DB;
 
 class KompetensiController extends Controller
 {
@@ -47,7 +48,6 @@ class KompetensiController extends Controller
         return response()->json(['message' => 'Kompetensi berhasil disimpan', 'kompetensi' => $kompetensi]);
     }
 
-
     // Mendapatkan periode berdasarkan user_id
     public function getPeriodeByUserId($user_id)
     {
@@ -63,6 +63,7 @@ class KompetensiController extends Controller
 
         return response()->json(['message' => 'User periode not found'], 404);
     }
+
     public function update(Request $request, $id)
     {
         $validatedData = $request->validate([
@@ -94,16 +95,16 @@ class KompetensiController extends Controller
     public function getKompetensiDetail($id)
     {
         $kompetensi = kompetensiModel::where('kompetensi_id', $id)
-            ->with(['user', 'kompetensiAdmin']) // Pastikan relasi `kompetensiAdmin` didefinisikan
+            ->with(['user', 'kompetensiAdmin', 'user.detailMahasiswa']) // Pastikan relasi detailMahasiswa didefinisikan
             ->first();
 
         if ($kompetensi) {
-            // Pastikan data dikembalikan lengkap, tambahkan default jika null
             return response()->json([
                 'success' => true,
                 'data' => [
                     'kompetensi_id' => $kompetensi->kompetensi_id,
                     'user_id' => $kompetensi->user_id ?? 0,
+                    'detail_mahasiswa_id' => $kompetensi->user->detailMahasiswa->detail_mahasiswa_id ?? 0, // Ambil detail_mahasiswa_id
                     'periode' => $kompetensi->periode->periode_nama ?? 'Tidak Ada Periode',
                     'kompetensi_admin_id' => $kompetensi->kompetensi_admin_id ?? 0,
                     'kompetensi_nama' => $kompetensi->kompetensiAdmin->kompetensi_nama ?? 'Tidak Ada Nama Kompetensi',
@@ -120,10 +121,36 @@ class KompetensiController extends Controller
             ], 404);
         }
     }
+
     public function getKompetensiAdmin()
     {
         $kompetensiAdmin = kompetensi_adminModel::all();
 
         return response()->json($kompetensiAdmin);
+    }
+
+    public function getDetailMahasiswaIdByUserId($userId)
+    {
+        $detailMahasiswa = DB::table('detail_mahasiswa')
+            ->join('m_user', 'detail_mahasiswa.user_id', '=', 'm_user.user_id') // Join ke tabel m_user
+            ->where('detail_mahasiswa.user_id', $userId)
+            ->select('detail_mahasiswa.detail_mahasiswa_id', 'm_user.nama', 'm_user.username') // Ambil detail_mahasiswa_id, nama, dan username
+            ->first();
+
+        if ($detailMahasiswa) {
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'detail_mahasiswa_id' => $detailMahasiswa->detail_mahasiswa_id,
+                    'nama' => $detailMahasiswa->nama,
+                    'username' => $detailMahasiswa->username
+                ]
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Detail Mahasiswa ID not found'
+            ], 404);
+        }
     }
 }
