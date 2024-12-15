@@ -59,8 +59,7 @@
                             class="nav-link {{ $activeMenu == 'validasi' ? 'active' : '' }}">
                             <i class="nav-icon fas fa-check-double"></i>
                             <p>Validasi Registrasi</p>
-                            <span
-                                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                            <span class="badge badge-danger badge-validasi position-absolute top-0 start-100 translate-middle rounded-pill">
                             </span>
                         </a>
                     </li>
@@ -257,7 +256,7 @@
         // Panggil fungsi untuk badge pelamar pekerjaan
         updateBadge('{{ url('/hitung-notif-pelamar') }}', '.badge-pelamar');
         updateBadge('{{ url('/hitung-notif-pelamar-admin') }}', '.badge-pelamar-admin');
-        updateBadge('{{ url('/hitung-notif') }}', '.badge');
+        updateBadge('{{ url('/hitung-notif') }}', '.badge-validasi');
         updateBadge('{{ url('/hitung-notif-notifikasi') }}', '.badge-notifikasi');
     });
 </script>
