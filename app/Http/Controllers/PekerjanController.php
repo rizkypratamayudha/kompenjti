@@ -217,62 +217,77 @@ class PekerjanController extends Controller
     }
 
     public function delete_ajax(Request $request, string $pekerjaan_id)
-{
-    if ($request->ajax() || $request->wantsJson()) {
-        $pekerjaan = PekerjaanModel::find($pekerjaan_id);
+    {
+        if ($request->ajax() || $request->wantsJson()) {
+            $pekerjaan = PekerjaanModel::find($pekerjaan_id);
 
-        if (!$pekerjaan) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Data Pekerjaan tidak ditemukan'
-            ]);
-        }
+            if (!$pekerjaan) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Data Pekerjaan tidak ditemukan'
+                ]);
+            }
 
-        // Cek apakah terdapat data di relasi t_approve_pekerjaan
-        if ($pekerjaan->t_approve_pekerjaan()->exists()) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Pekerjaan tidak dapat dihapus karena adanya anggota dalam pekerjaan ini'
-            ]);
-        }
-        if ($pekerjaan->t_pending_pekerjaan()->exists()) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Pekerjaan tidak dapat dihapus karena adanya Pelamar dalam pekerjaan ini'
-            ]);
-        }
+            // Cek apakah terdapat data di relasi t_approve_pekerjaan
+            if ($pekerjaan->t_approve_pekerjaan()->exists()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Pekerjaan tidak dapat dihapus karena adanya anggota dalam pekerjaan ini'
+                ]);
+            }
 
-        try {
-            // Hapus semua data terkait secara bertahap
-            $pekerjaan->detail_pekerjaan->each(function ($detail) {
-                // Hapus persyaratan dan kompetensi dosen terkait
-                $detail->persyaratan()->delete();
-                $detail->kompetensiDosen()->delete();
+            // Cek apakah terdapat data di relasi t_pending_pekerjaan
+            if ($pekerjaan->t_pending_pekerjaan()->exists()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Pekerjaan tidak dapat dihapus karena adanya Pelamar dalam pekerjaan ini'
+                ]);
+            }
+
+            // Cek apakah ada progres yang memiliki pengumpulan
+            $progresDenganPengumpulan = $pekerjaan->progres->filter(function ($progres) {
+                return $progres->pengumpulan()->exists();
             });
 
-            // Hapus data detail pekerjaan
-            $pekerjaan->detail_pekerjaan()->delete();
-            $pekerjaan->progres()->delete();
-            $pekerjaan->notifikasi()->delete();
+            if ($progresDenganPengumpulan->isNotEmpty()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Pekerjaan tidak dapat dihapus karena memiliki Progres dengan data Pengumpulan'
+                ]);
+            }
 
-            // Hapus data pekerjaan itu sendiri
-            $pekerjaan->delete();
+            try {
+                // Hapus semua data terkait secara bertahap
+                $pekerjaan->detail_pekerjaan->each(function ($detail) {
+                    // Hapus persyaratan dan kompetensi dosen terkait
+                    $detail->persyaratan()->delete();
+                    $detail->kompetensiDosen()->delete();
+                });
 
-            return response()->json([
-                'status' => true,
-                'message' => 'Data Pekerjaan berhasil dihapus'
-            ]);
-        } catch (\Exception $e) {
-            // Tangani error lainnya
-            return response()->json([
-                'status' => false,
-                'message' => 'Data gagal dihapus: ' . $e->getMessage()
-            ]);
+                // Hapus data detail pekerjaan
+                $pekerjaan->detail_pekerjaan()->delete();
+                $pekerjaan->progres()->delete();
+                $pekerjaan->notifikasi()->delete();
+
+                // Hapus data pekerjaan itu sendiri
+                $pekerjaan->delete();
+
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Data Pekerjaan berhasil dihapus'
+                ]);
+            } catch (\Exception $e) {
+                // Tangani error lainnya
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Data gagal dihapus: ' . $e->getMessage()
+                ]);
+            }
         }
+
+        return redirect('/');
     }
 
-    return redirect('/');
-}
 
 
     public function approvePekerjaan(Request $request)
